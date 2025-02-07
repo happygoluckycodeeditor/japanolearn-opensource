@@ -1,6 +1,6 @@
 export default function SetupForm(): JSX.Element {
   return (
-    <div className="card lg:card-side bg-base-100 shadow-xl">
+    <div className="card lg:card-side bg-base-100 shadow-xl animate-[fadeIn_0.3s_ease-in-out]">
       <div className="card-body">
         <h2 className="card-title">Welcome! Let&apos;s set up your profile</h2>
         <div className="form-control w-full max-w-xs">
