@@ -5,7 +5,7 @@ export default function SetupForm(): JSX.Element {
         <h2 className="card-title">Welcome! Let&apos;s set up your profile</h2>
         <div className="form-control w-full max-w-xs">
           <label className="label">
-            <span className="label-text">What&apos;s your name?</span>
+            <span className="label-text">Setup your username</span>
           </label>
           <input
             type="text"
