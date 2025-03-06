@@ -24,7 +24,8 @@ if (process.contextIsolated) {
   window.electron = {
     ...electronAPI,
     ipcRenderer: {
-      invoke: (channel: string, ...args: unknown[]): Promise<unknown> => ipcRenderer.invoke(channel, ...args)
+      invoke: (channel: string, ...args: unknown[]): Promise<unknown> =>
+        ipcRenderer.invoke(channel, ...args)
     }
   }
   // @ts-ignore (define in dts)

@@ -6,10 +6,10 @@ export default function SetupForm(): JSX.Element {
 
   const handleSubmit = async (): Promise<void> => {
     if (!username.trim()) return
-    
+
     // Save to database using IPC
     await window.electron.ipcRenderer.invoke('save-username', username)
-    
+
     // Update UI state
     setIsSubmitted(true)
   }

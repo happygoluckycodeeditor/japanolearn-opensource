@@ -59,7 +59,6 @@ ipcMain.handle('reset-database', () => {
   }
 })
 
-
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
