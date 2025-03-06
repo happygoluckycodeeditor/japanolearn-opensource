@@ -2,6 +2,63 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import Database from 'better-sqlite3'
+
+// Initialize database in the user data directory
+const db = new Database(join(app.getPath('userData'), 'japanolearn.db'))
+
+// Create users table if it doesn't exist
+db.exec(`
+  CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  )
+`)
+
+// Handle save-username IPC event
+ipcMain.handle('save-username', (_event, username) => {
+  try {
+    const stmt = db.prepare('INSERT INTO users (username) VALUES (?)')
+    const result = stmt.run(username)
+    return { success: true, id: result.lastInsertRowid }
+  } catch (error) {
+    console.error('Error saving username:', error)
+    if (error instanceof Error) {
+      return { success: false, error: error.message }
+    } else {
+      return { success: false, error: 'An unknown error occurred' }
+    }
+  }
+})
+
+// Add this handler to check database content
+ipcMain.handle('get-users', () => {
+  try {
+    const stmt = db.prepare('SELECT * FROM users')
+    const users = stmt.all()
+    return { success: true, users }
+  } catch (error) {
+    console.error('Error fetching users:', error)
+    if (error instanceof Error) {
+      return { success: false, error: error.message }
+    } else {
+      return { success: false, error: 'An unknown error occurred with DB Fetching' }
+    }
+  }
+})
+
+// Add this handler to reset users table
+ipcMain.handle('reset-database', () => {
+  try {
+    db.prepare('DELETE FROM users').run()
+    return { success: true, message: 'Database reset successfully' }
+  } catch (error) {
+    console.error('Error resetting database:', error)
+    return { success: false, error: 'Database reset was not successful' }
+  }
+})
+
 
 function createWindow(): void {
   // Create the browser window.
