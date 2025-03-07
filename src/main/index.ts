@@ -5,10 +5,11 @@ import icon from '../../resources/icon.png?asset'
 import Database from 'better-sqlite3'
 
 // Initialize database in the user data directory
-const db = new Database(join(app.getPath('userData'), 'japanolearn.db'))
+const userDb = new Database(join(app.getPath('userData'), 'UserData.db'))
+const lessonDb = new Database(join(app.getPath('userData'), 'japanolearn.db'))
 
-// Create users table if it doesn't exist
-db.exec(`
+// User database setup
+userDb.exec(`
   CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT NOT NULL,
@@ -16,10 +17,20 @@ db.exec(`
   )
 `)
 
+// Lesson database setup (example)
+lessonDb.exec(`
+  CREATE TABLE IF NOT EXISTS lessons (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    difficulty INTEGER NOT NULL
+  )
+`)
+
 // Handle save-username IPC event
 ipcMain.handle('save-username', (_event, username) => {
   try {
-    const stmt = db.prepare('INSERT INTO users (username) VALUES (?)')
+    const stmt = userDb.prepare('INSERT INTO users (username) VALUES (?)')
     const result = stmt.run(username)
     return { success: true, id: result.lastInsertRowid }
   } catch (error) {
@@ -35,7 +46,7 @@ ipcMain.handle('save-username', (_event, username) => {
 // Add this handler to check database content
 ipcMain.handle('get-users', () => {
   try {
-    const stmt = db.prepare('SELECT * FROM users')
+    const stmt = userDb.prepare('SELECT * FROM users')
     const users = stmt.all()
     return { success: true, users }
   } catch (error) {
@@ -51,7 +62,7 @@ ipcMain.handle('get-users', () => {
 // Add this handler to reset users table
 ipcMain.handle('reset-database', () => {
   try {
-    db.prepare('DELETE FROM users').run()
+    userDb.prepare('DELETE FROM users').run()
     return { success: true, message: 'Database reset successfully' }
   } catch (error) {
     console.error('Error resetting database:', error)

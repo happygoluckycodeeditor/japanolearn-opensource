@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import HomePage from './components/HomePage'
 import SetupForm from './components/SetupForm'
+import Dashboard from './components/Dashboard'
 
 export default function App(): JSX.Element {
   return (
@@ -13,6 +14,7 @@ export default function App(): JSX.Element {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/setup" element={<SetupForm />} />
+            <Route path="/dashboard" element={<Dashboard />} />
           </Routes>
         </div>
       </div>
