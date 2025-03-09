@@ -23,7 +23,7 @@ export default function Dashboard(): JSX.Element {
             <h2 className="card-title">Today&apos;s Lessons</h2>
             <ul className="menu bg-base-200 rounded-box">
               <li>
-                <a>Hiragana Basics</a>
+                <a>Hiragana Basics We will add a better Dashboard</a>
               </li>
               <li>
                 <a>Common Greetings</a>
