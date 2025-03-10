@@ -1,9 +1,17 @@
 import React from 'react'
 
 const Navbar: React.FC = () => {
+  // This function will now open the confirmation modal instead of quitting directly
   const handleQuit = (): void => {
-    // This would be implemented to handle application quit
-    console.log('Quit application')
+    const modal = document.getElementById('quit_confirmation_modal') as HTMLDialogElement
+    modal?.showModal()
+  }
+
+  // This function will be called when user confirms quitting
+  const confirmQuit = (): void => {
+    // For Electron apps, we need to use the window.electron API
+    // Assuming you have an IPC channel set up for quitting the app
+    window.electron.ipcRenderer.send('quit-app')
   }
 
   return (
@@ -85,6 +93,24 @@ const Navbar: React.FC = () => {
           Quit
         </button>
       </div>
+
+      {/* Quit Confirmation Modal */}
+      <dialog id="quit_confirmation_modal" className="modal modal-bottom sm:modal-middle">
+        <div className="modal-box">
+          <h3 className="font-bold text-lg">Confirm Exit</h3>
+          <p className="py-4">Are you sure you want to quit JapanoLearn?</p>
+          <div className="modal-action">
+            <form method="dialog" className="flex gap-2">
+              {/* This button will close the modal without quitting */}
+              <button className="btn">Cancel</button>
+              {/* This button will close the modal and quit the app */}
+              <button className="btn btn-primary" onClick={confirmQuit}>
+                Quit
+              </button>
+            </form>
+          </div>
+        </div>
+      </dialog>
     </div>
   )
 }

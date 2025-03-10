@@ -10,8 +10,16 @@ const api = {}
 if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld('electron', {
-      ...electronAPI,
       ipcRenderer: {
+        // Make sure 'quit-app' is included in the list of exposed channels
+        send: (channel: string, ...args: unknown[]) => {
+          if (
+            ['ping', 'quit-app', 'save-username' /* other allowed channels */].includes(channel)
+          ) {
+            ipcRenderer.send(channel, ...args)
+          }
+        },
+        // other methods you might need
         invoke: (channel, ...args) => ipcRenderer.invoke(channel, ...args)
       }
     })
