@@ -8,13 +8,19 @@ import Navbar from './components/Navbar'
 const AppContent = (): JSX.Element => {
   const location = useLocation()
   const showNavbar = !['/', '/setup'].includes(location.pathname)
+  // Add this new condition to only show welcome text on specific routes
+  const showWelcomeText = ['/', '/setup'].includes(location.pathname)
 
   return (
     <div className="flex flex-col h-screen bg-gray-200">
       {showNavbar && <Navbar />}
       <div className="flex flex-col items-center justify-center flex-grow">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Japanolearn</h1>
-        <p className="text-lg mb-8">This is the opensource version!</p>
+        {showWelcomeText && (
+          <>
+            <h1 className="text-4xl font-bold mb-4">Welcome to Japanolearn</h1>
+            <p className="text-lg mb-8">This is the opensource version!</p>
+          </>
+        )}
 
         <div className="transition-all duration-300 ease-in-out">
           <Routes>
@@ -27,6 +33,7 @@ const AppContent = (): JSX.Element => {
     </div>
   )
 }
+
 export default function App(): JSX.Element {
   return (
     <BrowserRouter>
