@@ -1,5 +1,8 @@
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry'
 import { useEffect, useState } from 'react'
+import img1 from '../assets/images/img1.svg'
+import img2 from '../assets/images/img2.svg'
+import img3 from '../assets/images/img3.svg'
 
 export default function Dashboard(): JSX.Element {
   const [username, setUsername] = useState('User')
@@ -27,6 +30,7 @@ export default function Dashboard(): JSX.Element {
         <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 3 }}>
           <Masonry gutter="16px">
             {/* Hiragana Card */}
+            {/* Hiragana Card with Background Image */}
             <div
               className="
               relative
@@ -41,18 +45,29 @@ export default function Dashboard(): JSX.Element {
               hover:shadow-2xl
               w-full
               "
+              style={{
+                backgroundImage: `url(${img1})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+                position: 'relative'
+              }}
             >
-              <h2 className="text-lg font-bold text-blue-800">Hiragana Practice</h2>
-              <p className="mt-2 text-blue-700">
-                Master the basic Japanese alphabet with interactive exercises.
-              </p>
-              <div className="absolute bottom-4 right-4 text-4xl">あ</div>
-              <div className="mt-3 text-blue-600">
-                <span className="inline-block bg-blue-100 rounded px-2 py-1 mr-1">あ</span>
-                <span className="inline-block bg-blue-100 rounded px-2 py-1 mr-1">い</span>
-                <span className="inline-block bg-blue-100 rounded px-2 py-1 mr-1">う</span>
-                <span className="inline-block bg-blue-100 rounded px-2 py-1">え</span>
+              {/* Overlay to ensure text readability */}
+              <div className="absolute inset-0 bg-gray-200 opacity-50 rounded-lg"></div>
+
+              {/* Content positioned above the overlay */}
+              <div className="relative z-10">
+                <h2 className="text-lg font-bold text-blue-800">Lessons</h2>
+                <p className="mt-2 text-blue-700">Get Started with Japanese lessons!</p>
+                <div className="mt-3 text-blue-600">
+                  <span className="inline-block bg-blue-100 rounded px-2 py-1 mr-1">あ</span>
+                  <span className="inline-block bg-blue-100 rounded px-2 py-1 mr-1">い</span>
+                  <span className="inline-block bg-blue-100 rounded px-2 py-1 mr-1">う</span>
+                  <span className="inline-block bg-blue-100 rounded px-2 py-1">え</span>
+                </div>
               </div>
+              <div className="absolute bottom-4 right-4 text-4xl z-10">あ</div>
             </div>
 
             {/* Katakana Card */}
@@ -97,17 +112,30 @@ export default function Dashboard(): JSX.Element {
               ease-in-out
               hover:shadow-2xl
               "
+              style={{
+                backgroundImage: `url(${img2})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+                position: 'relative'
+              }}
             >
-              <h2 className="text-lg font-bold text-purple-800">Kanji Explorer</h2>
-              <p className="mt-2 text-purple-700">
-                Discover and learn the most common Japanese characters.
-              </p>
-              <div className="absolute bottom-4 right-4 text-4xl">水</div>
-              <div className="mt-3 text-purple-600">
-                <span className="inline-block bg-purple-100 rounded px-2 py-1 mr-1">人</span>
-                <span className="inline-block bg-purple-100 rounded px-2 py-1 mr-1">日</span>
-                <span className="inline-block bg-purple-100 rounded px-2 py-1 mr-1">月</span>
+              {/* Overlay to ensure text readability */}
+              <div className="absolute inset-0 bg-gray-200 opacity-50 rounded-lg"></div>
+
+              <div className="relative z-10">
+                <h2 className="text-lg font-bold text-purple-800">Dictionary</h2>
+                <p className="mt-2 text-purple-700">
+                  Discover and learn Japanese words and Phrases.
+                </p>
+
+                <div className="mt-3 text-purple-600">
+                  <span className="inline-block bg-purple-100 rounded px-2 py-1 mr-1">人</span>
+                  <span className="inline-block bg-purple-100 rounded px-2 py-1 mr-1">日</span>
+                  <span className="inline-block bg-purple-100 rounded px-2 py-1 mr-1">月</span>
+                </div>
               </div>
+              <div className="absolute bottom-4 right-4 text-4xl">水</div>
             </div>
 
             {/* Vocabulary Card */}
@@ -152,12 +180,26 @@ export default function Dashboard(): JSX.Element {
               ease-in-out
               hover:shadow-2xl
               "
+              style={{
+                backgroundImage: `url(${img3})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+                position: 'relative'
+              }}
             >
-              <h2 className="text-lg font-bold text-amber-800">Grammar Patterns</h2>
-              <p className="mt-2 text-amber-700">Master the structure of Japanese sentences.</p>
-              <div className="mt-3 text-amber-600">
-                <p className="bg-amber-100 rounded p-2 mb-2">わたしは本を読みます。</p>
-                <p className="bg-amber-100 rounded p-2">日本語を勉強しています。</p>
+              {/* Overlay to ensure text readability */}
+              <div className="absolute inset-0 bg-gray-200 opacity-50 rounded-lg"></div>
+
+              <div className="relative z-10">
+                <h2 className="text-lg font-bold text-black-800">Exercises</h2>
+                <p className="mt-2 text-black-700">
+                  Practice what you have learnt in different quizzes!
+                </p>
+                <div className="mt-3 text-black-600">
+                  <p className="bg-gray-100 rounded p-2 mb-2">わたしは__を読みます。</p>
+                  <p className="bg-gray-100 rounded p-2">日本語__勉強しています。</p>
+                </div>
               </div>
             </div>
 
