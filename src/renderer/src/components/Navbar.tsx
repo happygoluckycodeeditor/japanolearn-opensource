@@ -89,6 +89,7 @@ const Navbar: React.FC = () => {
         </ul>
       </div>
       <div className="navbar-end">
+        <button className="btn btn-ghost mr-2">Options</button>
         <button onClick={handleQuit} className="btn btn-primary">
           Quit
         </button>
