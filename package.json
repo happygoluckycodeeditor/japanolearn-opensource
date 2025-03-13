@@ -1,10 +1,10 @@
 {
-  "name": "japanolearn-opensource",
-  "version": "1.0.0",
-  "description": "An Electron application with React and TypeScript",
+  "name": "japanolearn",
+  "version": "0.0.1",
+  "description": "An Electron application made with React for Learning Japanese",
   "main": "./out/main/index.js",
-  "author": "example.com",
-  "homepage": "https://electron-vite.org",
+  "author": "https://github.com/happygoluckycodeeditor",
+  "homepage": "https://www.japanolearn.com",
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
