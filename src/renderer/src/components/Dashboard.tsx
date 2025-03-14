@@ -20,7 +20,7 @@ export default function Dashboard(): JSX.Element {
   }, [])
 
   return (
-    <div className="w-screen max-w-full p-10 pt-20 sm:pl-10 sm:pr-10 md:pl-24 md:pr-24">
+    <div className="w-screen max-w-full p-10 pt-20 sm:pl-10 sm:pr-10 md:pl-24 md:pr-24 bg-gray-200">
       {/*Greeting */}
       <h1 className="text-4xl font-bold mb-4">Welcome to Japanolearn</h1>
       <p className="mt-4">Hello, {username}!</p>

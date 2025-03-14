@@ -1,6 +1,9 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const Navbar: React.FC = () => {
+  const navigate = useNavigate()
+
   // This function will now open the confirmation modal instead of quitting directly
   const handleQuit = (): void => {
     const modal = document.getElementById('quit_confirmation_modal') as HTMLDialogElement
@@ -14,8 +17,17 @@ const Navbar: React.FC = () => {
     window.electron.ipcRenderer.send('quit-app')
   }
 
+  const goToOptions = (): void => {
+    navigate('/options')
+  }
+
+  // New function to navigate to Dashboard
+  const goToDashboard = (): void => {
+    navigate('/dashboard')
+  }
+
   return (
-    <div className="navbar bg-base-100 fixed top-0 w-full z-10">
+    <div className="navbar bg-base-100 fixed top-0 w-full z-30">
       <div className="navbar-start">
         <div className="dropdown">
           <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
@@ -39,7 +51,7 @@ const Navbar: React.FC = () => {
             className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[50] mt-3 w-52 p-2 shadow"
           >
             <li>
-              <a>Home</a>
+              <a onClick={goToDashboard}>Home</a>
             </li>
             <li>
               <a>Lessons</a>
@@ -65,7 +77,7 @@ const Navbar: React.FC = () => {
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1">
           <li>
-            <a>Home</a>
+            <a onClick={goToDashboard}>Home</a>
           </li>
           <li>
             <details className="z-[50]">
@@ -89,7 +101,9 @@ const Navbar: React.FC = () => {
         </ul>
       </div>
       <div className="navbar-end">
-        <button className="btn btn-ghost mr-2">Options</button>
+        <button onClick={goToOptions} className="btn btn-ghost mr-2">
+          Options
+        </button>
         <button onClick={handleQuit} className="btn btn-primary">
           Quit
         </button>
