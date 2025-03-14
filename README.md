@@ -43,4 +43,4 @@ $ npm run build:mac
 $ npm run build:linux
 ```
 
-If you want to have the executable file, plese
+If you want to have the executable file, please let me know.
