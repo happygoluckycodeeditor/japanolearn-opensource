@@ -25,6 +25,21 @@ const Navbar: React.FC = () => {
   const goToDashboard = (): void => {
     navigate('/dashboard')
   }
+  
+  const goToAllLessons = (): void => {
+    navigate('/all-lessons')
+  }
+  const goToExercises = (): void => {
+    navigate('/exercises')
+  }
+  
+  const goToAbout = (): void => {
+    navigate('/about')
+  }
+
+  const goToDictionary = (): void => {
+    navigate('/dictionary')
+  }
 
   return (
     <div className="navbar bg-base-100 fixed top-0 w-full z-30">
@@ -54,21 +69,21 @@ const Navbar: React.FC = () => {
               <a onClick={goToDashboard}>Home</a>
             </li>
             <li>
-              <a>Lessons</a>
+              <a onClick={goToAllLessons}>Lessons</a>
               <ul className="p-2">
                 <li>
-                  <a>All Lessons</a>
+                  <a onClick={goToAllLessons}>All Lessons</a>
                 </li>
               </ul>
             </li>
             <li>
-              <a>Exercises</a>
+              <a onClick={goToExercises}>Exercises</a>
             </li>
             <li>
-              <a>Dictionary</a>
+              <a onClick={goToDictionary}>Dictionary</a>
             </li>
             <li>
-              <a>About</a>
+              <a onClick={goToAbout}>About</a>
             </li>
           </ul>
         </div>
@@ -81,22 +96,22 @@ const Navbar: React.FC = () => {
           </li>
           <li>
             <details className="z-[50]">
-              <summary>Lessons</summary>
+              <summary onClick={goToAllLessons}>Lessons</summary>
               <ul className="p-2">
                 <li>
-                  <a>All Lessons</a>
+                  <a onClick={goToAllLessons}>All Lessons</a>
                 </li>
               </ul>
             </details>
           </li>
           <li>
-            <a>Exercises</a>
+            <a onClick={goToExercises}>Exercises</a>
           </li>
           <li>
-            <a>Dictionary</a>
+            <a onClick={goToDictionary}>Dictionary</a>
           </li>
           <li>
-            <a>About</a>
+            <a onClick={goToAbout}>About</a>
           </li>
         </ul>
       </div>

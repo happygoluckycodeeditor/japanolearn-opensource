@@ -5,6 +5,11 @@ import SetupForm from './components/SetupForm'
 import Dashboard from './components/Dashboard'
 import Navbar from './components/Navbar'
 import Options from './components/Options'
+import Exercises from './components/Exercises'
+import About from './components/About'
+import Dictionary from './components/Dictionary'
+import Lessons from './components/Lessons'
+import AllLessons from './components/AllLessons'
 
 // This component determines whether to show the navbar based on the current route
 const AppContent = (): JSX.Element => {
@@ -43,6 +48,11 @@ const AppContent = (): JSX.Element => {
             <Route path="/setup" element={<SetupForm />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/options" element={<Options />} />
+            <Route path="/exercises" element={<Exercises />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/dictionary" element={<Dictionary />} />
+            <Route path="/lessons" element={<Lessons />} />
+            <Route path="/all-lessons" element={<AllLessons />} />
           </Routes>
         </div>
       </div>
