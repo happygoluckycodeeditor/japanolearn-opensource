@@ -25,14 +25,14 @@ const Navbar: React.FC = () => {
   const goToDashboard = (): void => {
     navigate('/dashboard')
   }
-  
+
   const goToAllLessons = (): void => {
     navigate('/all-lessons')
   }
   const goToExercises = (): void => {
     navigate('/exercises')
   }
-  
+
   const goToAbout = (): void => {
     navigate('/about')
   }
