@@ -27,6 +27,42 @@ lessonDb.exec(`
   )
 `)
 
+// Lesson database setup
+lessonDb.exec(`
+  CREATE TABLE IF NOT EXISTS lessons (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    difficulty INTEGER NOT NULL,
+    order_index INTEGER NOT NULL
+  )
+`)
+
+// Practice tests table
+lessonDb.exec(`
+  CREATE TABLE IF NOT EXISTS practice_tests (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    lesson_id INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    instructions TEXT NOT NULL,
+    FOREIGN KEY (lesson_id) REFERENCES lessons(id)
+  )
+`)
+
+// Exercises table
+lessonDb.exec(`
+  CREATE TABLE IF NOT EXISTS exercises (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    practice_test_id INTEGER NOT NULL,
+    question TEXT NOT NULL,
+    correct_answer TEXT NOT NULL,
+    options TEXT,  /* JSON string for multiple choice options */
+    exercise_type TEXT NOT NULL, /* 'multiple-choice', 'fill-blank', etc. */
+    FOREIGN KEY (practice_test_id) REFERENCES practice_tests(id)
+  )
+`)
+
+
 // Handle save-username IPC event
 ipcMain.handle('save-username', (_event, username) => {
   try {
@@ -69,6 +105,75 @@ ipcMain.handle('reset-database', () => {
     return { success: false, error: 'Database reset was not successful' }
   }
 })
+
+// Get all lessons
+ipcMain.handle('get-lessons', () => {
+  try {
+    const stmt = lessonDb.prepare('SELECT * FROM lessons ORDER BY order_index')
+    const lessons = stmt.all()
+    return { success: true, lessons }
+  } catch (error) {
+    console.error('Error fetching lessons:', error)
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+  }
+})
+
+// Get practice tests for a lesson
+ipcMain.handle('get-practice-tests', (_event, lessonId) => {
+  try {
+    const stmt = lessonDb.prepare('SELECT * FROM practice_tests WHERE lesson_id = ?')
+    const tests = stmt.all(lessonId)
+    return { success: true, tests }
+  } catch (error) {
+    console.error('Error fetching practice tests:', error)
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+  }
+})
+
+// Get exercises for a practice test
+ipcMain.handle('get-exercises', (_event, practiceTestId) => {
+  try {
+    const stmt = lessonDb.prepare('SELECT * FROM exercises WHERE practice_test_id = ?')
+    const exercises = stmt.all(practiceTestId)
+    return { success: true, exercises }
+  } catch (error) {
+    console.error('Error fetching exercises:', error)
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+  }
+})
+
+// Save user progress
+ipcMain.handle('save-progress', (_event, { userId, lessonId, completed }) => {
+  try {
+    const stmt = userDb.prepare(`
+      INSERT INTO user_progress (user_id, lesson_id, completed, last_accessed)
+      VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+      ON CONFLICT(user_id, lesson_id) 
+      DO UPDATE SET completed = ?, last_accessed = CURRENT_TIMESTAMP
+    `)
+    stmt.run(userId, lessonId, completed, completed)
+    return { success: true }
+  } catch (error) {
+    console.error('Error saving progress:', error)
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+  }
+})
+
+// Save exercise result
+ipcMain.handle('save-exercise-result', (_event, { userId, exerciseId, isCorrect, userAnswer }) => {
+  try {
+    const stmt = userDb.prepare(`
+      INSERT INTO exercise_results (user_id, exercise_id, is_correct, user_answer)
+      VALUES (?, ?, ?, ?)
+    `)
+    stmt.run(userId, exerciseId, isCorrect, userAnswer)
+    return { success: true }
+  } catch (error) {
+    console.error('Error saving exercise result:', error)
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+  }
+})
+
 
 function createWindow(): void {
   // Create the browser window.
