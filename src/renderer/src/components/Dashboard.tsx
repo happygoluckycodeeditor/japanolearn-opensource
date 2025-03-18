@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import img1 from '../assets/images/img1.svg'
 import img2 from '../assets/images/img2.svg'
 import img3 from '../assets/images/img3.svg'
+import { useNavigate } from 'react-router-dom'
 
 export default function Dashboard(): JSX.Element {
   const [username, setUsername] = useState('User')
@@ -18,6 +19,22 @@ export default function Dashboard(): JSX.Element {
 
     fetchUsername()
   }, [])
+
+  // Addding navigation to the dashboard
+  const navigate = useNavigate()
+
+  // New function to navigate to Dashboard
+
+  const goToAllLessons = (): void => {
+    navigate('/all-lessons')
+  }
+  const goToExercises = (): void => {
+    navigate('/exercises')
+  }
+
+  const goToDictionary = (): void => {
+    navigate('/dictionary')
+  }
 
   return (
     <div className="w-screen max-w-full p-10 pt-20 sm:pl-10 sm:pr-10 md:pl-24 md:pr-24 bg-gray-200">
@@ -57,7 +74,7 @@ export default function Dashboard(): JSX.Element {
               <div className="absolute inset-0 bg-gray-200 opacity-50 rounded-lg"></div>
 
               {/* Content positioned above the overlay */}
-              <div className="relative z-10">
+              <div className="relative z-10" onClick={goToAllLessons}>
                 <h2 className="text-lg font-bold text-blue-800">Lessons</h2>
                 <p className="mt-2 text-blue-700">Get Started with Japanese lessons!</p>
                 <div className="mt-3 text-blue-600">
@@ -123,7 +140,7 @@ export default function Dashboard(): JSX.Element {
               {/* Overlay to ensure text readability */}
               <div className="absolute inset-0 bg-gray-200 opacity-50 rounded-lg"></div>
 
-              <div className="relative z-10">
+              <div className="relative z-10" onClick={goToDictionary}>
                 <h2 className="text-lg font-bold text-purple-800">Dictionary</h2>
                 <p className="mt-2 text-purple-700">
                   Discover and learn Japanese words and Phrases.
@@ -191,7 +208,7 @@ export default function Dashboard(): JSX.Element {
               {/* Overlay to ensure text readability */}
               <div className="absolute inset-0 bg-gray-200 opacity-50 rounded-lg"></div>
 
-              <div className="relative z-10">
+              <div className="relative z-10" onClick={goToExercises}>
                 <h2 className="text-lg font-bold text-black-800">Exercises</h2>
                 <p className="mt-2 text-black-700">
                   Practice what you have learnt in different quizzes!
