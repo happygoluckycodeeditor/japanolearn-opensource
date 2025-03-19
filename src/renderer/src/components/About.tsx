@@ -1,4 +1,5 @@
 import React from 'react'
+import { Shell } from 'electron'
 
 const Options: React.FC = () => {
   return (
@@ -10,20 +11,20 @@ const Options: React.FC = () => {
         Application
       </p>
       <p className="mt-4">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, nisl eget ultricies
-        tincidunt, nunc nisl aliquam nisl, eget aliquam nisl nisl sit amet nisl. Donec euismod, nisl
-        eget ultricies tincidunt, nunc nisl aliquam nisl, eget aliquam nisl nisl sit amet nisl.
-        Donec euismod, nisl eget ultricies tincidunt, nunc nisl aliquam nisl, eget aliquam nisl nisl
-        sit amet nisl. Donec euismod, nisl eget ultricies tincidunt, nunc nisl aliquam nisl, eget
-        aliquam nisl nisl sit amet nisl. Donec euismod, nisl eget ultricies tincidunt, nunc nisl
-        aliquam nisl, eget aliquam nisl nisl sit amet nisl. Vestibulum ante ipsum primis in faucibus
-        orci luctus et ultrices posuere cubilia Curae; Sed aliquam, nisi quis porttitor congue, elit
-        erat euismod orci, ac placerat dolor lectus quis orci. Phasellus consectetuer vestibulum
-        elit. Aenean tellus metus, bibendum sed, posuere ac, mattis non, nunc. Vestibulum fringilla
-        pede sit amet augue. In turpis. Pellentesque posuere. Praesent turpis. Aenean posuere,
-        tortor sed cursus feugiat, nunc augue blandit nunc, eu sollicitudin urna dolor sagittis
-        lacus. If you need to generate lorem ipsum text programmatically, you can use a command-line
-        tool like:
+        Japanolearn is made as a hobby project by{' '}
+        <a href="https://github.com/happygoluckycodeeditor">Tanmay Bagwe</a>. This project is a open
+        source way of learning Japanese. The lessons and every content in this app is mostly
+        original and are made by Tanmay Bagwe.
+        <br></br>
+        Lessons are added everyweek and if you want to check the online version please go to{' '}
+        <a href="https://japanolearn.com/">Japanolearn&apos;s Offical website</a>
+        <br />
+        The source code for this app is available on{' '}
+        <a href="https://github.com/happygoluckycodeeditor/japanolearn-opensource">Github</a>
+        The application is still in its early stages and is still being developed. Your feedback and
+        also donations will help Tanmay keep developing this application daily!
+        <br />
+        Thank you very much!
       </p>
 
       {/* We'll add more content here later */}
