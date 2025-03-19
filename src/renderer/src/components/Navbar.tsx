@@ -69,7 +69,7 @@ const Navbar: React.FC = () => {
               <a onClick={goToDashboard}>Home</a>
             </li>
             <li>
-              <a onClick={goToAllLessons}>Lessons</a>
+              <a>Lessons</a>
               <ul className="p-2">
                 <li>
                   <a onClick={goToAllLessons}>All Lessons</a>
@@ -96,7 +96,7 @@ const Navbar: React.FC = () => {
           </li>
           <li>
             <details className="z-[50]">
-              <summary onClick={goToAllLessons}>Lessons</summary>
+              <summary>Lessons</summary>
               <ul className="p-2">
                 <li>
                   <a onClick={goToAllLessons}>All Lessons</a>

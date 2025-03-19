@@ -1,5 +1,4 @@
 import React from 'react'
-import { Shell } from 'electron'
 
 const Options: React.FC = () => {
   return (
@@ -8,26 +7,48 @@ const Options: React.FC = () => {
       <h1 className="text-4xl font-bold mb-4">About</h1>
       <p className="mt-4">
         Here comes the About Page. This page includes all of the metadata and history about the
-        Application
+        Application.
       </p>
       <p className="mt-4">
         Japanolearn is made as a hobby project by{' '}
-        <a href="https://github.com/happygoluckycodeeditor">Tanmay Bagwe</a>. This project is a open
-        source way of learning Japanese. The lessons and every content in this app is mostly
-        original and are made by Tanmay Bagwe.
-        <br></br>
-        Lessons are added everyweek and if you want to check the online version please go to{' '}
-        <a href="https://japanolearn.com/">Japanolearn&apos;s Offical website</a>
+        <a
+          href="https://github.com/happygoluckycodeeditor"
+          className="text-red-400 underline"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Tanmay Bagwe
+        </a>
+        . This project is an open-source way of learning Japanese. The lessons and every content in
+        this app are mostly original and are made by Tanmay Bagwe.
+        <br />
+        Lessons are added every week, and if you want to check the online version, please visit{' '}
+        <a
+          href="https://japanolearn.com/"
+          className="text-red-400 underline"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Japanolearn&apos;s Official website
+        </a>
+        .
         <br />
         The source code for this app is available on{' '}
-        <a href="https://github.com/happygoluckycodeeditor/japanolearn-opensource">Github</a>
-        The application is still in its early stages and is still being developed. Your feedback and
-        also donations will help Tanmay keep developing this application daily!
+        <a
+          href="https://github.com/happygoluckycodeeditor/japanolearn-opensource"
+          className="text-red-400 underline"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          GitHub
+        </a>
+        .
+        <br />
+        The application is still in its early stages and is under active development. Your feedback
+        and donations will help Tanmay continue developing this application daily!
         <br />
         Thank you very much!
       </p>
-
-      {/* We'll add more content here later */}
     </div>
   )
 }
