@@ -6,6 +6,10 @@ const Options: React.FC = () => {
       {/* Title */}
       <h1 className="text-4xl font-bold mb-4">Dictionary</h1>
       <p className="mt-4">We will implement the dictionary</p>
+      <p className="mt-4">
+        This will include the dictionary page and we will be implementing the dictionary from some
+        Fast Database
+      </p>
 
       {/* We'll add more content here later */}
     </div>
