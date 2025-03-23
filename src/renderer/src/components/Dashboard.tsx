@@ -46,8 +46,8 @@ export default function Dashboard(): JSX.Element {
       <div className="mt-6">
         <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 3 }}>
           <Masonry gutter="16px">
-            {/* Hiragana Card */}
-            {/* Hiragana Card with Background Image */}
+            {/* Lesson Card */}
+            {/* Lesson Card with Background Image */}
             <div
               className="
               relative
@@ -62,6 +62,7 @@ export default function Dashboard(): JSX.Element {
               hover:shadow-2xl
               w-full
               "
+              onClick={goToAllLessons}
               style={{
                 backgroundImage: `url(${img1})`,
                 backgroundSize: 'cover',
@@ -74,7 +75,7 @@ export default function Dashboard(): JSX.Element {
               <div className="absolute inset-0 bg-gray-200 opacity-50 rounded-lg"></div>
 
               {/* Content positioned above the overlay */}
-              <div className="relative z-10" onClick={goToAllLessons}>
+              <div className="relative z-10">
                 <h2 className="text-lg font-bold text-blue-800">Lessons</h2>
                 <p className="mt-2 text-blue-700">Get Started with Japanese lessons!</p>
                 <div className="mt-3 text-blue-600">
@@ -129,6 +130,7 @@ export default function Dashboard(): JSX.Element {
               ease-in-out
               hover:shadow-2xl
               "
+              onClick={goToDictionary}
               style={{
                 backgroundImage: `url(${img2})`,
                 backgroundSize: 'cover',
@@ -140,7 +142,7 @@ export default function Dashboard(): JSX.Element {
               {/* Overlay to ensure text readability */}
               <div className="absolute inset-0 bg-gray-200 opacity-50 rounded-lg"></div>
 
-              <div className="relative z-10" onClick={goToDictionary}>
+              <div className="relative z-10">
                 <h2 className="text-lg font-bold text-purple-800">Dictionary</h2>
                 <p className="mt-2 text-purple-700">
                   Discover and learn Japanese words and Phrases.
@@ -197,6 +199,7 @@ export default function Dashboard(): JSX.Element {
               ease-in-out
               hover:shadow-2xl
               "
+              onClick={goToExercises}
               style={{
                 backgroundImage: `url(${img3})`,
                 backgroundSize: 'cover',
@@ -208,7 +211,7 @@ export default function Dashboard(): JSX.Element {
               {/* Overlay to ensure text readability */}
               <div className="absolute inset-0 bg-gray-200 opacity-50 rounded-lg"></div>
 
-              <div className="relative z-10" onClick={goToExercises}>
+              <div className="relative z-10">
                 <h2 className="text-lg font-bold text-black-800">Exercises</h2>
                 <p className="mt-2 text-black-700">
                   Practice what you have learnt in different quizzes!
