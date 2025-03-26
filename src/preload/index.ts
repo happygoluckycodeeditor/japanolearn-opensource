@@ -2,8 +2,11 @@ import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 
 // Custom APIs for renderer
-const api = {}
-
+const api = {
+  dictionary: {
+    search: (query: string): Promise<unknown> => ipcRenderer.invoke('dictionary:search', query)
+  }
+}
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise
 // just add to the DOM global.
