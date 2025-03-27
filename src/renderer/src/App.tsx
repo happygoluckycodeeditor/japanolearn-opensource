@@ -10,6 +10,7 @@ import About from './components/About'
 import Dictionary from './components/Dictionary'
 import Lessons from './components/Lessons'
 import AllLessons from './components/AllLessons'
+import DonateButton from './components/DonateButton'
 
 // This component determines whether to show the navbar based on the current route
 const AppContent = (): JSX.Element => {
@@ -56,6 +57,9 @@ const AppContent = (): JSX.Element => {
           </Routes>
         </div>
       </div>
+
+      {/* Donate Button */}
+      <DonateButton />
     </div>
   )
 }
