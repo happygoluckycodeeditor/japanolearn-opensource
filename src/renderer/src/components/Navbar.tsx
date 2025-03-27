@@ -87,7 +87,9 @@ const Navbar: React.FC = () => {
             </li>
           </ul>
         </div>
-        <a className="btn btn-ghost text-xl">JapanoLearn</a>
+        <a className="btn btn-ghost text-xl" onClick={goToDashboard}>
+          JapanoLearn
+        </a>
       </div>
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1">
