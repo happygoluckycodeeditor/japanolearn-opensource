@@ -6,6 +6,8 @@ const Options: React.FC = () => {
       {/* Title */}
       <h1 className="text-4xl font-bold mb-4">Options</h1>
       <p className="mt-4">Configure your JapanoLearn experience</p>
+      <p>Making more things soon here such as DB editor
+      </p>
 
       {/* We'll add more content here later */}
     </div>
