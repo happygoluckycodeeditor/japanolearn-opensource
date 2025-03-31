@@ -59,8 +59,6 @@ const AppContent = (): JSX.Element => {
           </Routes>
         </div>
       </div>
-
-
     </div>
   )
 }
