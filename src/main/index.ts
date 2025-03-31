@@ -103,7 +103,7 @@ ipcMain.handle('update-username', (_event, { userId, newUsername }) => {
   try {
     const stmt = userDb.prepare('UPDATE users SET username = ? WHERE id = ?')
     const result = stmt.run(newUsername, userId)
-    
+
     if (result.changes > 0) {
       return { success: true, message: 'Username updated successfully' }
     } else {
