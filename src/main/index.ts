@@ -98,6 +98,27 @@ ipcMain.handle('reset-database', () => {
   }
 })
 
+// Make sure this handler is added before the app.whenReady() call
+ipcMain.handle('update-username', (_event, { userId, newUsername }) => {
+  try {
+    const stmt = userDb.prepare('UPDATE users SET username = ? WHERE id = ?')
+    const result = stmt.run(newUsername, userId)
+    
+    if (result.changes > 0) {
+      return { success: true, message: 'Username updated successfully' }
+    } else {
+      return { success: false, error: 'No user found with that ID' }
+    }
+  } catch (error) {
+    console.error('Error updating username:', error)
+    if (error instanceof Error) {
+      return { success: false, error: error.message }
+    } else {
+      return { success: false, error: 'An unknown error occurred' }
+    }
+  }
+})
+
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
