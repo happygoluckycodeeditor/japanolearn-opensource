@@ -19,6 +19,7 @@ const AppContent = (): JSX.Element => {
   const [transitionStage, setTransitionStage] = useState('fadeIn')
   const showNavbar = !['/', '/setup'].includes(location.pathname)
   const showWelcomeText = ['/', '/setup'].includes(location.pathname)
+  const showDonate = !['/', '/setup'].includes(location.pathname)
 
   useEffect(() => {
     if (location !== displayLocation) {
@@ -33,6 +34,7 @@ const AppContent = (): JSX.Element => {
   return (
     <div className="flex flex-col h-screen bg-gray-200">
       {showNavbar && <Navbar />}
+      {showDonate && <DonateButton />}
       <div className="flex flex-col items-center justify-center flex-grow">
         {showWelcomeText && (
           <>
@@ -58,8 +60,7 @@ const AppContent = (): JSX.Element => {
         </div>
       </div>
 
-      {/* Donate Button */}
-      <DonateButton />
+
     </div>
   )
 }
