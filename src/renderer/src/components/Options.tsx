@@ -119,6 +119,7 @@ const Options: React.FC = () => {
           <div className="collapse-title font-semibold text-lg">Data Management</div>
           <div className="collapse-content">
             <p className="text-sm">Data management options will be available in future updates.</p>
+            <p className="text-sm">Adding a feature on how on modifying the inbuilt dataset</p>
           </div>
         </div>
       </div>
