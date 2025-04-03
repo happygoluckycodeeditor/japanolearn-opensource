@@ -7,6 +7,7 @@ const api = {
     search: (query: string): Promise<unknown> => ipcRenderer.invoke('dictionary:search', query)
   }
 }
+
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise
 // just add to the DOM global.
@@ -23,7 +24,28 @@ if (process.contextIsolated) {
           }
         },
         // other methods you might need
-        invoke: (channel, ...args) => ipcRenderer.invoke(channel, ...args)
+        invoke: (channel: string, ...args: unknown[]): Promise<unknown> => {
+          // List of allowed channels for invoke
+          const validChannels = [
+            'save-username',
+            'get-users',
+            'reset-database',
+            'update-username',
+            'dictionary:search',
+            // New lesson management channels
+            'get-lessons',
+            'get-lesson-questions',
+            'add-lesson',
+            'update-lesson',
+            'delete-lesson'
+          ]
+
+          if (validChannels.includes(channel)) {
+            return ipcRenderer.invoke(channel, ...args)
+          }
+
+          return Promise.reject(new Error(`Unauthorized IPC channel: ${channel}`))
+        }
       }
     })
     contextBridge.exposeInMainWorld('api', api)
