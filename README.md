@@ -1,9 +1,7 @@
 # japanolearn-opensource
 The Open-Source Version of Japanolearn, use it, improve it and have fun!
 
-The app is work in progress and should be ready for the alpha version by the end of February 2025!
-
-Update: I got tired and did not find much time to implement things, we are pushing it to April 2025!
+I am updating the project everyday and I am hoping that I will be able to make the alpha version of this project by the end of April 2025 with a demo ready
 
 <img width="1201" alt="image" src="https://github.com/user-attachments/assets/6ec87cdb-44c5-42fd-b6e2-b4e9f40bf999" />
 
