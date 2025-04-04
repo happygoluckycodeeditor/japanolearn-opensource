@@ -414,6 +414,25 @@ const Options: React.FC = () => {
 
                     {/* Lesson Form */}
                     <div className="form-control">
+                      {/* ID Field (only shown when editing or viewing an existing lesson) */}
+                      {!isAddingNew && selectedLesson && (
+                        <div className="mb-4">
+                          <label className="label">
+                            <span className="label-text font-semibold">Lesson ID</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={selectedLesson.id}
+                            disabled
+                            className="input input-bordered w-full max-w-xs bg-gray-100"
+                            readOnly
+                          />
+                          <p className="text-xs text-gray-500 mt-1">
+                            This is the unique identifier for this lesson. It cannot be changed.
+                          </p>
+                        </div>
+                      )}
+
                       <label className="label">
                         <span className="label-text">Title</span>
                       </label>
