@@ -12,7 +12,19 @@ Japanolearn-Opensource is an open-source Japanese learning Application which is 
 
 The app is work in progress and it will take some time for the app's V0.5 Alpha to come up. We are thinking of releasing it by the end of February 2025!
 
+## Current Progress Status
+
+As of March 2025, I have steadily working on the UI of the application and hopefully by the end of April 2025, I will be able to finish Alpha V0.1 to be shipped as a demo concept for the users.
+
+From Mid April I will be adding some lessons and videos which will be usef for the application. The videos will be uploaded on youtube! So please look forward.
+
+### ‼️Just a Disclaimer that the application is not perfect and it has been my first app, I will continuously try to improve on it‼️ 
+
+### No Warranty is covered with this application
+
 ## Recommended IDE Setup
+
+The Japanolearn app is made through Electron and is run with Typecript and Javascript and therefore having some experience with Javascript and React will definitely help with working on the Japanolearn's Application development.
 
 - [VSCode](https://code.visualstudio.com/) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
 
