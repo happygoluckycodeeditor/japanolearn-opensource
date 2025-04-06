@@ -18,6 +18,23 @@ As of March 2025, I have steadily working on the UI of the application and hopef
 
 From Mid April I will be adding some lessons and videos which will be usef for the application. The videos will be uploaded on youtube! So please look forward.
 
+##Features
+
+The program has the following features
+
+###Lessons
+
+The application has a lesson feature where different aspects of the Japanese Language (Grammar, reading, learing Hiragana, etc) are incorporated into bite-size lessons
+
+###Exercises
+
+The exercise section has lots of exercises which are based on lessons, these can range from Kanji quizzes, grammar practice and also reading and comprehension practice.
+
+###Dictionary
+
+The Dictionary has a interactive easy to search dictionary which can be used for searching words when you feel like it!
+(This is quasi finished)
+
 ### ‼️Just a Disclaimer that the application is not perfect and it has been my first app, I will continuously try to improve on it‼️ 
 
 ### No Warranty is covered with this application
