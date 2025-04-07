@@ -445,7 +445,7 @@ ipcMain.handle('add-exercise', (_event, exerciseData) => {
       INSERT INTO exercises (lesson_id, title, description, difficulty, type)
       VALUES (?, ?, ?, ?, ?)
     `)
-    
+
     const result = stmt.run(
       exerciseData.lesson_id,
       exerciseData.title,
@@ -453,12 +453,12 @@ ipcMain.handle('add-exercise', (_event, exerciseData) => {
       exerciseData.difficulty || null,
       exerciseData.type || null
     )
-    
+
     // Fetch the newly created exercise
     const newExercise = lessonDb
       .prepare('SELECT * FROM exercises WHERE id = ?')
       .get(result.lastInsertRowid)
-    
+
     return { success: true, exercise: newExercise }
   } catch (error) {
     console.error('Error adding exercise:', error)
@@ -478,7 +478,7 @@ ipcMain.handle('update-exercise', (_event, exerciseData) => {
       SET title = ?, description = ?, difficulty = ?, type = ?
       WHERE id = ?
     `)
-    
+
     stmt.run(
       exerciseData.title,
       exerciseData.description || null,
@@ -486,12 +486,12 @@ ipcMain.handle('update-exercise', (_event, exerciseData) => {
       exerciseData.type || null,
       exerciseData.id
     )
-    
+
     // Fetch the updated exercise
     const updatedExercise = lessonDb
       .prepare('SELECT * FROM exercises WHERE id = ?')
       .get(exerciseData.id)
-    
+
     return { success: true, exercise: updatedExercise }
   } catch (error) {
     console.error('Error updating exercise:', error)
@@ -508,17 +508,17 @@ ipcMain.handle('delete-exercise', (_event, exerciseId) => {
   try {
     // Begin transaction
     lessonDb.prepare('BEGIN TRANSACTION').run()
-    
+
     try {
       // Delete related exercise questions first
       lessonDb.prepare('DELETE FROM exercise_questions WHERE exercise_id = ?').run(exerciseId)
-      
+
       // Delete the exercise
       lessonDb.prepare('DELETE FROM exercises WHERE id = ?').run(exerciseId)
-      
+
       // Commit transaction
       lessonDb.prepare('COMMIT').run()
-      
+
       return { success: true }
     } catch (error) {
       // Rollback on error
@@ -545,7 +545,7 @@ ipcMain.handle('add-exercise-question', (_event, questionData) => {
       )
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `)
-    
+
     const result = stmt.run(
       questionData.exercise_id,
       questionData.question,
@@ -556,12 +556,12 @@ ipcMain.handle('add-exercise-question', (_event, questionData) => {
       questionData.correct_answer,
       questionData.explanation || null
     )
-    
+
     // Fetch the newly created question
     const newQuestion = lessonDb
       .prepare('SELECT * FROM exercise_questions WHERE id = ?')
       .get(result.lastInsertRowid)
-    
+
     return { success: true, question: newQuestion }
   } catch (error) {
     console.error('Error adding exercise question:', error)
@@ -582,7 +582,7 @@ ipcMain.handle('update-exercise-question', (_event, questionData) => {
           option_d = ?, correct_answer = ?, explanation = ?
       WHERE id = ?
     `)
-    
+
     stmt.run(
       questionData.question,
       questionData.option_a,
@@ -593,12 +593,12 @@ ipcMain.handle('update-exercise-question', (_event, questionData) => {
       questionData.explanation || null,
       questionData.id
     )
-    
+
     // Fetch the updated question
     const updatedQuestion = lessonDb
       .prepare('SELECT * FROM exercise_questions WHERE id = ?')
       .get(questionData.id)
-    
+
     return { success: true, question: updatedQuestion }
   } catch (error) {
     console.error('Error updating exercise question:', error)
