@@ -32,12 +32,22 @@ if (process.contextIsolated) {
             'reset-database',
             'update-username',
             'dictionary:search',
-            // New lesson management channels
+            // Lesson management channels
             'get-lessons',
             'get-lesson-questions',
             'add-lesson',
             'update-lesson',
-            'delete-lesson'
+            'delete-lesson',
+            // Exercise management channels
+            'get-exercises',
+            'get-exercise-questions',
+            'add-exercise',
+            'update-exercise',
+            'delete-exercise',
+            // Question management channels
+            'add-exercise-question',
+            'update-exercise-question',
+            'delete-exercise-question'
           ]
 
           if (validChannels.includes(channel)) {
