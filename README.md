@@ -61,15 +61,17 @@ $ npm run dev
 
 ### Build
 
+This may or may not work, still a WIP
+
 ```bash
 # For windows
-$ npm run build:win
+$ npx electron-vite build && npx electron-builder --win
 
 # For macOS
-$ npm run build:mac
+$ npx electron-vite build && npx electron-builder --mac
 
 # For Linux
-$ npm run build:linux
+$ npx electron-vite build && npx electron-builder --linux
 ```
 
 If you want to have the executable file, please let me know.
