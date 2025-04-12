@@ -14,7 +14,8 @@ The app is work in progress and it will take some time for the app's V0.5 Alpha 
 
 ## Current Progress Status
 
-As of March 2025, I have steadily working on the UI of the application and hopefully by the end of April 2025, I will be able to finish Alpha V0.1 to be shipped as a demo concept for the users.
+As of April 12, we have been getting difficulties in figuring out how to build the app. I was doing experiments on it and I was not able to make a stable build which can be a problem later on at the end of the month.
+Currently I will keep working on the basic layout and features and cleaning the database and later work on creating a build file.
 
 From Mid April I will be adding some lessons and videos which will be usef for the application. The videos will be uploaded on youtube! So please look forward.
 
