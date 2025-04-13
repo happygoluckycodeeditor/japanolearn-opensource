@@ -14,8 +14,10 @@ The app is work in progress and it will take some time for the app's V0.5 Alpha 
 
 ## Current Progress Status
 
-As of April 12, we have been getting difficulties in figuring out how to build the app. I was doing experiments on it and I was not able to make a stable build which can be a problem later on at the end of the month.
-Currently I will keep working on the basic layout and features and cleaning the database and later work on creating a build file.
+As of April 13, we have been getting difficulties in figuring out how to build the app. I was doing experiments on it and I was not able to make a stable build which can be a problem later on at the end of the month.
+I am trying to figure out how to add the Dictionary SQL Lite file to the resources of the build and also fix the UI issues of the application. Let's see how it works out.
+We are still on track but errors can delay the launch of the initial application. Let's see How it turns to be.
+From Mid of April I will be starting to work on the demo video content of the application and see how that turns out to be.
 
 From Mid April I will be adding some lessons and videos which will be usef for the application. The videos will be uploaded on youtube! So please look forward.
 
