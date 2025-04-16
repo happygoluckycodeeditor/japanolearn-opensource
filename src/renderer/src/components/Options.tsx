@@ -22,7 +22,7 @@ const Options: React.FC = () => {
       {/* Title - Fixed at top */}
       <div className="sticky top-20 bg-gray-200 z-10 pb-4">
         <h1 className="text-4xl font-bold mb-4">Options</h1>
-        <p className="mb-8">Configure your JapanoLearn experience</p>
+        <p className="mb-8">Configure your JapanoLearn experience and handle the database</p>
 
         {/* Tabs - Fixed below title */}
         <div className="max-w-3xl mx-auto">
