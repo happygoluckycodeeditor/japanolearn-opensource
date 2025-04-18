@@ -15,7 +15,7 @@ const LessonsList: React.FC<LessonsListProps> = ({
   onAddNew
 }) => {
   return (
-    <div className="w-full md:w-1/3 bg-base-200 p-4 rounded-lg">
+    <div className="w-full bg-base-200 p-4 rounded-lg">
       <div className="flex justify-between items-center mb-4">
         <h3 className="font-bold">Lessons</h3>
         <button className="btn btn-sm btn-primary" onClick={onAddNew}>

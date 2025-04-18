@@ -163,7 +163,7 @@ const DataManagement: React.FC = () => {
         </div>
       )}
 
-      <div className="flex flex-col md:flex-row gap-4">
+      <div className="flex flex-col gap-4">
         {/* Lessons List */}
         <LessonsList
           lessons={lessons}
@@ -177,7 +177,7 @@ const DataManagement: React.FC = () => {
         />
 
         {/* Lesson Details/Editor */}
-        <div className="w-full md:w-2/3 bg-base-200 p-4 rounded-lg">
+        <div className="w-full bg-base-200 p-4 rounded-lg">
           {selectedLesson || isAddingNew ? (
             <LessonEditor
               selectedLesson={selectedLesson}
