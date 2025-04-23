@@ -21,8 +21,6 @@ From Mid of April I will be starting to work on the demo video content of the ap
 
 As of April 20, I have started adding Lesson content to the application and will be adding more lesson content for the demo version.
 
-Working on it
-
 ##Features
 
 The program has the following features
