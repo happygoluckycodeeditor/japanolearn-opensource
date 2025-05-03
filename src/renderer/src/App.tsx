@@ -10,6 +10,8 @@ import About from './components/About'
 import Dictionary from './components/Dictionary'
 import Lessons from './components/Lessons'
 import AllLessons from './components/AllLessons'
+import LevelLessons from './components/LevelLessons'
+import CategoryLessons from './components/CategoryLessons'
 import DonateButton from './components/DonateButton'
 
 // This component determines whether to show the navbar based on the current route
@@ -56,6 +58,8 @@ const AppContent = (): JSX.Element => {
             <Route path="/dictionary" element={<Dictionary />} />
             <Route path="/lessons" element={<Lessons />} />
             <Route path="/all-lessons" element={<AllLessons />} />
+            <Route path="/level/:level" element={<LevelLessons />} />
+            <Route path="/category/:category" element={<CategoryLessons />} />
           </Routes>
         </div>
       </div>
