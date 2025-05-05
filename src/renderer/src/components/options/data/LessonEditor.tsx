@@ -42,7 +42,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
     category: 'Grammar',
     order_index: 0
   })
-  
+
   // Add state for managing questions
   const [isManagingQuestions, setIsManagingQuestions] = useState(false)
 
@@ -290,10 +290,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
         <div className="mt-6">
           <div className="flex justify-between items-center mb-2">
             <h4 className="font-semibold">Lesson Questions</h4>
-            <button 
-              className="btn btn-sm btn-outline"
-              onClick={() => setIsManagingQuestions(true)}
-            >
+            <button className="btn btn-sm btn-outline" onClick={() => setIsManagingQuestions(true)}>
               Manage Questions
             </button>
           </div>
@@ -386,7 +383,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
           onClose={() => setIsManagingQuestions(false)}
           onQuestionsUpdated={() => {
             if (selectedLesson) {
-              onQuestionsUpdated(selectedLesson.id);
+              onQuestionsUpdated(selectedLesson.id)
             }
           }}
           setDbMessage={setDbMessage}

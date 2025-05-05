@@ -198,8 +198,6 @@ ipcMain.handle('get-lessons', () => {
   }
 })
 
-
-
 ipcMain.handle('add-lesson', (_event, lessonData) => {
   try {
     const stmt = lessonDb.prepare(`
@@ -647,8 +645,8 @@ ipcMain.handle('add-lesson-question', (_event, questionData) => {
       questionData.question,
       questionData.option_a,
       questionData.option_b,
-      questionData.option_c || '',  // Use empty string instead of null
-      questionData.option_d || '',  // Use empty string instead of null
+      questionData.option_c || '', // Use empty string instead of null
+      questionData.option_d || '', // Use empty string instead of null
       questionData.correct_answer,
       questionData.explanation || null
     )
@@ -683,8 +681,8 @@ ipcMain.handle('update-lesson-question', (_event, questionData) => {
       questionData.question,
       questionData.option_a,
       questionData.option_b,
-      questionData.option_c || '',  // Use empty string instead of null
-      questionData.option_d || '',  // Use empty string instead of null
+      questionData.option_c || '', // Use empty string instead of null
+      questionData.option_d || '', // Use empty string instead of null
       questionData.correct_answer,
       questionData.explanation || null,
       questionData.id
