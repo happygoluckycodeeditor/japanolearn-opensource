@@ -1,5 +1,5 @@
 {
-  "name": "japanolearn",
+  "name": "japanolearn-opensource",
   "version": "0.0.1",
   "description": "An Electron application made with React for Learning Japanese",
   "main": "./out/main/index.js",
@@ -17,9 +17,9 @@
     "build": "npm run typecheck && electron-vite build",
     "postinstall": "electron-builder install-app-deps",
     "build:unpack": "npm run build && electron-builder --dir",
-    "build:win": "npm run build && npx electron-builder --win",
-    "build:mac": "electron-vite build && npx electron-builder --mac",
-    "build:linux": "electron-vite build && npx electron-builder --linux"
+    "build:win": "electron-vite build && electron-builder --win",
+    "build:mac": "electron-vite build && electron-builder --mac",
+    "build:linux": "electron-vite build && electron-builder --linux"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.1",

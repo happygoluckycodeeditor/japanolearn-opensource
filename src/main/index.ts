@@ -309,6 +309,20 @@ ipcMain.handle('delete-lesson', (_event, lessonId) => {
   }
 })
 
+// Add this function before createWindow
+function shouldShowSetup(): boolean {
+  try {
+    const stmt = userDb.prepare('SELECT COUNT(*) as count FROM users')
+    const result = stmt.get() as { count: number }
+    console.log('User count in database:', result.count)
+    return result.count === 0
+  } catch (error) {
+    console.error('Error checking if setup is needed:', error)
+    return true // Default to showing setup if there's an error
+  }
+}
+
+// Then modify your createWindow function to use this information
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -336,9 +350,24 @@ function createWindow(): void {
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
+    const needsSetup = shouldShowSetup()
+    console.log('Needs setup:', needsSetup)
+    
+    // Add the setup query parameter to tell the renderer which screen to show
+    const url = new URL(process.env['ELECTRON_RENDERER_URL'])
+    url.searchParams.set('setup', needsSetup ? 'true' : 'false')
+    mainWindow.loadURL(url.toString())
   } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+    // For production, we'll pass a query parameter to the HTML file
+    const needsSetup = shouldShowSetup()
+    console.log('Needs setup:', needsSetup)
+    
+    const htmlPath = join(__dirname, '../renderer/index.html')
+    mainWindow.loadFile(htmlPath, {
+      query: {
+        'setup': needsSetup ? 'true' : 'false'
+      }
+    })
   }
 }
 

@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import HomePage from './components/HomePage'
 import SetupForm from './components/SetupForm'
@@ -60,6 +60,8 @@ const AppContent = (): JSX.Element => {
             <Route path="/all-lessons" element={<AllLessons />} />
             <Route path="/level/:level" element={<LevelLessons />} />
             <Route path="/category/:category" element={<CategoryLessons />} />
+            {/* Catch all other routes and redirect to homepage */}
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>
       </div>
@@ -67,10 +69,23 @@ const AppContent = (): JSX.Element => {
   )
 }
 
+// This is a wrapper component that forces the initial route to be the homepage
+const ForceHomepageWrapper = (): JSX.Element => {
+  const location = useLocation()
+
+  // If this is the initial load and we're not at the homepage, redirect
+  if (location.pathname !== '/' && location.key === 'default') {
+    console.log('ForceHomepageWrapper: Redirecting to homepage')
+    return <Navigate to="/" replace />
+  }
+
+  return <AppContent />
+}
+
 export default function App(): JSX.Element {
   return (
     <BrowserRouter>
-      <AppContent />
+      <ForceHomepageWrapper />
     </BrowserRouter>
   )
 }
