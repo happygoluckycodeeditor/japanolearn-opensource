@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Lesson, LessonQuestion, Exercise } from '../../../types/database'
+import LessonQuestionManager from './LessonQuestionManager'
 
 interface LessonEditorProps {
   selectedLesson: Lesson | null
@@ -13,6 +14,7 @@ interface LessonEditorProps {
   onDelete: () => void
   onSelectExercise: (exercise: Exercise) => void
   onAddNewExercise: () => void
+  onQuestionsUpdated: (lessonId: number) => void
   setDbMessage: (message: { text: string; type: string }) => void
 }
 
@@ -28,6 +30,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
   onDelete,
   onSelectExercise,
   onAddNewExercise,
+  onQuestionsUpdated,
   setDbMessage
 }) => {
   const [formData, setFormData] = useState<Partial<Lesson>>({
@@ -39,6 +42,9 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
     category: 'Grammar',
     order_index: 0
   })
+  
+  // Add state for managing questions
+  const [isManagingQuestions, setIsManagingQuestions] = useState(false)
 
   useEffect(() => {
     if (selectedLesson && !isAddingNew) {
@@ -284,7 +290,12 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
         <div className="mt-6">
           <div className="flex justify-between items-center mb-2">
             <h4 className="font-semibold">Lesson Questions</h4>
-            <button className="btn btn-sm btn-outline">Manage Questions</button>
+            <button 
+              className="btn btn-sm btn-outline"
+              onClick={() => setIsManagingQuestions(true)}
+            >
+              Manage Questions
+            </button>
           </div>
 
           {lessonQuestions.length > 0 ? (
@@ -293,13 +304,22 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
                 <thead>
                   <tr>
                     <th>Question</th>
+                    <th>Options</th>
                     <th>Correct Answer</th>
                   </tr>
                 </thead>
                 <tbody>
                   {lessonQuestions.map((q) => (
                     <tr key={q.id}>
-                      <td>{q.question}</td>
+                      <td className="max-w-xs truncate">{q.question}</td>
+                      <td>
+                        <div className="flex flex-col gap-1 text-xs">
+                          <span>A: {q.option_a}</span>
+                          <span>B: {q.option_b}</span>
+                          {q.option_c && <span>C: {q.option_c}</span>}
+                          {q.option_d && <span>D: {q.option_d}</span>}
+                        </div>
+                      </td>
                       <td>{q.correct_answer}</td>
                     </tr>
                   ))}
@@ -355,6 +375,22 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
             <p className="text-center text-gray-500 py-4">No exercises for this lesson</p>
           )}
         </div>
+      )}
+
+      {/* Lesson Question Manager Modal */}
+      {selectedLesson && (
+        <LessonQuestionManager
+          lesson={selectedLesson}
+          questions={lessonQuestions}
+          isOpen={isManagingQuestions}
+          onClose={() => setIsManagingQuestions(false)}
+          onQuestionsUpdated={() => {
+            if (selectedLesson) {
+              onQuestionsUpdated(selectedLesson.id);
+            }
+          }}
+          setDbMessage={setDbMessage}
+        />
       )}
     </>
   )

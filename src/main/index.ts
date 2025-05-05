@@ -198,20 +198,7 @@ ipcMain.handle('get-lessons', () => {
   }
 })
 
-ipcMain.handle('get-lesson-questions', (_event, lessonId) => {
-  try {
-    const stmt = lessonDb.prepare('SELECT * FROM lesson_questions WHERE lesson_id = ?')
-    const questions = stmt.all(lessonId)
-    return { success: true, questions }
-  } catch (error) {
-    console.error('Error fetching lesson questions:', error)
-    if (error instanceof Error) {
-      return { success: false, error: error.message }
-    } else {
-      return { success: false, error: 'An unknown error occurred' }
-    }
-  }
-})
+
 
 ipcMain.handle('add-lesson', (_event, lessonData) => {
   try {
@@ -617,6 +604,115 @@ ipcMain.handle('delete-exercise-question', (_event, questionId) => {
     return { success: true }
   } catch (error) {
     console.error('Error deleting exercise question:', error)
+    if (error instanceof Error) {
+      return { success: false, error: error.message }
+    } else {
+      return { success: false, error: 'An unknown error occurred' }
+    }
+  }
+})
+
+//IPC handlers for lesson question management
+
+//Get Lesson questions
+ipcMain.handle('get-lesson-questions', (_event, lessonId) => {
+  try {
+    const stmt = lessonDb.prepare('SELECT * FROM lesson_questions WHERE lesson_id = ?')
+    const questions = stmt.all(lessonId)
+    return { success: true, questions }
+  } catch (error) {
+    console.error('Error fetching lesson questions:', error)
+    if (error instanceof Error) {
+      return { success: false, error: error.message }
+    } else {
+      return { success: false, error: 'An unknown error occurred' }
+    }
+  }
+})
+
+// Add a new lesson question
+ipcMain.handle('add-lesson-question', (_event, questionData) => {
+  try {
+    const stmt = lessonDb.prepare(`
+      INSERT INTO lesson_questions (
+        lesson_id, question, option_a, option_b, option_c, option_d, 
+        correct_answer, explanation
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `)
+
+    // Ensure we're not passing null for option_c and option_d
+    const result = stmt.run(
+      questionData.lesson_id,
+      questionData.question,
+      questionData.option_a,
+      questionData.option_b,
+      questionData.option_c || '',  // Use empty string instead of null
+      questionData.option_d || '',  // Use empty string instead of null
+      questionData.correct_answer,
+      questionData.explanation || null
+    )
+
+    // Fetch the newly created question
+    const newQuestion = lessonDb
+      .prepare('SELECT * FROM lesson_questions WHERE id = ?')
+      .get(result.lastInsertRowid)
+
+    return { success: true, question: newQuestion }
+  } catch (error) {
+    console.error('Error adding lesson question:', error)
+    if (error instanceof Error) {
+      return { success: false, error: error.message }
+    } else {
+      return { success: false, error: 'An unknown error occurred' }
+    }
+  }
+})
+
+// Update an existing lesson question
+ipcMain.handle('update-lesson-question', (_event, questionData) => {
+  try {
+    const stmt = lessonDb.prepare(`
+      UPDATE lesson_questions 
+      SET question = ?, option_a = ?, option_b = ?, option_c = ?, 
+          option_d = ?, correct_answer = ?, explanation = ?
+      WHERE id = ?
+    `)
+
+    stmt.run(
+      questionData.question,
+      questionData.option_a,
+      questionData.option_b,
+      questionData.option_c || '',  // Use empty string instead of null
+      questionData.option_d || '',  // Use empty string instead of null
+      questionData.correct_answer,
+      questionData.explanation || null,
+      questionData.id
+    )
+
+    // Fetch the updated question
+    const updatedQuestion = lessonDb
+      .prepare('SELECT * FROM lesson_questions WHERE id = ?')
+      .get(questionData.id)
+
+    return { success: true, question: updatedQuestion }
+  } catch (error) {
+    console.error('Error updating lesson question:', error)
+    if (error instanceof Error) {
+      return { success: false, error: error.message }
+    } else {
+      return { success: false, error: 'An unknown error occurred' }
+    }
+  }
+})
+
+// Delete a lesson question
+ipcMain.handle('delete-lesson-question', (_event, questionId) => {
+  try {
+    lessonDb.prepare('DELETE FROM lesson_questions WHERE id = ?').run(questionId)
+    return { success: true }
+  } catch (error) {
+    console.error('Error deleting lesson question:', error)
     if (error instanceof Error) {
       return { success: false, error: error.message }
     } else {

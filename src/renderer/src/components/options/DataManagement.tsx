@@ -104,6 +104,11 @@ const DataManagement: React.FC = () => {
     setIsAddingNewExercise(false)
   }
 
+  // Handle lesson questions updated
+  const handleLessonQuestionsUpdated = (lessonId: number): void => {
+    fetchLessonQuestions(lessonId)
+  }
+
   // Handle deleting an exercise
   const handleDeleteExercise = async (): Promise<void> => {
     if (!selectedExercise) return
@@ -205,6 +210,7 @@ const DataManagement: React.FC = () => {
                 setIsEditingExercise(false)
                 setSelectedExercise(null)
               }}
+              onQuestionsUpdated={handleLessonQuestionsUpdated}
               setDbMessage={setDbMessage}
             />
           ) : (

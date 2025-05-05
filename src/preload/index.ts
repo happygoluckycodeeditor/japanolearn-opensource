@@ -47,7 +47,11 @@ if (process.contextIsolated) {
             // Question management channels
             'add-exercise-question',
             'update-exercise-question',
-            'delete-exercise-question'
+            'delete-exercise-question',
+            // Lesson question management channels - ADD THESE
+            'add-lesson-question',
+            'update-lesson-question',
+            'delete-lesson-question'
           ]
 
           if (validChannels.includes(channel)) {
