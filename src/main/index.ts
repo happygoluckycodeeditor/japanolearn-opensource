@@ -4,6 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/app_logo.png?asset'
 import Database from 'better-sqlite3'
 import { setupDictionaryHandlers } from './dictionary'
+import { existsSync, copyFileSync } from 'fs'
 
 // Define interface for table information
 interface TableInfo {
@@ -14,14 +15,22 @@ interface TableInfo {
 const userDataPath = app.getPath('userData')
 const userDbPath = join(userDataPath, 'UserData.db')
 const lessonDbPath = join(userDataPath, 'japanolearn.db')
+const dictionaryDbPath = join(userDataPath, 'jmdict.sqlite')
 
 // Check if lesson database exists, if not, copy from resources
 const resourceLessonDbPath = join(__dirname, '../../resources/japanolearn.db')
-import { existsSync, copyFileSync } from 'fs'
+const resourceDictionaryDbPath = join(__dirname, '../../resources/jmdict.sqlite')
 
 if (!existsSync(lessonDbPath) && existsSync(resourceLessonDbPath)) {
   copyFileSync(resourceLessonDbPath, lessonDbPath)
 }
+
+// Add dictionary database copy logic - same pattern as lesson database
+if (!existsSync(dictionaryDbPath) && existsSync(resourceDictionaryDbPath)) {
+  console.log('Copying dictionary database to user data directory...')
+  copyFileSync(resourceDictionaryDbPath, dictionaryDbPath)
+}
+
 // Initialize databases
 const userDb = new Database(userDbPath)
 const lessonDb = new Database(lessonDbPath)
@@ -31,6 +40,9 @@ console.log('User database path:', userDbPath)
 console.log('Lesson database path:', lessonDbPath)
 console.log('Resource lesson database path:', resourceLessonDbPath)
 console.log('Lesson database exists:', existsSync(lessonDbPath))
+console.log('Dictionary database path:', dictionaryDbPath)
+console.log('Resource dictionary database path:', resourceDictionaryDbPath)
+console.log('Dictionary database exists:', existsSync(dictionaryDbPath))
 
 // Add this after initializing lessonDb
 const tables = lessonDb
@@ -352,7 +364,7 @@ function createWindow(): void {
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     const needsSetup = shouldShowSetup()
     console.log('Needs setup:', needsSetup)
-    
+
     // Add the setup query parameter to tell the renderer which screen to show
     const url = new URL(process.env['ELECTRON_RENDERER_URL'])
     url.searchParams.set('setup', needsSetup ? 'true' : 'false')
@@ -361,11 +373,11 @@ function createWindow(): void {
     // For production, we'll pass a query parameter to the HTML file
     const needsSetup = shouldShowSetup()
     console.log('Needs setup:', needsSetup)
-    
+
     const htmlPath = join(__dirname, '../renderer/index.html')
     mainWindow.loadFile(htmlPath, {
       query: {
-        'setup': needsSetup ? 'true' : 'false'
+        setup: needsSetup ? 'true' : 'false'
       }
     })
   }

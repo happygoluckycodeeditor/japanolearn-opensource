@@ -2,6 +2,7 @@ import { ipcMain } from 'electron'
 import Database from 'better-sqlite3'
 import path from 'path'
 import { app } from 'electron'
+import { existsSync } from 'fs'
 
 // Function to detect query type
 function detectQueryType(query: string): 'kanji' | 'kana' | 'english' | 'all' {
@@ -22,12 +23,15 @@ function detectQueryType(query: string): 'kanji' | 'kana' | 'english' | 'all' {
 }
 
 export function setupDictionaryHandlers(): void {
-  // Connect to the SQLite database
-  const dbPath = app.isPackaged
-    ? path.join(process.resourcesPath, 'jmdict.sqlite')
-    : path.join(app.getAppPath(), 'resources', 'jmdict.sqlite')
+  // Use the same path as defined in index.ts - the copied file in user data directory
+  const dictionaryDbPath = path.join(app.getPath('userData'), 'jmdict.sqlite')
 
-  const db = new Database(dbPath)
+  console.log('Setting up dictionary handlers')
+  console.log('Dictionary path:', dictionaryDbPath)
+  console.log('Dictionary exists:', existsSync(dictionaryDbPath))
+
+  // Connect to the SQLite database
+  const db = new Database(dictionaryDbPath)
 
   ipcMain.handle('dictionary:search', async (_, query: string) => {
     if (!query) {
