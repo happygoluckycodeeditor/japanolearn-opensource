@@ -722,8 +722,8 @@ ipcMain.handle('update-lesson-question', (_event, questionData) => {
       questionData.question,
       questionData.option_a,
       questionData.option_b,
-      questionData.option_c || '', // Use empty string instead of null
-      questionData.option_d || '', // Use empty string instead of null
+      questionData.option_c || '', // Use empty string instead of null, still thinking if is necessary to make it compulsory or not
+      questionData.option_d || '', // Use empty string instead of null, still thinking if is necessary to make it compulsory or not
       questionData.correct_answer,
       questionData.explanation || null,
       questionData.id
