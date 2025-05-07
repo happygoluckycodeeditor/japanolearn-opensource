@@ -17,8 +17,8 @@
     "build": "npm run typecheck && electron-vite build",
     "postinstall": "electron-builder install-app-deps",
     "build:unpack": "npm run build && electron-builder --dir",
-    "build:win": "electron-vite build && electron-builder --win",
-    "build:mac": "electron-vite build && electron-builder --mac",
+    "build:win": "npm run build && electron-builder --win --ia32",
+    "build:mac": "electron-vite build && electron-builder --mac --universal",
     "build:linux": "electron-vite build && electron-builder --linux"
   },
   "dependencies": {
