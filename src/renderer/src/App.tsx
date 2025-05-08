@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom'
+import { HashRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import HomePage from './components/HomePage'
 import SetupForm from './components/SetupForm'
@@ -84,8 +84,8 @@ const ForceHomepageWrapper = (): JSX.Element => {
 
 export default function App(): JSX.Element {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <ForceHomepageWrapper />
-    </BrowserRouter>
+    </HashRouter>
   )
 }
