@@ -68,12 +68,12 @@ This may or may not work, still a WIP
 
 ```bash
 # For windows
-$ npx electron-vite build && npx electron-builder --win
+$ npx electron-vite build && npx electron-builder --win -x64
 
 # For macOS
-$ npx electron-vite build && npx electron-builder --mac
+$ npx electron-vite build && npx electron-builder --mac --universal
 
-# For Linux
+# For Linux (Not yet tested)
 $ npx electron-vite build && npx electron-builder --linux
 ```
 
