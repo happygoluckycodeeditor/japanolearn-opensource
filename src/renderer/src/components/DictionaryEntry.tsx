@@ -8,7 +8,7 @@ interface DictionaryEntryProps {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const DictionaryEntry: React.FC<DictionaryEntryProps> = ({ id, kanji, readings, meanings }) => {
+const DictionaryEntry: React.FC<DictionaryEntryProps> = ({ kanji, readings, meanings }) => {
   // Format meanings for display
   const formatMeanings = (meanings: string): JSX.Element[] => {
     return meanings.split(',').map((meaning, index) => (
