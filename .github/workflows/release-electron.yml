@@ -4,7 +4,10 @@ on:
   push:
     tags:
       - 'v*.*.*' # Triggers on version tags like v1.0.0
+  workflow_dispatch:
 
+permissions:
+  contents: write # This grants write access to repository contents including releases
 jobs:
   build:
     runs-on: ${{ matrix.os }}
