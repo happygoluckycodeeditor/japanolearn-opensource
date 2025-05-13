@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: write # This grants write access to repository contents including releases
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -32,22 +33,31 @@ jobs:
 
       - name: Package Electron app
         run: |
-          if [ "$RUNNER_OS" == "Windows" ]; then
+          if [ "${{ runner.os }}" == "Windows" ]; then
             npm run build:win
-          elif [ "$RUNNER_OS" == "macOS" ]; then
+          elif [ "${{ runner.os }}" == "macOS" ]; then
             npm run build:mac
           else
             npm run build:linux
           fi
         shell: bash
 
+      # Modified to only upload specific installer files
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: electron-build-${{ matrix.os }}
           path: |
-            dist/
-            release/
+            dist/*.exe
+            dist/*.msi
+            dist/*.dmg
+            dist/*.pkg
+            dist/*.AppImage
+            dist/*.deb
+            dist/*.rpm
+            dist/*.snap
+            dist/*.zip
+            dist/*.tar.gz
 
   release:
     needs: build
@@ -62,5 +72,6 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: ./artifacts/**/*
+          generate_release_notes: true
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
