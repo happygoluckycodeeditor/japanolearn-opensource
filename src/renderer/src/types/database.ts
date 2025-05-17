@@ -21,6 +21,7 @@ export interface LessonQuestion {
   option_d: string
   correct_answer: string
   explanation: string | null
+  image_path: string | null
 }
 
 // Define types for exercise entities
@@ -43,4 +44,5 @@ export interface ExerciseQuestion {
   option_d: string | null
   correct_answer: string
   explanation: string | null
+  image_path: string | null
 }

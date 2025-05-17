@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Lesson, LessonQuestion } from '../../../types/database'
+import ImageSelector from '../../common/ImageSelector'
 
 interface LessonQuestionManagerProps {
   lesson: Lesson
@@ -28,7 +29,8 @@ const LessonQuestionManager: React.FC<LessonQuestionManagerProps> = ({
     option_c: '',
     option_d: '',
     correct_answer: '',
-    explanation: ''
+    explanation: '',
+    image_path: null
   })
 
   const handleAddNewQuestion = (): void => {
@@ -42,7 +44,8 @@ const LessonQuestionManager: React.FC<LessonQuestionManagerProps> = ({
       option_c: '',
       option_d: '',
       correct_answer: '',
-      explanation: ''
+      explanation: '',
+      image_path: null
     })
   }
 
@@ -114,6 +117,10 @@ const LessonQuestionManager: React.FC<LessonQuestionManagerProps> = ({
     } catch (error) {
       setDbMessage({ text: 'An error occurred while saving the question', type: 'error' })
     }
+  }
+
+  const handleImageSelected = (path: string | null): void => {
+    setQuestionFormData({ ...questionFormData, image_path: path })
   }
 
   return (
@@ -279,6 +286,11 @@ const LessonQuestionManager: React.FC<LessonQuestionManagerProps> = ({
                 placeholder="Explanation for the correct answer"
                 rows={2}
               ></textarea>
+
+              <ImageSelector
+                initialImagePath={questionFormData.image_path || null}
+                onImageSelected={handleImageSelected}
+              />
 
               <div className="flex justify-end gap-2 mt-2">
                 <button className="btn btn-primary" onClick={handleSaveQuestion}>

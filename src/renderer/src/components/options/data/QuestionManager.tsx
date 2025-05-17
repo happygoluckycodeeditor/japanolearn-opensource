@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Exercise, ExerciseQuestion } from '../../../types/database'
+import ImageSelector from '../../common/ImageSelector'
 
 interface QuestionManagerProps {
   exercise: Exercise
@@ -28,7 +29,8 @@ const QuestionManager: React.FC<QuestionManagerProps> = ({
     option_c: '',
     option_d: '',
     correct_answer: '',
-    explanation: ''
+    explanation: '',
+    image_path: null
   })
 
   const handleAddNewQuestion = (): void => {
@@ -42,7 +44,8 @@ const QuestionManager: React.FC<QuestionManagerProps> = ({
       option_c: '',
       option_d: '',
       correct_answer: '',
-      explanation: ''
+      explanation: '',
+      image_path: null
     })
   }
 
@@ -114,6 +117,10 @@ const QuestionManager: React.FC<QuestionManagerProps> = ({
     } catch (error) {
       setDbMessage({ text: 'An error occurred while saving the question', type: 'error' })
     }
+  }
+
+  const handleImageSelected = (path: string | null): void => {
+    setQuestionFormData({ ...questionFormData, image_path: path })
   }
 
   return (
@@ -289,6 +296,11 @@ const QuestionManager: React.FC<QuestionManagerProps> = ({
                 placeholder="Explanation for the correct answer"
                 rows={2}
               ></textarea>
+
+              <ImageSelector
+                initialImagePath={questionFormData.image_path || null}
+                onImageSelected={handleImageSelected}
+              />
 
               <div className="flex justify-end gap-2 mt-2">
                 <button className="btn btn-primary" onClick={handleSaveQuestion}>

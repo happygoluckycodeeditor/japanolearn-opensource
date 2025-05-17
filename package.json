@@ -19,14 +19,17 @@
     "build:unpack": "npm run build && electron-builder --dir",
     "build:win": "electron-vite build && electron-builder --win --x64 --publish never",
     "build:mac": "electron-vite build && electron-builder --mac --universal --publish never",
-    "build:linux": "electron-vite build && electron-builder --linux --publish never"  },
+    "build:linux": "electron-vite build && electron-builder --linux --publish never"
+  },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.1",
     "@electron-toolkit/utils": "^3.0.0",
+    "@types/uuid": "^10.0.0",
     "better-sqlite3": "^11.8.1",
     "electron-updater": "^6.1.7",
     "react-responsive-masonry": "^2.7.1",
-    "react-router-dom": "^7.3.0"
+    "react-router-dom": "^7.3.0",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config-prettier": "^2.0.0",

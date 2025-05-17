@@ -4,7 +4,9 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/app_logo.png?asset'
 import Database from 'better-sqlite3'
 import { setupDictionaryHandlers } from './dictionary'
-import { existsSync, copyFileSync } from 'fs'
+import { existsSync, copyFileSync, mkdirSync } from 'fs'
+import { runMigrations } from './migrations'
+import { v4 as uuidv4 } from 'uuid' // You'll need to install this: npm install uuid @types/uuid
 
 // Define interface for table information
 interface TableInfo {
@@ -16,6 +18,14 @@ const userDataPath = app.getPath('userData')
 const userDbPath = join(userDataPath, 'UserData.db')
 const lessonDbPath = join(userDataPath, 'japanolearn.db')
 const dictionaryDbPath = join(userDataPath, 'jmdict.sqlite')
+
+// Add this near the top of your file to define image storage paths
+const questionImagesPath = join(userDataPath, 'question_images')
+
+// Create the directory if it doesn't exist
+if (!existsSync(questionImagesPath)) {
+  mkdirSync(questionImagesPath, { recursive: true })
+}
 
 // Check if lesson database exists, if not, copy from resources
 const resourceLessonDbPath = join(__dirname, '../../resources/japanolearn.db')
@@ -390,6 +400,9 @@ app.whenReady().then(() => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
   setupDictionaryHandlers()
+
+  // running Migration
+  runMigrations()
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
   // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
@@ -564,12 +577,15 @@ ipcMain.handle('delete-exercise', (_event, exerciseId) => {
 // Add a new exercise question
 ipcMain.handle('add-exercise-question', (_event, questionData) => {
   try {
+    // Handle image upload if provided
+    const imagePath = saveQuestionImage(questionData.image_path)
+
     const stmt = lessonDb.prepare(`
       INSERT INTO exercise_questions (
         exercise_id, question, option_a, option_b, option_c, option_d, 
-        correct_answer, explanation
+        correct_answer, explanation, image_path
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `)
 
     const result = stmt.run(
@@ -580,7 +596,8 @@ ipcMain.handle('add-exercise-question', (_event, questionData) => {
       questionData.option_c || null,
       questionData.option_d || null,
       questionData.correct_answer,
-      questionData.explanation || null
+      questionData.explanation || null,
+      imagePath
     )
 
     // Fetch the newly created question
@@ -602,10 +619,13 @@ ipcMain.handle('add-exercise-question', (_event, questionData) => {
 // Update an existing exercise question
 ipcMain.handle('update-exercise-question', (_event, questionData) => {
   try {
+    // Handle image upload if a new image is provided
+    const imagePath = saveQuestionImage(questionData.image_path)
+
     const stmt = lessonDb.prepare(`
       UPDATE exercise_questions 
       SET question = ?, option_a = ?, option_b = ?, option_c = ?, 
-          option_d = ?, correct_answer = ?, explanation = ?
+          option_d = ?, correct_answer = ?, explanation = ?, image_path = ?
       WHERE id = ?
     `)
 
@@ -617,6 +637,7 @@ ipcMain.handle('update-exercise-question', (_event, questionData) => {
       questionData.option_d || null,
       questionData.correct_answer,
       questionData.explanation || null,
+      imagePath,
       questionData.id
     )
 
@@ -672,24 +693,27 @@ ipcMain.handle('get-lesson-questions', (_event, lessonId) => {
 // Add a new lesson question
 ipcMain.handle('add-lesson-question', (_event, questionData) => {
   try {
+    // Handle image upload if provided
+    const imagePath = saveQuestionImage(questionData.image_path)
+
     const stmt = lessonDb.prepare(`
       INSERT INTO lesson_questions (
         lesson_id, question, option_a, option_b, option_c, option_d, 
-        correct_answer, explanation
+        correct_answer, explanation, image_path
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `)
 
-    // Ensure we're not passing null for option_c and option_d
     const result = stmt.run(
       questionData.lesson_id,
       questionData.question,
       questionData.option_a,
       questionData.option_b,
-      questionData.option_c || '', // Use empty string instead of null
-      questionData.option_d || '', // Use empty string instead of null
+      questionData.option_c || '',
+      questionData.option_d || '',
       questionData.correct_answer,
-      questionData.explanation || null
+      questionData.explanation || null,
+      imagePath
     )
 
     // Fetch the newly created question
@@ -711,10 +735,13 @@ ipcMain.handle('add-lesson-question', (_event, questionData) => {
 // Update an existing lesson question
 ipcMain.handle('update-lesson-question', (_event, questionData) => {
   try {
+    // Handle image upload if a new image is provided
+    const imagePath = saveQuestionImage(questionData.image_path)
+
     const stmt = lessonDb.prepare(`
       UPDATE lesson_questions 
       SET question = ?, option_a = ?, option_b = ?, option_c = ?, 
-          option_d = ?, correct_answer = ?, explanation = ?
+          option_d = ?, correct_answer = ?, explanation = ?, image_path = ?
       WHERE id = ?
     `)
 
@@ -722,10 +749,11 @@ ipcMain.handle('update-lesson-question', (_event, questionData) => {
       questionData.question,
       questionData.option_a,
       questionData.option_b,
-      questionData.option_c || '', // Use empty string instead of null, still thinking if is necessary to make it compulsory or not
-      questionData.option_d || '', // Use empty string instead of null, still thinking if is necessary to make it compulsory or not
+      questionData.option_c || '',
+      questionData.option_d || '',
       questionData.correct_answer,
       questionData.explanation || null,
+      imagePath,
       questionData.id
     )
 
@@ -758,4 +786,49 @@ ipcMain.handle('delete-lesson-question', (_event, questionId) => {
       return { success: false, error: 'An unknown error occurred' }
     }
   }
+})
+
+// Helper function to handle image uploads
+function saveQuestionImage(imagePath: string | null): string | null {
+  if (!imagePath) return null
+
+  // If it's already a stored image path, return it as is
+  if (imagePath.startsWith('question_images/')) {
+    return imagePath
+  }
+
+  try {
+    // Generate a unique filename
+    const uniqueFilename = `${uuidv4()}${imagePath.substring(imagePath.lastIndexOf('.'))}`
+    const destinationPath = join(questionImagesPath, uniqueFilename)
+
+    // Copy the image to our storage location
+    copyFileSync(imagePath, destinationPath)
+
+    // Return the relative path to be stored in the database
+    return `question_images/${uniqueFilename}`
+  } catch (error) {
+    console.error('Error saving image:', error)
+    return null
+  }
+}
+
+// Add a new IPC handler for image selection
+ipcMain.handle('select-image', async () => {
+  const { dialog } = require('electron')
+  const result = await dialog.showOpenDialog({
+    properties: ['openFile'],
+    filters: [{ name: 'Images', extensions: ['jpg', 'png', 'gif', 'jpeg', 'webp'] }]
+  })
+
+  if (result.canceled) {
+    return { success: false, canceled: true }
+  }
+
+  return { success: true, filePath: result.filePaths[0] }
+})
+
+// Add this handler to get the user data path for image display
+ipcMain.handle('get-user-data-path', () => {
+  return app.getPath('userData')
 })

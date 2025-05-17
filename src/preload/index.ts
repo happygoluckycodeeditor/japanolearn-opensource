@@ -5,7 +5,9 @@ import { electronAPI } from '@electron-toolkit/preload'
 const api = {
   dictionary: {
     search: (query: string): Promise<unknown> => ipcRenderer.invoke('dictionary:search', query)
-  }
+  },
+  selectImage: (): Promise<unknown> => ipcRenderer.invoke('select-image'),
+  getUserDataPath: (): Promise<unknown> => ipcRenderer.invoke('get-user-data-path')
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to
@@ -32,6 +34,8 @@ if (process.contextIsolated) {
             'reset-database',
             'update-username',
             'dictionary:search',
+            'select-image',
+            'get-user-data-path',
             // Lesson management channels
             'get-lessons',
             'get-lesson-questions',
