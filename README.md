@@ -10,16 +10,15 @@ I am updating the project everyday and I am hoping that I will be able to make t
 
 Japanolearn-Opensource is an open-source Japanese learning Application which is made with a goal of acccessibility to learn Japanese in Mind. The software is free and the source code is available for anyone to see and critique.
 
-The app is work in progress and it will take some time for the app's V0.5 Alpha to come up. We are thinking of releasing it by the end of February 2025!
+The app is work in progress and it will take some time for the app's V0.5 Alpha to come up. We are thinking of releasing it by the end of May 2025!
 
 ## Current Progress Status
 
-As of April 20, we have been getting difficulties in figuring out how to build the app. I was doing experiments on it and I was not able to make a stable build which can be a problem later on at the end of the month.
-I am trying to figure out how to add the Dictionary SQL Lite file to the resources of the build and also fix the UI issues of the application. Let's see how it works out.
-We are still on track but errors can delay the launch of the initial application. Let's see How it turns to be.
-From Mid of April I will be starting to work on the demo video content of the application and see how that turns out to be.
-
-As of April 20, I have started adding Lesson content to the application and will be adding more lesson content for the demo version.
+As of May 20, We were able to create a stable version and were able to push it on Github
+Currently we are working on
+1-Creating Auto Update
+2-Making Demo Lessons
+3-Create Proper Lesson and exercise structure
 
 ##Features
 
@@ -76,5 +75,7 @@ $ npx electron-vite build && npx electron-builder --mac --universal
 # For Linux (Not yet tested)
 $ npx electron-vite build && npx electron-builder --linux
 ```
+
+
 
 If you want to have the executable file, please let me know.
