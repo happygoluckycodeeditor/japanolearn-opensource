@@ -406,9 +406,7 @@ app.whenReady().then(() => {
 
   // Register protocol handler
   protocol.registerFileProtocol('app-image', (request, callback) => {
-    const filePath = url.fileURLToPath(
-      'file://' + request.url.slice('app-image://'.length)
-    )
+    const filePath = url.fileURLToPath('file://' + request.url.slice('app-image://'.length))
     callback({ path: filePath })
   })
 
@@ -847,14 +845,14 @@ ipcMain.handle('get-user-data-path', () => {
 // Add this IPC handler
 ipcMain.handle('get-secure-image-url', async (_, imagePath) => {
   if (!imagePath) return ''
-  
+
   // For stored images (relative path)
   if (imagePath.startsWith('question_images/')) {
     const userDataPath = app.getPath('userData')
     const absolutePath = path.join(userDataPath, imagePath)
     return `app-image://${absolutePath}`
   }
-  
+
   // For newly selected images (absolute path)
   return `app-image://${imagePath}`
 })
