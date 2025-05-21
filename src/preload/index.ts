@@ -55,7 +55,8 @@ if (process.contextIsolated) {
             // Lesson question management channels - ADD THESE
             'add-lesson-question',
             'update-lesson-question',
-            'delete-lesson-question'
+            'delete-lesson-question',
+            'get-secure-image-url'
           ]
 
           if (validChannels.includes(channel)) {

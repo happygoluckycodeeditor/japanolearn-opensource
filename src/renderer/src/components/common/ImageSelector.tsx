@@ -7,19 +7,30 @@ interface ImageSelectorProps {
 
 const ImageSelector: React.FC<ImageSelectorProps> = ({ initialImagePath, onImageSelected }) => {
   const [imagePath, setImagePath] = useState<string | null>(initialImagePath)
-  const [userDataPath, setUserDataPath] = useState<string>('')
-
-  useEffect(() => {
-    // Get user data path for displaying stored images
-    const getUserDataPath = async (): Promise<void> => {
-      const path = await window.electron.ipcRenderer.invoke('get-user-data-path')
-      setUserDataPath(path)
-    }
-    getUserDataPath()
-  }, [])
+  const [imageUrl, setImageUrl] = useState<string>('')
 
   useEffect(() => {
     setImagePath(initialImagePath)
+
+    // When image path changes, get the secure URL for the image
+    const loadImageUrl = async (): Promise<void> => {
+      if (initialImagePath) {
+        try {
+          const url = await window.electron.ipcRenderer.invoke(
+            'get-secure-image-url',
+            initialImagePath
+          )
+          setImageUrl(url)
+        } catch (error) {
+          console.error('Error loading image URL:', error)
+          setImageUrl('')
+        }
+      } else {
+        setImageUrl('')
+      }
+    }
+
+    loadImageUrl()
   }, [initialImagePath])
 
   const handleSelectImage = async (): Promise<void> => {
@@ -28,6 +39,13 @@ const ImageSelector: React.FC<ImageSelectorProps> = ({ initialImagePath, onImage
       if (result.success) {
         setImagePath(result.filePath)
         onImageSelected(result.filePath)
+
+        // Get secure URL for the newly selected image
+        const url = await window.electron.ipcRenderer.invoke(
+          'get-secure-image-url',
+          result.filePath
+        )
+        setImageUrl(url)
       }
     } catch (error) {
       console.error('Error selecting image:', error)
@@ -35,19 +53,8 @@ const ImageSelector: React.FC<ImageSelectorProps> = ({ initialImagePath, onImage
   }
   const handleRemoveImage = (): void => {
     setImagePath(null)
+    setImageUrl('')
     onImageSelected(null)
-  }
-  // Function to get the correct image source
-  const getImageSrc = (): string => {
-    if (!imagePath) return ''
-
-    // If it's a stored image (relative path)
-    if (imagePath.startsWith('question_images/')) {
-      return `file://${userDataPath}/${imagePath}`
-    }
-
-    // If it's a newly selected image (absolute path)
-    return `file://${imagePath}`
   }
   return (
     <div className="form-control">
@@ -72,13 +79,9 @@ const ImageSelector: React.FC<ImageSelectorProps> = ({ initialImagePath, onImage
           )}
         </div>
 
-        {imagePath && userDataPath && (
+        {imagePath && imageUrl && (
           <div className="image-preview mt-2 border border-base-300 rounded-lg p-2 max-w-xs">
-            <img
-              src={getImageSrc()}
-              alt="Question"
-              className="max-h-48 max-w-full object-contain"
-            />
+            <img src={imageUrl} alt="Question" className="max-h-48 max-w-full object-contain" />
           </div>
         )}
       </div>

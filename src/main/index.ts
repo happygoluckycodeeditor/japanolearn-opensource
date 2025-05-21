@@ -7,6 +7,9 @@ import { setupDictionaryHandlers } from './dictionary'
 import { existsSync, copyFileSync, mkdirSync } from 'fs'
 import { runMigrations } from './migrations'
 import { v4 as uuidv4 } from 'uuid' // You'll need to install this: npm install uuid @types/uuid
+import { protocol } from 'electron'
+import path from 'path'
+import url from 'url'
 
 // Define interface for table information
 interface TableInfo {
@@ -400,6 +403,14 @@ app.whenReady().then(() => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
   setupDictionaryHandlers()
+
+  // Register protocol handler
+  protocol.registerFileProtocol('app-image', (request, callback) => {
+    const filePath = url.fileURLToPath(
+      'file://' + request.url.slice('app-image://'.length)
+    )
+    callback({ path: filePath })
+  })
 
   // running Migration
   runMigrations()
@@ -831,4 +842,19 @@ ipcMain.handle('select-image', async () => {
 // Add this handler to get the user data path for image display
 ipcMain.handle('get-user-data-path', () => {
   return app.getPath('userData')
+})
+
+// Add this IPC handler
+ipcMain.handle('get-secure-image-url', async (_, imagePath) => {
+  if (!imagePath) return ''
+  
+  // For stored images (relative path)
+  if (imagePath.startsWith('question_images/')) {
+    const userDataPath = app.getPath('userData')
+    const absolutePath = path.join(userDataPath, imagePath)
+    return `app-image://${absolutePath}`
+  }
+  
+  // For newly selected images (absolute path)
+  return `app-image://${imagePath}`
 })
