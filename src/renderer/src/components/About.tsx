@@ -40,7 +40,8 @@ const Options: React.FC = () => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          GitHub
+          GitHub. We push udpates from Github, so if you want to chaeck on releases and patches,
+          please visit the Github Repository.
         </a>
         .
         <br />
@@ -48,6 +49,13 @@ const Options: React.FC = () => {
         and donations will help Tanmay continue developing this application daily!
         <br />
         Thank you very much!
+        <br />
+        <p className="mt-4 text-sm text-gray-700 border-t border-gray-300 pt-4">
+          <strong>Disclaimer:</strong> This application is provided &quot;as is&quot; without
+          warranty of any kind, express or implied. The creator of Japanolearn does not provide
+          technical support for this open-source version and disclaims all liability for damages
+          resulting from its use.
+        </p>
       </p>
     </div>
   )
