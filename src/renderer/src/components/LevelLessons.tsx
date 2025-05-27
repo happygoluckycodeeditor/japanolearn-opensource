@@ -125,7 +125,7 @@ const LevelLessons: React.FC = () => {
                       <h2 className="card-title">{lesson.title}</h2>
                       <p>{lesson.description}</p>
                       <div className="card-actions justify-end mt-4">
-                        <Link to={`/lessons/${lesson.id}`} className="btn btn-primary">
+                        <Link to={`/lesson/${lesson.id}`} className="btn btn-primary">
                           Start
                         </Link>
                         <Link to={`/exercises/${lesson.id}`} className="btn btn-secondary">
@@ -147,7 +147,7 @@ const LevelLessons: React.FC = () => {
                   <h2 className="card-title">{lesson.title}</h2>
                   <p>{lesson.description}</p>
                   <div className="card-actions justify-end mt-4">
-                    <Link to={`/lessons/${lesson.id}`} className="btn btn-primary">
+                    <Link to={`/lesson/${lesson.id}`} className="btn btn-primary">
                       Start
                     </Link>
                     <Link to={`/exercises/${lesson.id}`} className="btn btn-secondary">

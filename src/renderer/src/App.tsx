@@ -12,6 +12,7 @@ import Lessons from './components/Lessons'
 import AllLessons from './components/AllLessons'
 import LevelLessons from './components/LevelLessons'
 import CategoryLessons from './components/CategoryLessons'
+import LessonPage from './components/LessonPage'
 import DonateButton from './components/DonateButton'
 
 // This component determines whether to show the navbar based on the current route
@@ -60,6 +61,7 @@ const AppContent = (): JSX.Element => {
             <Route path="/all-lessons" element={<AllLessons />} />
             <Route path="/level/:level" element={<LevelLessons />} />
             <Route path="/category/:category" element={<CategoryLessons />} />
+            <Route path="/lesson/:lessonId" element={<LessonPage />} />
             {/* Catch all other routes and redirect to homepage */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
