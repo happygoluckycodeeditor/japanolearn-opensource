@@ -128,7 +128,7 @@ const LevelLessons: React.FC = () => {
                         <Link to={`/lesson/${lesson.id}`} className="btn btn-primary">
                           Start
                         </Link>
-                        <Link to={`/exercises/${lesson.id}`} className="btn btn-secondary">
+                        <Link to={`/lesson-exercises/${lesson.id}`} className="btn btn-secondary">
                           Exercise
                         </Link>
                       </div>
@@ -150,7 +150,7 @@ const LevelLessons: React.FC = () => {
                     <Link to={`/lesson/${lesson.id}`} className="btn btn-primary">
                       Start
                     </Link>
-                    <Link to={`/exercises/${lesson.id}`} className="btn btn-secondary">
+                    <Link to={`/lesson-exercises/${lesson.id}`} className="btn btn-secondary">
                       Exercise
                     </Link>
                   </div>

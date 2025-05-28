@@ -7,6 +7,7 @@ import Navbar from './components/Navbar'
 import Options from './components/Options'
 import Exercises from './components/Exercises'
 import ExercisePage from './components/ExercisePage'
+import LessonExercises from './components/LessonExercises'
 import About from './components/About'
 import Dictionary from './components/Dictionary'
 import Lessons from './components/Lessons'
@@ -57,6 +58,7 @@ const AppContent = (): JSX.Element => {
             <Route path="/options" element={<Options />} />
             <Route path="/exercises" element={<Exercises />} />
             <Route path="/exercise/:exerciseId" element={<ExercisePage />} />
+            <Route path="/lesson-exercises/:lessonId" element={<LessonExercises />} />
             <Route path="/about" element={<About />} />
             <Route path="/dictionary" element={<Dictionary />} />
             <Route path="/lessons" element={<Lessons />} />
