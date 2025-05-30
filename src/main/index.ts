@@ -139,17 +139,9 @@ autoUpdater.on('update-available', (info) => {
     })
     .then((result) => {
       if (result.response === 0) {
-        // User clicked "Update Now"
+        // User clicked "Update Now" - show progress dialog immediately
+        showDownloadProgressDialog()
         autoUpdater.downloadUpdate()
-
-        // Show downloading dialog
-        dialog.showMessageBox(mainWindow, {
-          type: 'info',
-          title: '⬇️ Downloading Update',
-          message: 'Update is being downloaded in the background.',
-          detail: "You can continue using the app. You'll be notified when it's ready to install.",
-          buttons: ['OK']
-        })
       } else {
         // User clicked "Update Later"
         console.log('User chose to update later')
@@ -157,45 +149,136 @@ autoUpdater.on('update-available', (info) => {
     })
 })
 
-autoUpdater.on('download-progress', (progressObj) => {
-  const percent = Math.round(progressObj.percent)
-  console.log(`Download progress: ${percent}%`)
+// Add this new function to show the progress dialog
+function showDownloadProgressDialog(): void {
+  // Create a new window for the download progress
+  const progressWindow = new BrowserWindow({
+    width: 400,
+    height: 200,
+    resizable: false,
+    minimizable: false,
+    maximizable: false,
+    closable: false,
+    alwaysOnTop: true,
+    parent: mainWindow,
+    modal: true,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false
+    }
+  })
 
-  // Update window title with progress
-  if (mainWindow) {
-    mainWindow.setTitle(`Japanolearn - Downloading update ${percent}%`)
-  }
-})
+  // Create HTML content for the progress window
+  const progressHTML = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Downloading Update</title>
+      <style>
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif
+          margin: 0
+          padding: 20px
+          background: #f5f5f5
+          display: flex
+          flex-direction: column
+          justify-content: center
+          height: 160px
+        }
+        .container {
+          text-align: center
+        }
+        .title {
+          font-size: 18px
+          font-weight: 600
+          margin-bottom: 20px
+          color: #333
+        }
+        .progress-container {
+          background: #e0e0e0
+          border-radius: 10px
+          height: 20px
+          margin: 20px 0
+          overflow: hidden
+        }
+        .progress-bar {
+          background: linear-gradient(90deg, #4CAF50, #45a049)
+          height: 100%
+          width: 0%
+          transition: width 0.3s ease
+          border-radius: 10px
+        }
+        .progress-text {
+          font-size: 14px
+          color: #666
+          margin-top: 10px
+        }
+        .status {
+          font-size: 12px
+          color: #888
+          margin-top: 5px
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="title">📥 Downloading Update</div>
+        <div class="progress-container">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div class="progress-text" id="progressText">0%</div>
+        <div class="status" id="statusText">Preparing download...</div>
+      </div>
+    </body>
+    </html>
+  `
 
-autoUpdater.on('update-downloaded', () => {
-  console.log('Update downloaded')
+  progressWindow.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(progressHTML)}`)
 
-  // Reset window title
-  if (mainWindow) {
-    mainWindow.setTitle('Japanolearn')
-  }
+  // Update progress when download progresses
+  autoUpdater.on('download-progress', (progressObj) => {
+    const percent = Math.round(progressObj.percent)
+    const speed = (progressObj.bytesPerSecond / 1024 / 1024).toFixed(1) // MB/s
+    const transferred = (progressObj.transferred / 1024 / 1024).toFixed(1) // MB
+    const total = (progressObj.total / 1024 / 1024).toFixed(1) // MB
 
-  // Show install dialog
-  dialog
-    .showMessageBox(mainWindow, {
-      type: 'info',
-      title: '✅ Update Ready',
-      message: 'Update has been downloaded successfully!',
-      detail: 'The application will restart to complete the installation.',
-      buttons: ['🔄 Restart Now', '⏰ Restart Later'],
-      defaultId: 0,
-      cancelId: 1
-    })
-    .then((result) => {
-      if (result.response === 0) {
-        // User clicked "Restart Now"
-        autoUpdater.quitAndInstall()
-      } else {
-        // User clicked "Restart Later"
-        console.log('User chose to restart later')
-      }
-    })
-})
+    progressWindow.webContents.executeJavaScript(`
+      document.getElementById('progressBar').style.width = '${percent}%'
+      document.getElementById('progressText').textContent = '${percent}%'
+      document.getElementById('statusText').textContent = '${transferred}MB / ${total}MB (${speed} MB/s)'
+    `)
+  })
+
+  // Close progress window when download completes
+  autoUpdater.on('update-downloaded', () => {
+    progressWindow.close()
+
+    // Show install dialog immediately
+    dialog
+      .showMessageBox(mainWindow, {
+        type: 'info',
+        title: '✅ Update Ready',
+        message: 'Update has been downloaded successfully!',
+        detail: 'The application will restart to complete the installation.',
+        buttons: ['🔄 Restart Now', '⏰ Restart Later'],
+        defaultId: 0,
+        cancelId: 1
+      })
+      .then((result) => {
+        if (result.response === 0) {
+          autoUpdater.quitAndInstall()
+        } else {
+          console.log('User chose to restart later')
+        }
+      })
+  })
+
+  // Handle download errors
+  autoUpdater.on('error', (err) => {
+    progressWindow.close()
+    dialog.showErrorBox('Update Error', `Failed to download update: ${err.message}`)
+  })
+}
 
 // No need to create tables for lessonDb as it's pre-populated
 // Handle save-username IPC event
