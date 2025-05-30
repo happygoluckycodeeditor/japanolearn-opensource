@@ -50,7 +50,7 @@ const Options: React.FC = () => {
         <br />
         Thank you very much!
         <br />
-        <p>Checking for Auto Updates v0.0.5</p>
+        <p>Checking for Auto Updates v0.0.7 Hopefully it works</p>
         <br />
         <p className="mt-4 text-sm text-gray-700 border-t border-gray-300 pt-4">
           <strong>Disclaimer:</strong> This application is provided &quot;as is&quot; without
