@@ -50,13 +50,14 @@ const Options: React.FC = () => {
         <br />
         Thank you very much!
         <br />
+        <p>Checking for Auto Updates v0.0.5</p>
+        <br />
         <p className="mt-4 text-sm text-gray-700 border-t border-gray-300 pt-4">
           <strong>Disclaimer:</strong> This application is provided &quot;as is&quot; without
           warranty of any kind, express or implied. The creator of Japanolearn does not provide
           technical support for this open-source version and disclaims all liability for damages
           resulting from its use.
         </p>
-        <p>Checking for Auto Updates</p>
       </p>
     </div>
   )
