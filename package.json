@@ -1,6 +1,6 @@
 {
   "name": "japanolearn-opensource",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "An Electron application made with React for Learning Japanese",
   "main": "./out/main/index.js",
   "author": "https://github.com/happygoluckycodeeditor",
@@ -19,7 +19,50 @@
     "build:unpack": "npm run build && electron-builder --dir",
     "build:win": "electron-vite build && electron-builder --win --x64 --publish never",
     "build:mac": "electron-vite build && electron-builder --mac --universal --publish never",
-    "build:linux": "electron-vite build && electron-builder --linux --publish never"
+    "build:linux": "electron-vite build && electron-builder --linux --publish never",
+    "build:win:publish": "electron-vite build && electron-builder --win --x64 --publish always",
+    "build:mac:publish": "electron-vite build && electron-builder --mac --universal --publish always",
+    "build:linux:publish": "electron-vite build && electron-builder --linux --publish always"
+  },
+  "build": {
+    "appId": "com.japanolearn.app",
+    "productName": "JapanoLearn",
+    "directories": {
+      "output": "dist"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "happygoluckycodeeditor",
+      "repo": "japanolearn-opensource"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ]
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["universal"]
+        }
+      ]
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": ["x64"]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.1",

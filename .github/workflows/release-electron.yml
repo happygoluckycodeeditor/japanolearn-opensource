@@ -31,18 +31,21 @@ jobs:
       - name: Build app
         run: npm run build
 
-      - name: Package Electron app
+      # Package and publish to GitHub releases for auto-updater
+      - name: Package and Publish Electron app
         run: |
           if [ "${{ runner.os }}" == "Windows" ]; then
-            npm run build:win
+            npm run build:win:publish
           elif [ "${{ runner.os }}" == "macOS" ]; then
-            npm run build:mac
+            npm run build:mac:publish
           else
-            npm run build:linux
+            npm run build:linux:publish
           fi
         shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Modified to only upload specific installer files
+      # Upload artifacts for manual download
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -58,6 +61,8 @@ jobs:
             dist/*.snap
             dist/*.zip
             dist/*.tar.gz
+            dist/*latest*.yml
+            dist/*latest*.json
 
   release:
     needs: build

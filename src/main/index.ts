@@ -1,12 +1,13 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, dialog, Menu } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import { autoUpdater } from 'electron-updater'
 import icon from '../../resources/app_logo.png?asset'
 import Database from 'better-sqlite3'
 import { setupDictionaryHandlers } from './dictionary'
 import { existsSync, copyFileSync, mkdirSync } from 'fs'
 import { runMigrations } from './migrations'
-import { v4 as uuidv4 } from 'uuid' // You'll need to install this: npm install uuid @types/uuid
+import { v4 as uuidv4 } from 'uuid'
 import { protocol } from 'electron'
 import path from 'path'
 import url from 'url'
@@ -15,6 +16,12 @@ import url from 'url'
 interface TableInfo {
   name: string
 }
+
+// Configure auto-updater
+autoUpdater.autoDownload = false // Don't auto-download, ask user first
+autoUpdater.autoInstallOnAppQuit = false
+
+let mainWindow: BrowserWindow
 
 // Paths for databases
 const userDataPath = app.getPath('userData')
@@ -102,6 +109,93 @@ userDb.exec(`
     FOREIGN KEY (user_id) REFERENCES users(id)
   )
 `)
+
+// Auto-updater event handlers
+autoUpdater.on('checking-for-update', () => {
+  console.log('Checking for update...')
+})
+
+autoUpdater.on('update-not-available', () => {
+  console.log('Update not available.')
+})
+
+autoUpdater.on('error', (err) => {
+  console.log('Error in auto-updater:', err)
+})
+
+autoUpdater.on('update-available', (info) => {
+  console.log('Update available:', info.version)
+
+  // Show update dialog
+  dialog
+    .showMessageBox(mainWindow, {
+      type: 'question',
+      title: '🎉 Update Available',
+      message: `JapanoLearn ${info.version} is now available!`,
+      detail: `You're currently using version ${app.getVersion()}.\n\nWould you like to download and install this update?`,
+      buttons: ['📥 Update Now', '⏰ Update Later'],
+      defaultId: 0,
+      cancelId: 1
+    })
+    .then((result) => {
+      if (result.response === 0) {
+        // User clicked "Update Now"
+        autoUpdater.downloadUpdate()
+
+        // Show downloading dialog
+        dialog.showMessageBox(mainWindow, {
+          type: 'info',
+          title: '⬇️ Downloading Update',
+          message: 'Update is being downloaded in the background.',
+          detail: "You can continue using the app. You'll be notified when it's ready to install.",
+          buttons: ['OK']
+        })
+      } else {
+        // User clicked "Update Later"
+        console.log('User chose to update later')
+      }
+    })
+})
+
+autoUpdater.on('download-progress', (progressObj) => {
+  const percent = Math.round(progressObj.percent)
+  console.log(`Download progress: ${percent}%`)
+
+  // Update window title with progress
+  if (mainWindow) {
+    mainWindow.setTitle(`Japanolearn - Downloading update ${percent}%`)
+  }
+})
+
+autoUpdater.on('update-downloaded', () => {
+  console.log('Update downloaded')
+
+  // Reset window title
+  if (mainWindow) {
+    mainWindow.setTitle('Japanolearn')
+  }
+
+  // Show install dialog
+  dialog
+    .showMessageBox(mainWindow, {
+      type: 'info',
+      title: '✅ Update Ready',
+      message: 'Update has been downloaded successfully!',
+      detail: 'The application will restart to complete the installation.',
+      buttons: ['🔄 Restart Now', '⏰ Restart Later'],
+      defaultId: 0,
+      cancelId: 1
+    })
+    .then((result) => {
+      if (result.response === 0) {
+        // User clicked "Restart Now"
+        autoUpdater.quitAndInstall()
+      } else {
+        // User clicked "Restart Later"
+        console.log('User chose to restart later')
+      }
+    })
+})
 
 // No need to create tables for lessonDb as it's pre-populated
 // Handle save-username IPC event
@@ -347,10 +441,50 @@ function shouldShowSetup(): boolean {
   }
 }
 
+// Create application menu with update check
+function createMenu(): void {
+  const template = [
+    {
+      label: 'Help',
+      submenu: [
+        {
+          label: 'Check for Updates',
+          click: (): void => {
+            if (app.isPackaged) {
+              autoUpdater.checkForUpdates()
+            } else {
+              dialog.showMessageBox(mainWindow, {
+                type: 'info',
+                title: 'Development Mode',
+                message: 'Updates are only available in production builds.',
+                buttons: ['OK']
+              })
+            }
+          }
+        },
+        {
+          label: 'About',
+          click: (): void => {
+            dialog.showMessageBox(mainWindow, {
+              type: 'info',
+              title: 'About JapanoLearn',
+              message: `JapanoLearn v${app.getVersion()}`,
+              detail: 'Learn Japanese with ease!',
+              buttons: ['OK']
+            })
+          }
+        }
+      ]
+    }
+  ]
+
+  const menu = Menu.buildFromTemplate(template)
+  Menu.setApplicationMenu(menu)
+}
 // Then modify your createWindow function to use this information
 function createWindow(): void {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
     show: false,
@@ -423,12 +557,20 @@ app.whenReady().then(() => {
   ipcMain.on('ping', () => console.log('pong'))
 
   createWindow()
+  createMenu()
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
+
+  // Check for updates after app is ready (only in production)
+  if (app.isPackaged) {
+    setTimeout(() => {
+      autoUpdater.checkForUpdates()
+    }, 3000) // Wait 3 seconds after startup
+  }
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -443,10 +585,6 @@ app.on('window-all-closed', () => {
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
 
-// Quitting the app when the quit button is clicked
-ipcMain.on('quit-app', () => {
-  app.quit()
-})
 // Quitting the app when the quit button is clicked
 ipcMain.on('quit-app', () => {
   app.quit()
@@ -855,4 +993,14 @@ ipcMain.handle('get-secure-image-url', async (_, imagePath) => {
 
   // For newly selected images (absolute path)
   return `app-image://${imagePath}`
+})
+
+// Handle manual update check from renderer
+ipcMain.handle('check-for-updates-manual', async () => {
+  if (app.isPackaged) {
+    autoUpdater.checkForUpdates()
+    return 'Checking for updates...'
+  } else {
+    return 'Updates only work in production builds'
+  }
 })
