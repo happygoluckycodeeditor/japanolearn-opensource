@@ -56,6 +56,7 @@ const Options: React.FC = () => {
           technical support for this open-source version and disclaims all liability for damages
           resulting from its use.
         </p>
+        <p>Checking for Auto Updates</p>
       </p>
     </div>
   )
