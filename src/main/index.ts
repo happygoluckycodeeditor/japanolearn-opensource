@@ -151,14 +151,16 @@ autoUpdater.on('update-available', (info) => {
 
 // Add this new function to show the progress dialog
 function showDownloadProgressDialog(): void {
-  // Create a new window for the download progress
-  const progressWindow = new BrowserWindow({
+  let progressWindow: BrowserWindow | null = null
+
+  // Create progress window
+  progressWindow = new BrowserWindow({
     width: 400,
     height: 200,
     resizable: false,
     minimizable: false,
     maximizable: false,
-    closable: false,
+    closable: true, // ← Allow closing
     alwaysOnTop: true,
     parent: mainWindow,
     modal: true,
@@ -235,48 +237,90 @@ function showDownloadProgressDialog(): void {
 
   progressWindow.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(progressHTML)}`)
 
-  // Update progress when download progresses
-  autoUpdater.on('download-progress', (progressObj) => {
+  // Progress handler
+  const progressHandler = (progressObj: {
+    percent: number
+    bytesPerSecond: number
+    transferred: number
+    total: number
+  }): void => {
+    if (!progressWindow) return
+
     const percent = Math.round(progressObj.percent)
-    const speed = (progressObj.bytesPerSecond / 1024 / 1024).toFixed(1) // MB/s
-    const transferred = (progressObj.transferred / 1024 / 1024).toFixed(1) // MB
-    const total = (progressObj.total / 1024 / 1024).toFixed(1) // MB
+    const speed = (progressObj.bytesPerSecond / 1024 / 1024).toFixed(1)
+    const transferred = (progressObj.transferred / 1024 / 1024).toFixed(1)
+    const total = (progressObj.total / 1024 / 1024).toFixed(1)
+
+    console.log(`Download progress: ${percent}% - ${transferred}MB / ${total}MB (${speed} MB/s)`)
 
     progressWindow.webContents.executeJavaScript(`
-      document.getElementById('progressBar').style.width = '${percent}%'
-      document.getElementById('progressText').textContent = '${percent}%'
-      document.getElementById('statusText').textContent = '${transferred}MB / ${total}MB (${speed} MB/s)'
+      document.getElementById('progressBar').style.width = '${percent}%';
+      document.getElementById('progressText').textContent = '${percent}%';
+      document.getElementById('statusText').textContent = '${transferred}MB / ${total}MB (${speed} MB/s)';
     `)
-  })
 
-  // Close progress window when download completes
-  autoUpdater.on('update-downloaded', () => {
-    progressWindow.close()
+    if (percent >= 100) {
+      progressWindow.webContents.executeJavaScript(`
+        document.getElementById('statusText').textContent = 'Verifying update...';
+      `)
+    }
+  }
+  // Download complete handler - THIS IS THE KEY FIX
+  const downloadedHandler = (): void => {
+    console.log('update-downloaded event fired!')
 
-    // Show install dialog immediately
-    dialog
-      .showMessageBox(mainWindow, {
-        type: 'info',
-        title: '✅ Update Ready',
-        message: 'Update has been downloaded successfully!',
-        detail: 'The application will restart to complete the installation.',
-        buttons: ['🔄 Restart Now', '⏰ Restart Later'],
-        defaultId: 0,
-        cancelId: 1
-      })
-      .then((result) => {
-        if (result.response === 0) {
-          autoUpdater.quitAndInstall()
-        } else {
-          console.log('User chose to restart later')
-        }
-      })
-  })
+    // FORCE CLOSE the progress window first
+    if (progressWindow && !progressWindow.isDestroyed()) {
+      progressWindow.destroy() // Use destroy() instead of close()
+      progressWindow = null
+    }
 
-  // Handle download errors
-  autoUpdater.on('error', (err) => {
-    progressWindow.close()
+    // Wait a moment for window to fully close, then show dialog
+    setTimeout(() => {
+      dialog
+        .showMessageBox(mainWindow, {
+          type: 'info',
+          title: '✅ Update Ready',
+          message: 'Update has been downloaded successfully!',
+          detail: 'The application will restart to complete the installation.',
+          buttons: ['🔄 Restart Now', '⏰ Restart Later'],
+          defaultId: 0,
+          cancelId: 1
+        })
+        .then((result) => {
+          if (result.response === 0) {
+            console.log('User clicked Restart Now')
+            autoUpdater.quitAndInstall()
+          } else {
+            console.log('User chose to restart later')
+          }
+        })
+        .catch((err) => {
+          console.error('Error showing restart dialog:', err)
+        })
+    }, 100) // Small delay to ensure window is fully closed
+  }
+
+  // Error handler
+  const errorHandler = (err: Error): void => {
+    console.error('Download error:', err)
+    if (progressWindow && !progressWindow.isDestroyed()) {
+      progressWindow.destroy()
+      progressWindow = null
+    }
     dialog.showErrorBox('Update Error', `Failed to download update: ${err.message}`)
+  }
+  // Attach event listeners
+  autoUpdater.on('download-progress', progressHandler)
+  autoUpdater.once('update-downloaded', downloadedHandler) // Use once() to prevent multiple calls
+  autoUpdater.once('error', errorHandler)
+
+  // Clean up when progress window is manually closed
+  progressWindow.on('closed', () => {
+    autoUpdater.removeListener('download-progress', progressHandler)
+    autoUpdater.removeListener('update-downloaded', downloadedHandler)
+    autoUpdater.removeListener('error', errorHandler)
+    progressWindow = null
   })
 }
 
