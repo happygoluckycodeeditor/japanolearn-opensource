@@ -1,4 +1,12 @@
-import { app, shell, BrowserWindow, ipcMain, dialog, Menu } from 'electron'
+import {
+  app,
+  shell,
+  BrowserWindow,
+  ipcMain,
+  dialog,
+  Menu,
+  MenuItemConstructorOptions
+} from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { autoUpdater } from 'electron-updater'
@@ -20,6 +28,11 @@ interface TableInfo {
 // Configure auto-updater
 autoUpdater.autoDownload = false // Don't auto-download, ask user first
 autoUpdater.autoInstallOnAppQuit = false
+
+// Add these additional configurations for better restart behavior
+if (process.platform === 'win32') {
+  autoUpdater.autoInstallOnAppQuit = true
+}
 
 let mainWindow: BrowserWindow
 
@@ -271,7 +284,7 @@ function showDownloadProgressDialog(): void {
 
     // FORCE CLOSE the progress window first
     if (progressWindow && !progressWindow.isDestroyed()) {
-      progressWindow.destroy() // Use destroy() instead of close()
+      progressWindow.destroy()
       progressWindow = null
     }
 
@@ -289,8 +302,15 @@ function showDownloadProgressDialog(): void {
         })
         .then((result) => {
           if (result.response === 0) {
-            console.log('User clicked Restart Now')
-            autoUpdater.quitAndInstall()
+            console.log('User clicked Restart Now - attempting to quit and install')
+
+            // Set a flag to prevent the normal quit behavior
+            app.removeAllListeners('window-all-closed')
+
+            // Force quit and install
+            setImmediate(() => {
+              autoUpdater.quitAndInstall(false, true)
+            })
           } else {
             console.log('User chose to restart later')
           }
@@ -298,7 +318,7 @@ function showDownloadProgressDialog(): void {
         .catch((err) => {
           console.error('Error showing restart dialog:', err)
         })
-    }, 100) // Small delay to ensure window is fully closed
+    }, 100)
   }
 
   // Error handler
@@ -570,7 +590,70 @@ function shouldShowSetup(): boolean {
 
 // Create application menu with update check
 function createMenu(): void {
-  const template = [
+  const isMac = process.platform === 'darwin'
+
+  const template: MenuItemConstructorOptions[] = [
+    // macOS app menu
+    ...(isMac
+      ? [
+          {
+            label: app.getName(),
+            submenu: [
+              { role: 'about' as const },
+              { type: 'separator' as const },
+              { role: 'services' as const },
+              { type: 'separator' as const },
+              { role: 'hide' as const },
+              { role: 'hideothers' as const },
+              { role: 'unhide' as const },
+              { type: 'separator' as const },
+              { role: 'quit' as const }
+            ] as MenuItemConstructorOptions[]
+          }
+        ]
+      : []),
+
+    // File menu
+    {
+      label: 'File',
+      submenu: [
+        isMac ? { role: 'close' as const } : { role: 'quit' as const }
+      ] as MenuItemConstructorOptions[]
+    },
+
+    // Edit menu
+    {
+      label: 'Edit',
+      submenu: [
+        { role: 'undo' as const },
+        { role: 'redo' as const },
+        { type: 'separator' as const },
+        { role: 'cut' as const },
+        { role: 'copy' as const },
+        { role: 'paste' as const },
+        ...(isMac
+          ? [
+              { role: 'pasteAndMatchStyle' as const },
+              { role: 'delete' as const },
+              { role: 'selectAll' as const },
+              { type: 'separator' as const },
+              {
+                label: 'Speech',
+                submenu: [
+                  { role: 'startSpeaking' as const },
+                  { role: 'stopSpeaking' as const }
+                ] as MenuItemConstructorOptions[]
+              }
+            ]
+          : [
+              { role: 'delete' as const },
+              { type: 'separator' as const },
+              { role: 'selectAll' as const }
+            ])
+      ] as MenuItemConstructorOptions[]
+    },
+
+    // Help menu
     {
       label: 'Help',
       submenu: [
@@ -601,13 +684,14 @@ function createMenu(): void {
             })
           }
         }
-      ]
+      ] as MenuItemConstructorOptions[]
     }
   ]
 
   const menu = Menu.buildFromTemplate(template)
   Menu.setApplicationMenu(menu)
 }
+
 // Then modify your createWindow function to use this information
 function createWindow(): void {
   // Create the browser window.
@@ -700,10 +784,9 @@ app.whenReady().then(() => {
   }
 })
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
+// Replace your existing window-all-closed handler with this:
 app.on('window-all-closed', () => {
+  // On macOS, keep app running even when all windows are closed
   if (process.platform !== 'darwin') {
     app.quit()
   }
