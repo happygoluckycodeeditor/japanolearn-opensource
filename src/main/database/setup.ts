@@ -1,6 +1,6 @@
 import { app } from 'electron'
 import { join } from 'path'
-import { existsSync, copyFileSync, mkdirSync } from 'fs'
+import { existsSync, copyFileSync, mkdirSync, readdirSync, statSync } from 'fs'
 import Database from 'better-sqlite3'
 
 export interface DatabasePaths {
@@ -27,6 +27,26 @@ export function getDatabasePaths(): DatabasePaths {
   }
 }
 
+// Helper function to copy directory recursively
+function copyDirectoryRecursive(source: string, destination: string): void {
+  if (!existsSync(destination)) {
+    mkdirSync(destination, { recursive: true })
+  }
+
+  const files = readdirSync(source)
+
+  for (const file of files) {
+    const sourcePath = join(source, file)
+    const destPath = join(destination, file)
+
+    if (statSync(sourcePath).isDirectory()) {
+      copyDirectoryRecursive(sourcePath, destPath)
+    } else {
+      copyFileSync(sourcePath, destPath)
+    }
+  }
+}
+
 export function setupDatabases(): { userDb: Database.Database; lessonDb: Database.Database } {
   const paths = getDatabasePaths()
 
@@ -38,6 +58,7 @@ export function setupDatabases(): { userDb: Database.Database; lessonDb: Databas
   // Copy databases from resources if they don't exist
   const resourceLessonDbPath = join(__dirname, '../../resources/japanolearn.db')
   const resourceDictionaryDbPath = join(__dirname, '../../resources/jmdict.sqlite')
+  const resourceQuestionImagesPath = join(__dirname, '../../resources/question_images')
 
   if (!existsSync(paths.lessonDbPath) && existsSync(resourceLessonDbPath)) {
     copyFileSync(resourceLessonDbPath, paths.lessonDbPath)
@@ -46,6 +67,17 @@ export function setupDatabases(): { userDb: Database.Database; lessonDb: Databas
   if (!existsSync(paths.dictionaryDbPath) && existsSync(resourceDictionaryDbPath)) {
     console.log('Copying dictionary database to user data directory...')
     copyFileSync(resourceDictionaryDbPath, paths.dictionaryDbPath)
+  }
+
+  // Copy question images from resources if they don't exist in user data
+  if (existsSync(resourceQuestionImagesPath)) {
+    const userImagesExist =
+      existsSync(paths.questionImagesPath) && readdirSync(paths.questionImagesPath).length > 0
+
+    if (!userImagesExist) {
+      console.log('Copying question images to user data directory...')
+      copyDirectoryRecursive(resourceQuestionImagesPath, paths.questionImagesPath)
+    }
   }
 
   // Initialize databases
@@ -60,6 +92,9 @@ export function setupDatabases(): { userDb: Database.Database; lessonDb: Databas
   console.log('Dictionary database path:', paths.dictionaryDbPath)
   console.log('Resource dictionary database path:', resourceDictionaryDbPath)
   console.log('Dictionary database exists:', existsSync(paths.dictionaryDbPath))
+  console.log('Question images path:', paths.questionImagesPath)
+  console.log('Resource question images path:', resourceQuestionImagesPath)
+  console.log('Question images exist:', existsSync(paths.questionImagesPath))
 
   // Log lesson database tables
   const tables = lessonDb.prepare("SELECT name FROM sqlite_master WHERE type='table'").all() as {
