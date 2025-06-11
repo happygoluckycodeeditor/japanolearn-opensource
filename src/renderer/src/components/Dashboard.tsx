@@ -36,6 +36,10 @@ export default function Dashboard(): JSX.Element {
     navigate('/dictionary')
   }
 
+  const goToProfile = (): void => {
+    navigate('/profile')
+  }
+
   return (
     <div className="w-screen max-w-full p-10 pt-20 sm:pl-10 sm:pr-10 md:pl-24 md:pr-24 bg-gray-200">
       {/*Greeting */}
@@ -223,7 +227,7 @@ export default function Dashboard(): JSX.Element {
               </div>
             </div>
 
-            {/* Culture Card */}
+            {/* Profile Card */}
             <div
               className="
               relative
@@ -238,16 +242,18 @@ export default function Dashboard(): JSX.Element {
               ease-in-out
               hover:shadow-2xl
               "
+              onClick={goToProfile}
             >
-              <h2 className="text-lg font-bold text-teal-800">Japanese Culture</h2>
-              <p className="mt-2 text-teal-700">
-                Learn about customs, traditions, and cultural concepts.
-              </p>
+              <h2 className="text-lg font-bold text-teal-800">Profile</h2>
+              <p className="mt-2 text-teal-700">Check your stats, level and progress</p>
               <div className="mt-3 text-teal-600">
-                <span className="inline-block bg-teal-100 rounded px-2 py-1 mr-1">着物</span>
-                <span className="inline-block bg-teal-100 rounded px-2 py-1 mr-1">お茶</span>
-                <span className="inline-block bg-teal-100 rounded px-2 py-1">和食</span>
+                <span className="inline-block bg-teal-100 rounded px-2 py-1 mr-1">Level 5</span>
+                <span className="inline-block bg-teal-100 rounded px-2 py-1 mr-1">
+                  85% Progress
+                </span>
+                <span className="inline-block bg-teal-100 rounded px-2 py-1">Stats</span>
               </div>
+              <div className="absolute bottom-4 right-4 text-4xl">👤</div>
             </div>
           </Masonry>
         </ResponsiveMasonry>
