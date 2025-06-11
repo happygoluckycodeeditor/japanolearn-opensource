@@ -4,7 +4,7 @@ export default function Profile(): JSX.Element {
   const navigate = useNavigate()
 
   const goBack = (): void => {
-    navigate('/')
+    navigate('/Dashboard')
   }
 
   return (
