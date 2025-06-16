@@ -46,3 +46,54 @@ export interface ExerciseQuestion {
   explanation: string | null
   image_path: string | null
 }
+
+// NEW: User profile related types
+export interface User {
+  id: number
+  username: string
+  created_at?: string
+}
+
+export interface UserProgress {
+  id: number
+  user_id: number
+  lesson_id: number
+  completed_at: string
+  xp_earned: number
+}
+
+export interface UserExerciseAttempt {
+  id: number
+  user_id: number
+  exercise_id: number
+  score: number
+  total_questions: number
+  accuracy: number
+  attempted_at: string
+}
+
+export interface UserDailyActivity {
+  id: number
+  user_id: number
+  date: string
+  xp_earned: number
+  lessons_completed: number
+  exercises_completed: number
+}
+
+export interface UserProfile extends User {
+  totalXp: number
+  level: number
+  currentLevelXp: number
+  nextLevelXp: number
+  xpToNextLevel: number
+  lessonsCompleted: number
+  avgAccuracy: number
+}
+
+export interface ActivityData {
+  date: string
+  xp_earned: number
+  lessons_completed: number
+  exercises_completed: number
+}

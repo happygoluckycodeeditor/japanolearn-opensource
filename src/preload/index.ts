@@ -56,7 +56,12 @@ if (process.contextIsolated) {
             'add-lesson-question',
             'update-lesson-question',
             'delete-lesson-question',
-            'get-secure-image-url'
+            'get-secure-image-url',
+            // User profile channels - ADD THESE
+            'get-user-profile',
+            'get-user-activity',
+            'record-lesson-completion',
+            'record-exercise-attempt'
           ]
 
           if (validChannels.includes(channel)) {
