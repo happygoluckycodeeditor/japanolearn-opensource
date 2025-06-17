@@ -84,6 +84,24 @@ const DataManagement: React.FC = () => {
     }
   }
 
+  // NEW: Add this function to refetch a specific exercise
+  const refetchSelectedExercise = async (exerciseId: number): Promise<void> => {
+    try {
+      // Get the updated exercise data
+      const result = await window.electron.ipcRenderer.invoke('get-exercises', selectedLesson?.id)
+      if (result.success) {
+        const updatedExercise = result.exercises.find((ex: Exercise) => ex.id === exerciseId)
+        if (updatedExercise) {
+          setSelectedExercise(updatedExercise)
+          // Also refetch exercise questions to make sure they're up to date
+          fetchExerciseQuestions(exerciseId)
+        }
+      }
+    } catch (error) {
+      console.error('Error refetching selected exercise:', error)
+    }
+  }
+
   // Handle selecting a lesson
   const handleSelectLesson = (lesson: Lesson): void => {
     setSelectedLesson(lesson)
@@ -236,7 +254,13 @@ const DataManagement: React.FC = () => {
               isEditing={isEditingExercise}
               lessonId={selectedLesson?.id}
               onSave={() => {
-                if (selectedLesson) fetchExercises(selectedLesson.id)
+                if (selectedLesson) {
+                  fetchExercises(selectedLesson.id)
+                  // NEW: Also refetch the selected exercise if we're editing an existing one
+                  if (selectedExercise && isEditingExercise) {
+                    refetchSelectedExercise(selectedExercise.id)
+                  }
+                }
                 setIsAddingNewExercise(false)
                 setIsEditingExercise(false)
               }}

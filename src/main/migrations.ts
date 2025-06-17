@@ -27,6 +27,24 @@ export function runMigrations(): void {
       db.prepare('ALTER TABLE exercise_questions ADD COLUMN image_path TEXT').run()
     }
 
+    // Check if exp column exists in lessons table
+    const lessonsColumns = db.prepare(`PRAGMA table_info(lessons)`).all() as {
+      name: string
+    }[]
+    if (!lessonsColumns.some((col) => col.name === 'exp')) {
+      console.log('Adding exp column to lessons table')
+      db.prepare('ALTER TABLE lessons ADD COLUMN exp INTEGER DEFAULT 10').run()
+    }
+
+    // Check if exp column exists in exercises table
+    const exercisesColumns = db.prepare(`PRAGMA table_info(exercises)`).all() as {
+      name: string
+    }[]
+    if (!exercisesColumns.some((col) => col.name === 'exp')) {
+      console.log('Adding exp column to exercises table')
+      db.prepare('ALTER TABLE exercises ADD COLUMN exp INTEGER DEFAULT 5').run()
+    }
+
     db.close()
     console.log('Database migrations completed successfully')
   } catch (error) {

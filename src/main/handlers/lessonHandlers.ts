@@ -11,10 +11,13 @@ export function setupLessonHandlers(lessonDb: Database.Database): void {
     try {
       // Check what tables exist
       const tables = lessonDb
-        .prepare('SELECT name FROM sqlite_master WHERE type=\'table\'')
+        .prepare("SELECT name FROM sqlite_master WHERE type='table'")
         .all() as TableInfo[]
 
-      console.log('Available tables:', tables.map((t: TableInfo) => t.name))
+      console.log(
+        'Available tables:',
+        tables.map((t: TableInfo) => t.name)
+      )
 
       let lessons: unknown[] = []
 
@@ -53,12 +56,12 @@ export function setupLessonHandlers(lessonDb: Database.Database): void {
     }
   })
 
-  // Add lesson handler
+  // Add lesson handler - UPDATED to include exp
   ipcMain.handle('add-lesson', (_event, lessonData) => {
     try {
       const stmt = lessonDb.prepare(`
-        INSERT INTO lessons (title, description, explanation, video_url, level, category, order_index)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO lessons (title, description, explanation, video_url, level, category, order_index, exp)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
       `)
 
       const result = stmt.run(
@@ -68,7 +71,8 @@ export function setupLessonHandlers(lessonDb: Database.Database): void {
         lessonData.video_url || null,
         lessonData.level || null,
         lessonData.category || null,
-        lessonData.order_index || null
+        lessonData.order_index || null,
+        lessonData.exp || 10 // NEW: Include exp field with default value
       )
 
       // Fetch the newly created lesson
@@ -87,13 +91,13 @@ export function setupLessonHandlers(lessonDb: Database.Database): void {
     }
   })
 
-  // Update lesson handler
+  // Update lesson handler - UPDATED to include exp
   ipcMain.handle('update-lesson', (_event, lessonData) => {
     try {
       const stmt = lessonDb.prepare(`
         UPDATE lessons 
         SET title = ?, description = ?, explanation = ?, video_url = ?, 
-            level = ?, category = ?, order_index = ?
+            level = ?, category = ?, order_index = ?, exp = ?
         WHERE id = ?
       `)
 
@@ -105,11 +109,14 @@ export function setupLessonHandlers(lessonDb: Database.Database): void {
         lessonData.level || null,
         lessonData.category || null,
         lessonData.order_index || null,
+        lessonData.exp || 10, // NEW: Include exp field with default value
         lessonData.id
       )
 
       // Fetch the updated lesson
-      const updatedLesson = lessonDb.prepare('SELECT * FROM lessons WHERE id = ?').get(lessonData.id)
+      const updatedLesson = lessonDb
+        .prepare('SELECT * FROM lessons WHERE id = ?')
+        .get(lessonData.id)
 
       return { success: true, lesson: updatedLesson }
     } catch (error) {

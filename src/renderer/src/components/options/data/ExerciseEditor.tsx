@@ -4,7 +4,7 @@ import { Exercise } from '../../../types/database'
 interface ExerciseEditorProps {
   selectedExercise: Exercise | null
   isAddingNew: boolean
-  isEditing: boolean // We'll use this prop
+  isEditing: boolean
   lessonId?: number
   onSave: () => void
   onCancel: () => void
@@ -14,7 +14,7 @@ interface ExerciseEditorProps {
 const ExerciseEditor: React.FC<ExerciseEditorProps> = ({
   selectedExercise,
   isAddingNew,
-  isEditing, // Now using this prop
+  isEditing,
   lessonId,
   onSave,
   onCancel,
@@ -25,11 +25,11 @@ const ExerciseEditor: React.FC<ExerciseEditorProps> = ({
     description: '',
     difficulty: 'Beginner',
     type: 'Multiple Choice',
-    lesson_id: lessonId
+    lesson_id: lessonId,
+    exp: 5 // NEW: Default XP value
   })
 
   useEffect(() => {
-    // Use isEditing in the condition to determine form state
     if (selectedExercise && (isEditing || !isAddingNew)) {
       setFormData(selectedExercise)
     } else {
@@ -38,7 +38,8 @@ const ExerciseEditor: React.FC<ExerciseEditorProps> = ({
         description: '',
         difficulty: 'Beginner',
         type: 'Multiple Choice',
-        lesson_id: lessonId
+        lesson_id: lessonId,
+        exp: 5 // NEW: Default XP value for new exercises
       })
     }
   }, [selectedExercise, isAddingNew, isEditing, lessonId])
@@ -47,7 +48,9 @@ const ExerciseEditor: React.FC<ExerciseEditorProps> = ({
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ): void => {
     const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
+    // Handle number inputs properly
+    const processedValue = name === 'exp' ? parseInt(value) || 0 : value
+    setFormData((prev) => ({ ...prev, [name]: processedValue }))
   }
 
   const handleSaveExercise = async (): Promise<void> => {
@@ -57,11 +60,16 @@ const ExerciseEditor: React.FC<ExerciseEditorProps> = ({
         return
       }
 
+      // NEW: Validate XP value
+      if (!formData.exp || formData.exp < 1) {
+        setDbMessage({ text: 'XP must be at least 1', type: 'error' })
+        return
+      }
+
       let result
       if (isAddingNew) {
         result = await window.electron.ipcRenderer.invoke('add-exercise', formData)
       } else if (isEditing) {
-        // Explicitly check isEditing
         result = await window.electron.ipcRenderer.invoke('update-exercise', {
           id: selectedExercise?.id,
           ...formData
@@ -162,6 +170,26 @@ const ExerciseEditor: React.FC<ExerciseEditorProps> = ({
               <option value="Listening">Listening</option>
               <option value="Writing">Writing</option>
             </select>
+          </div>
+
+          {/* NEW: XP Field */}
+          <div className="md:col-span-2">
+            <label className="label">
+              <span className="label-text">XP Reward</span>
+            </label>
+            <input
+              type="number"
+              name="exp"
+              value={formData.exp || 5}
+              onChange={handleInputChange}
+              className="input input-bordered w-full mb-2"
+              placeholder="XP earned for completing this exercise"
+              min="1"
+              max="500"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              XP points awarded when this exercise is completed successfully
+            </p>
           </div>
         </div>
       </div>

@@ -22,8 +22,8 @@ export function setupExerciseHandlers(lessonDb: Database.Database): void {
   ipcMain.handle('add-exercise', (_event, exerciseData) => {
     try {
       const stmt = lessonDb.prepare(`
-        INSERT INTO exercises (lesson_id, title, description, difficulty, type)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO exercises (lesson_id, title, description, difficulty, type, exp)
+        VALUES (?, ?, ?, ?, ?, ?)
       `)
 
       const result = stmt.run(
@@ -31,7 +31,8 @@ export function setupExerciseHandlers(lessonDb: Database.Database): void {
         exerciseData.title,
         exerciseData.description || null,
         exerciseData.difficulty || null,
-        exerciseData.type || null
+        exerciseData.type || null,
+        exerciseData.exp || 5
       )
 
       // Fetch the newly created exercise
@@ -55,7 +56,7 @@ export function setupExerciseHandlers(lessonDb: Database.Database): void {
     try {
       const stmt = lessonDb.prepare(`
         UPDATE exercises 
-        SET title = ?, description = ?, difficulty = ?, type = ?
+        SET title = ?, description = ?, difficulty = ?, type = ?, exp = ?
         WHERE id = ?
       `)
 
@@ -64,6 +65,7 @@ export function setupExerciseHandlers(lessonDb: Database.Database): void {
         exerciseData.description || null,
         exerciseData.difficulty || null,
         exerciseData.type || null,
+        exerciseData.exp || 5,
         exerciseData.id
       )
 

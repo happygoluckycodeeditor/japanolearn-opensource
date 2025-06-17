@@ -8,6 +8,7 @@ export interface Lesson {
   level: string | null
   category: string | null
   order_index: number | null
+  exp: number
   created_at: string
 }
 
@@ -26,6 +27,7 @@ export interface LessonQuestion {
 
 // Define types for exercise entities
 export interface Exercise {
+  exp: number
   id: number
   lesson_id: number
   title: string

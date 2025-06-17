@@ -49,6 +49,11 @@ const ExerciseDetails: React.FC<ExerciseDetailsProps> = ({
         <div className="mb-2">
           <span className="font-semibold">Type:</span> {exercise.type || 'Not specified'}
         </div>
+        {/* NEW: Display XP value */}
+        <div className="mb-2">
+          <span className="font-semibold">XP Reward:</span>{' '}
+          <span className="badge badge-primary">{exercise.exp || 5} XP</span>
+        </div>
       </div>
 
       {/* Exercise Questions Section */}

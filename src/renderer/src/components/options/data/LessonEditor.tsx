@@ -40,7 +40,8 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
     video_url: '',
     level: 'Beginner',
     category: 'Grammar',
-    order_index: 0
+    order_index: 0,
+    exp: 10 // NEW: Default XP value
   })
 
   // Add state for managing questions
@@ -57,7 +58,8 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
         video_url: '',
         level: 'Beginner',
         category: 'Grammar',
-        order_index: 0
+        order_index: 0,
+        exp: 10 // Default XP value for new lessons, so it does not throw an error
       })
     }
   }, [selectedLesson, isAddingNew])
@@ -66,13 +68,21 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ): void => {
     const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
+    // Handle number inputs properly
+    const processedValue = name === 'order_index' || name === 'exp' ? parseInt(value) || 0 : value
+    setFormData((prev) => ({ ...prev, [name]: processedValue }))
   }
 
   const handleSaveLesson = async (): Promise<void> => {
     try {
       if (!formData.title || !formData.description) {
         setDbMessage({ text: 'Title and description are required', type: 'error' })
+        return
+      }
+
+      // Validate XP value
+      if (!formData.exp || formData.exp < 1) {
+        setDbMessage({ text: 'XP must be at least 1', type: 'error' })
         return
       }
 
@@ -281,6 +291,27 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
               placeholder="Display order"
               min="0"
             />
+          </div>
+
+          {/* NEW: XP Field */}
+          <div>
+            <label className="label">
+              <span className="label-text">XP Reward</span>
+            </label>
+            <input
+              type="number"
+              name="exp"
+              value={formData.exp || 10}
+              onChange={handleInputChange}
+              disabled={!isEditing && !isAddingNew}
+              className="input input-bordered w-full mb-2"
+              placeholder="XP earned for completing this lesson"
+              min="1"
+              max="1000"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              XP points awarded when this lesson is completed
+            </p>
           </div>
         </div>
       </div>
