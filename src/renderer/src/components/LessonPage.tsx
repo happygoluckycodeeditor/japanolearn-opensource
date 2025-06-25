@@ -230,13 +230,14 @@ const LessonPage: React.FC = () => {
         </div>
       )}
 
-      {/* Lesson Explanation */}
+      {/* Lesson Explanation - Simple HTML Display */}
       {lesson.explanation && (
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <h2 className="text-2xl font-semibold mb-4 text-gray-700">Explanation</h2>
-          <div className="text-gray-600 leading-relaxed whitespace-pre-wrap">
-            {lesson.explanation}
-          </div>
+          <div
+            className="text-gray-600 leading-relaxed"
+            dangerouslySetInnerHTML={{ __html: lesson.explanation }}
+          />
         </div>
       )}
 

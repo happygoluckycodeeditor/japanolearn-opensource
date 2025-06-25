@@ -39,7 +39,9 @@
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ]
     },
@@ -47,11 +49,15 @@
       "target": [
         {
           "target": "zip",
-          "arch": ["universal"]
+          "arch": [
+            "universal"
+          ]
         },
         {
           "target": "dmg",
-          "arch": ["universal"]
+          "arch": [
+            "universal"
+          ]
         }
       ]
     },
@@ -59,7 +65,9 @@
       "target": [
         {
           "target": "AppImage",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ]
     },
@@ -74,6 +82,8 @@
     "@types/uuid": "^10.0.0",
     "better-sqlite3": "^11.8.1",
     "electron-updater": "^6.1.7",
+    "quill": "^2.0.3",
+    "react-quill": "^2.0.0",
     "react-responsive-masonry": "^2.7.1",
     "react-router-dom": "^7.3.0",
     "uuid": "^11.1.0"

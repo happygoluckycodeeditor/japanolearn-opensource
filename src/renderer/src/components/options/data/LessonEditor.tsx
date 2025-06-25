@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react'
+import ReactQuill from 'react-quill'
+import 'react-quill/dist/quill.snow.css' // This is all you need!
 import { Lesson, LessonQuestion, Exercise } from '../../../types/database'
 import LessonQuestionManager from './LessonQuestionManager'
 
@@ -16,6 +18,18 @@ interface LessonEditorProps {
   onAddNewExercise: () => void
   onQuestionsUpdated: (lessonId: number) => void
   setDbMessage: (message: { text: string; type: string }) => void
+}
+
+// Simple Quill configuration - uses defaults which are great!
+const quillModules = {
+  toolbar: [
+    [{ header: [1, 2, 3, false] }],
+    ['bold', 'italic', 'underline'],
+    [{ list: 'ordered' }, { list: 'bullet' }],
+    ['blockquote', 'code-block'],
+    ['link'],
+    ['clean']
+  ]
 }
 
 const LessonEditor: React.FC<LessonEditorProps> = ({
@@ -41,10 +55,9 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
     level: 'Beginner',
     category: 'Grammar',
     order_index: 0,
-    exp: 10 // NEW: Default XP value
+    exp: 10
   })
 
-  // Add state for managing questions
   const [isManagingQuestions, setIsManagingQuestions] = useState(false)
 
   useEffect(() => {
@@ -59,7 +72,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
         level: 'Beginner',
         category: 'Grammar',
         order_index: 0,
-        exp: 10 // Default XP value for new lessons, so it does not throw an error
+        exp: 10
       })
     }
   }, [selectedLesson, isAddingNew])
@@ -68,9 +81,12 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ): void => {
     const { name, value } = e.target
-    // Handle number inputs properly
     const processedValue = name === 'order_index' || name === 'exp' ? parseInt(value) || 0 : value
     setFormData((prev) => ({ ...prev, [name]: processedValue }))
+  }
+
+  const handleExplanationChange = (content: string): void => {
+    setFormData((prev) => ({ ...prev, explanation: content }))
   }
 
   const handleSaveLesson = async (): Promise<void> => {
@@ -80,7 +96,6 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
         return
       }
 
-      // Validate XP value
       if (!formData.exp || formData.exp < 1) {
         setDbMessage({ text: 'XP must be at least 1', type: 'error' })
         return
@@ -162,9 +177,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
         </div>
       </div>
 
-      {/* Lesson Form */}
       <div className="form-control">
-        {/* ID Field (only shown when editing or viewing an existing lesson) */}
         {!isAddingNew && selectedLesson && (
           <div className="mb-4">
             <label className="label">
@@ -209,18 +222,32 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
           rows={2}
         ></textarea>
 
+        {/* Simplified Explanation Section */}
         <label className="label">
           <span className="label-text">Explanation</span>
         </label>
-        <textarea
-          name="explanation"
-          value={formData.explanation || ''}
-          onChange={handleInputChange}
-          disabled={!isEditing && !isAddingNew}
-          className="textarea textarea-bordered mb-2"
-          placeholder="Detailed explanation of the lesson content"
-          rows={4}
-        ></textarea>
+        {isEditing || isAddingNew ? (
+          <div className="mb-4">
+            <ReactQuill
+              theme="snow"
+              value={formData.explanation || ''}
+              onChange={handleExplanationChange}
+              modules={quillModules}
+              placeholder="Write your lesson explanation here..."
+            />
+          </div>
+        ) : (
+          <div className="mb-4">
+            <div
+              className="min-h-[100px] p-4 border border-gray-300 rounded-lg bg-gray-50"
+              dangerouslySetInnerHTML={{
+                __html:
+                  formData.explanation ||
+                  '<p class="text-gray-500 italic">No explanation provided</p>'
+              }}
+            />
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
@@ -293,7 +320,6 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
             />
           </div>
 
-          {/* NEW: XP Field */}
           <div>
             <label className="label">
               <span className="label-text">XP Reward</span>
@@ -316,7 +342,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
         </div>
       </div>
 
-      {/* Lesson Questions Section (only shown when viewing) */}
+      {/* Rest of your component remains the same... */}
       {!isEditing && !isAddingNew && selectedLesson && (
         <div className="mt-6">
           <div className="flex justify-between items-center mb-2">
@@ -360,7 +386,6 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
         </div>
       )}
 
-      {/* Exercises Section (only shown when viewing a lesson) */}
       {!isEditing && !isAddingNew && selectedLesson && (
         <div className="mt-6 border-t pt-4">
           <div className="flex justify-between items-center mb-4">
@@ -405,7 +430,6 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
         </div>
       )}
 
-      {/* Lesson Question Manager Modal */}
       {selectedLesson && (
         <LessonQuestionManager
           lesson={selectedLesson}
