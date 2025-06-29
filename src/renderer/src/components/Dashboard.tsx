@@ -7,17 +7,20 @@ import { useNavigate } from 'react-router-dom'
 
 export default function Dashboard(): JSX.Element {
   const [username, setUsername] = useState('User')
+  const [userLevel, setUserLevel] = useState<number | null>(null)
 
   useEffect(() => {
-    async function fetchUsername(): Promise<void> {
+    async function fetchUserData(): Promise<void> {
       const result = await window.electron.ipcRenderer.invoke('get-users')
 
       if (result.success && result.users && result.users.length > 0) {
         setUsername(result.users[0].username)
+        // Assuming the level is stored in the user data
+        setUserLevel(result.users[0].level || 1)
       }
     }
 
-    fetchUsername()
+    fetchUserData()
   }, [])
 
   // Addding navigation to the dashboard
@@ -44,7 +47,14 @@ export default function Dashboard(): JSX.Element {
     <div className="w-screen max-w-full p-10 pt-20 sm:pl-10 sm:pr-10 md:pl-24 md:pr-24 bg-gray-200">
       {/*Greeting */}
       <h1 className="text-4xl font-bold mb-4">Welcome to Japanolearn</h1>
-      <p className="mt-4">Hello, {username}!</p>
+      <div className="flex items-center gap-4 mt-4">
+        <p className="text-lg">Hello, {username}!</p>
+        {userLevel && (
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+            Level {userLevel}
+          </span>
+        )}
+      </div>
 
       {/* Masonry Layout */}
       <div className="mt-6">
