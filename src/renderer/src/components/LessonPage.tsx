@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import YouTube, { YouTubeProps } from 'react-youtube'
 import LessonProgressDrawer from './LessonProgressDrawer'
@@ -92,6 +92,9 @@ const LessonPage: React.FC = () => {
   const [videoDuration, setVideoDuration] = useState(0)
   const [videoWatchTime, setVideoWatchTime] = useState(0)
   const [youtubeAPIReady, setYoutubeAPIReady] = useState(false)
+
+  // Add a ref to track the current interval
+  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     // Load YouTube API first
@@ -213,6 +216,11 @@ const LessonPage: React.FC = () => {
   }
 
   const startProgressTracking = (player: YouTubePlayer): void => {
+    // Clear any existing interval first
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current)
+    }
+
     const trackProgress = (): void => {
       if (player && typeof player.getCurrentTime === 'function') {
         const currentTime = player.getCurrentTime()
@@ -233,18 +241,28 @@ const LessonPage: React.FC = () => {
     }
 
     // Track progress every second while playing
-    const interval = setInterval(() => {
+    progressIntervalRef.current = setInterval(() => {
       if (player.getPlayerState() === 1) {
         // Still playing
         trackProgress()
       } else {
-        clearInterval(interval)
+        // Video paused/stopped - clear this interval
+        if (progressIntervalRef.current) {
+          clearInterval(progressIntervalRef.current)
+          progressIntervalRef.current = null
+        }
       }
     }, 1000)
-
-    // Clean up interval after 10 seconds (will restart when playing again)
-    setTimeout(() => clearInterval(interval), 10000)
   }
+
+  // Clean up interval on component unmount
+  useEffect(() => {
+    return (): void => {
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current)
+      }
+    }
+  }, [])
 
   const onPlayerError: YouTubeProps['onError'] = (event) => {
     console.error('YouTube player error:', event.data)
