@@ -1,0 +1,72 @@
+/* DaisyUI Drawer Scrollbar Override */
+.drawer-side {
+  scrollbar-width: thin;
+  scrollbar-color: #9ca3af #f1f5f9;
+}
+
+.drawer-side::-webkit-scrollbar {
+  width: 8px;
+}
+
+.drawer-side::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.drawer-side::-webkit-scrollbar-thumb {
+  background: #9ca3af;
+  border-radius: 4px;
+  border: 1px solid #f1f5f9;
+}
+
+.drawer-side::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* Override any overlay-scrollbar class that might be causing issues */
+.drawer-side .overlay-scrollbar::-webkit-scrollbar {
+  width: 8px !important;
+  opacity: 1 !important;
+}
+
+.drawer-side .overlay-scrollbar::-webkit-scrollbar-track {
+  background: #f1f5f9 !important;
+  opacity: 1 !important;
+}
+
+.drawer-side .overlay-scrollbar::-webkit-scrollbar-thumb {
+  background: #9ca3af !important;
+  opacity: 1 !important;
+  border-radius: 4px !important;
+}
+
+/* Specific override for your lesson progress drawer */
+.drawer-side > div[class*="min-h-full"] {
+  scrollbar-width: thin;
+  scrollbar-color: #9ca3af #f1f5f9;
+}
+
+.drawer-side > div[class*="min-h-full"]::-webkit-scrollbar {
+  width: 8px !important;
+  background: transparent;
+}
+
+.drawer-side > div[class*="min-h-full"]::-webkit-scrollbar-track {
+  background: #f1f5f9 !important;
+  border-radius: 4px;
+}
+
+.drawer-side > div[class*="min-h-full"]::-webkit-scrollbar-thumb {
+  background: #9ca3af !important;
+  border-radius: 4px;
+  border: 1px solid #f1f5f9;
+}
+
+.drawer-side > div[class*="min-h-full"]::-webkit-scrollbar-thumb:hover {
+  background: #6b7280 !important;
+}
+
+/* Remove any gaps or transparent effects */
+.drawer-side * {
+  scrollbar-gutter: stable;
+}
