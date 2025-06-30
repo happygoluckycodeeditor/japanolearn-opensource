@@ -1,5 +1,54 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import YouTube, { YouTubeProps } from 'react-youtube'
+
+// Add this function at the top of the file, outside the component
+const loadYouTubeAPI = (): Promise<void> => {
+  return new Promise((resolve) => {
+    // Check if YouTube API is already loaded
+    if (window.YT && window.YT.Player) {
+      resolve()
+      return
+    }
+
+    // Create script element with HTTPS URL
+    const script = document.createElement('script')
+    script.src = 'https://www.youtube.com/iframe_api'
+    script.async = true
+
+    // Set up the callback
+    window.onYouTubeIframeAPIReady = (): void => {
+      resolve()
+    }
+
+    document.head.appendChild(script)
+  })
+}
+
+// Add proper type declarations for YouTube API
+declare global {
+  interface Window {
+    YT: {
+      Player: new (elementId: string, options: YouTubeProps) => YouTubePlayer
+      PlayerState: {
+        UNSTARTED: number
+        ENDED: number
+        PLAYING: number
+        PAUSED: number
+        BUFFERING: number
+        CUED: number
+      }
+    }
+    onYouTubeIframeAPIReady: () => void
+  }
+}
+
+// YouTube Player interface
+interface YouTubePlayer {
+  getCurrentTime(): number
+  getDuration(): number
+  getPlayerState(): number
+}
 
 interface Lesson {
   id: number
@@ -36,11 +85,25 @@ const LessonPage: React.FC = () => {
   const [showResults, setShowResults] = useState(false)
   const [imageUrls, setImageUrls] = useState<{ [key: number]: string }>({})
 
+  // New state for video progress tracking
+  const [videoProgress, setVideoProgress] = useState(0) // 0-50 for video progress
+  const [quizProgress, setQuizProgress] = useState(0) // 0-50 for quiz progress
+  const [videoDuration, setVideoDuration] = useState(0)
+  const [videoWatchTime, setVideoWatchTime] = useState(0)
+  const [youtubeAPIReady, setYoutubeAPIReady] = useState(false)
+
   useEffect(() => {
-    if (lessonId) {
+    // Load YouTube API first
+    loadYouTubeAPI().then(() => {
+      setYoutubeAPIReady(true)
+    })
+  }, [])
+
+  useEffect(() => {
+    if (lessonId && youtubeAPIReady) {
       loadLessonData()
     }
-  }, [lessonId])
+  }, [lessonId, youtubeAPIReady])
 
   const loadLessonData = async (): Promise<void> => {
     try {
@@ -101,11 +164,14 @@ const LessonPage: React.FC = () => {
 
   const handleSubmitQuiz = (): void => {
     setShowResults(true)
+    // Calculate quiz progress based on completion
+    setQuizProgress(50) // Full quiz progress when submitted
   }
 
   const resetQuiz = (): void => {
     setSelectedAnswers({})
     setShowResults(false)
+    setQuizProgress(0) // Reset quiz progress
   }
 
   const handleBackClick = (): void => {
@@ -116,17 +182,84 @@ const LessonPage: React.FC = () => {
     }
   }
 
-  const getYouTubeEmbedUrl = (url: string): string => {
+  const getYouTubeVideoId = (url: string): string => {
     if (!url) return ''
 
     // Handle different YouTube URL formats
     const videoIdMatch = url.match(
       /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/
     )
-    if (videoIdMatch) {
-      return `https://www.youtube.com/embed/${videoIdMatch[1]}`
+    return videoIdMatch ? videoIdMatch[1] : ''
+  }
+
+  // YouTube player event handlers
+  const onPlayerReady: YouTubeProps['onReady'] = (event) => {
+    const duration = event.target.getDuration()
+    setVideoDuration(duration)
+    console.log('Video ready, duration:', duration)
+  }
+
+  const onPlayerStateChange: YouTubeProps['onStateChange'] = (event) => {
+    const playerState = event.data
+    console.log('Player state changed:', playerState)
+
+    // YouTube player states:
+    // -1 (unstarted), 0 (ended), 1 (playing), 2 (paused), 3 (buffering), 5 (video cued)
+    if (playerState === 1) {
+      // Playing
+      startProgressTracking(event.target)
     }
-    return url
+  }
+
+  const startProgressTracking = (player: YouTubePlayer): void => {
+    const trackProgress = (): void => {
+      if (player && typeof player.getCurrentTime === 'function') {
+        const currentTime = player.getCurrentTime()
+        const duration = player.getDuration()
+
+        if (duration > 0) {
+          const watchPercentage = (currentTime / duration) * 100
+          setVideoWatchTime(currentTime)
+
+          // Update video progress (0-50 based on 80% completion)
+          if (watchPercentage >= 80) {
+            setVideoProgress(50) // Full video progress at 80%
+          } else {
+            setVideoProgress((watchPercentage / 80) * 50) // Scale to 50 max
+          }
+        }
+      }
+    }
+
+    // Track progress every second while playing
+    const interval = setInterval(() => {
+      if (player.getPlayerState() === 1) {
+        // Still playing
+        trackProgress()
+      } else {
+        clearInterval(interval)
+      }
+    }, 1000)
+
+    // Clean up interval after 10 seconds (will restart when playing again)
+    setTimeout(() => clearInterval(interval), 10000)
+  }
+
+  const onPlayerError: YouTubeProps['onError'] = (event) => {
+    console.error('YouTube player error:', event.data)
+  }
+
+  // YouTube player options
+  const youtubeOpts: YouTubeProps['opts'] = {
+    height: '100%',
+    width: '100%',
+    playerVars: {
+      autoplay: 0,
+      controls: 1,
+      rel: 0,
+      showinfo: 0,
+      modestbranding: 1
+    }
   }
 
   const calculateScore = (): { correct: number; total: number } => {
@@ -139,7 +272,10 @@ const LessonPage: React.FC = () => {
     return { correct, total: questions.length }
   }
 
-  if (loading) {
+  // Calculate total lesson progress
+  const totalProgress = Math.round(videoProgress + quizProgress)
+
+  if (loading || !youtubeAPIReady) {
     return (
       <div className="w-screen max-w-full p-10 pt-20 sm:pl-10 sm:pr-10 md:pl-24 md:pr-24 bg-gray-200 min-h-screen">
         <div className="flex justify-center items-center h-64">
@@ -168,6 +304,7 @@ const LessonPage: React.FC = () => {
   }
 
   const score = showResults ? calculateScore() : null
+  const videoId = getYouTubeVideoId(lesson.video_url)
 
   return (
     <div className="w-screen max-w-full p-10 pt-20 sm:pl-10 sm:pr-10 md:pl-24 md:pr-24 bg-gray-200 min-h-screen">
@@ -190,6 +327,18 @@ const LessonPage: React.FC = () => {
           </svg>
           Back to {lesson.level} Lessons
         </button>
+      </div>
+
+      {/* Progress Debug Info (temporary) */}
+      <div className="mb-4 p-4 bg-blue-100 rounded-lg">
+        <div className="text-sm">
+          <div>Video Progress: {Math.round(videoProgress)}/50</div>
+          <div>Quiz Progress: {Math.round(quizProgress)}/50</div>
+          <div>Total Progress: {totalProgress}%</div>
+          <div>
+            Watch Time: {Math.round(videoWatchTime)}s / {Math.round(videoDuration)}s
+          </div>
+        </div>
       </div>
 
       {/* Lesson Title */}
@@ -216,15 +365,17 @@ const LessonPage: React.FC = () => {
       </div>
 
       {/* YouTube Video */}
-      {lesson.video_url && (
+      {lesson.video_url && videoId && (
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <h2 className="text-2xl font-semibold mb-4 text-gray-700">Video Lesson</h2>
           <div className="aspect-video">
-            <iframe
-              src={getYouTubeEmbedUrl(lesson.video_url)}
-              title="Lesson Video"
-              className="w-full h-full rounded-lg"
-              allowFullScreen
+            <YouTube
+              videoId={videoId}
+              opts={youtubeOpts}
+              onReady={onPlayerReady}
+              onStateChange={onPlayerStateChange}
+              onError={onPlayerError}
+              className="w-full h-full"
             />
           </div>
         </div>
@@ -253,7 +404,6 @@ const LessonPage: React.FC = () => {
               </div>
             )}
           </div>
-
           <div className="space-y-6">
             {questions.map((question, index) => (
               <div key={question.id} className="border-b border-gray-200 pb-6 last:border-b-0">
