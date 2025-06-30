@@ -83,6 +83,7 @@
     "better-sqlite3": "^11.8.1",
     "electron-updater": "^6.1.7",
     "quill": "^2.0.3",
+    "react-confetti": "^6.4.0",
     "react-quill": "^2.0.0",
     "react-responsive-masonry": "^2.7.1",
     "react-router-dom": "^7.3.0",
