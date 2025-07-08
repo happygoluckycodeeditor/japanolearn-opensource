@@ -101,8 +101,8 @@ const LessonPage: React.FC = () => {
 
   // Add user state
   const [user, setUser] = useState<{ id: number; username: string } | null>(null)
-  // Track if lesson completion has been recorded
-  const [hasRecordedCompletion, setHasRecordedCompletion] = useState(false)
+  // Add state for persisted progress for the drawer button
+  const [persistedProgress, setPersistedProgress] = useState<number | null>(null)
 
   // Add a ref to track the current interval
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null)
@@ -137,6 +137,34 @@ const LessonPage: React.FC = () => {
     }
   }, [lessonId, youtubeAPIReady])
 
+  // On lesson load, fetch persisted progress and initialize progress state
+  useEffect(() => {
+    async function fetchAndSetProgress(): Promise<void> {
+      if (user && lesson) {
+        try {
+          const progressResult = await window.electron.ipcRenderer.invoke(
+            'get-user-lesson-progress',
+            {
+              userId: user.id,
+              lessonId: lesson.id
+            }
+          )
+          if (progressResult.success && progressResult.progress) {
+            if (typeof progressResult.progress.video_progress === 'number') {
+              setVideoProgress(progressResult.progress.video_progress)
+            }
+            if (typeof progressResult.progress.quiz_progress === 'number') {
+              setQuizProgress(progressResult.progress.quiz_progress)
+            }
+          }
+        } catch {
+          // Ignore errors, fallback to default 0
+        }
+      }
+    }
+    fetchAndSetProgress()
+  }, [user, lesson])
+
   // Fetch current user on mount
   useEffect(() => {
     async function fetchUser(): Promise<void> {
@@ -152,40 +180,59 @@ const LessonPage: React.FC = () => {
     fetchUser()
   }, [])
 
-  // Persist lesson completion when both video and quiz are done
+  // Fetch persisted progress for the drawer button
   useEffect(() => {
-    if (
-      user &&
-      lesson &&
-      Math.round(videoProgress) === 50 &&
-      Math.round(quizProgress) === 50 &&
-      !hasRecordedCompletion
-    ) {
-      // Call IPC to record lesson completion
-      window.electron.ipcRenderer
-        .invoke('record-lesson-completion', {
-          userId: user.id,
-          lessonId: lesson.id,
-          xpEarned: lesson.exp || 10, // fallback to 10 if not set
-          videoProgress: Math.round(videoProgress),
-          quizProgress: Math.round(quizProgress),
-          overallProgress: Math.round(videoProgress + quizProgress)
-        })
-        .then(() => {
-          setHasRecordedCompletion(true)
-        })
-        .catch(() => {
-          // Optionally handle error
-        })
+    async function fetchPersistedProgress(): Promise<void> {
+      try {
+        const result = await window.electron.ipcRenderer.invoke('get-users')
+        if (result.success && result.users && result.users.length > 0 && lesson) {
+          const uid = result.users[0].id
+          const progressResult = await window.electron.ipcRenderer.invoke(
+            'get-user-lesson-progress',
+            {
+              userId: uid,
+              lessonId: lesson.id
+            }
+          )
+          if (progressResult.success && progressResult.progress) {
+            setPersistedProgress(progressResult.progress.overall_progress)
+          } else {
+            setPersistedProgress(null)
+          }
+        }
+      } catch {
+        setPersistedProgress(null)
+      }
     }
-    // Reset flag if lesson changes or progress resets
-    if (
-      hasRecordedCompletion &&
-      (Math.round(videoProgress) < 50 || Math.round(quizProgress) < 50)
-    ) {
-      setHasRecordedCompletion(false)
+    fetchPersistedProgress()
+  }, [lesson?.id, showResults, videoProgress, quizProgress])
+
+  // Persist progress whenever video or quiz progress changes
+  useEffect(() => {
+    if (user && lesson) {
+      // Only set completed=1 if both are done
+      const completed = Math.round(videoProgress) === 50 && Math.round(quizProgress) === 50 ? 1 : 0
+      // Only send progress if it increases
+      const newVideo = Math.round(videoProgress)
+      const newQuiz = Math.round(quizProgress)
+      const newOverall = Math.round(videoProgress + quizProgress)
+      // Fetch the previous values for video and quiz from DB (if available)
+      // We'll use the same logic as in the drawer for max
+      // But we need to fetch the actual persisted video/quiz progress, not just overall
+      // For now, let's assume we have them in persistedVideo and persistedQuiz
+      // (You can extend the persistedProgress state to store all three if needed)
+      // For now, always send, since backend will enforce max
+      window.electron.ipcRenderer.invoke('record-lesson-completion', {
+        userId: user.id,
+        lessonId: lesson.id,
+        xpEarned: completed === 1 ? lesson.exp || 10 : 0,
+        videoProgress: newVideo,
+        quizProgress: newQuiz,
+        overallProgress: newOverall,
+        completed
+      })
     }
-  }, [user, lesson, videoProgress, quizProgress, hasRecordedCompletion])
+  }, [user, lesson, videoProgress, quizProgress, showResults])
 
   const loadLessonData = async (): Promise<void> => {
     try {
@@ -253,7 +300,6 @@ const LessonPage: React.FC = () => {
   const resetQuiz = (): void => {
     setSelectedAnswers({})
     setShowResults(false)
-    setQuizProgress(0) // Reset quiz progress
     // Reset confetti state so it can trigger again
     setShowConfetti(false)
     setHasTriggeredConfetti(false)
@@ -446,7 +492,12 @@ const LessonPage: React.FC = () => {
               <span className="text-2xl">💻</span>
               <div className="text-xs font-medium text-center leading-tight">
                 <div>Progress</div>
-                <div className="font-bold">{Math.round(videoProgress + quizProgress)}%</div>
+                <div className="font-bold">
+                  {persistedProgress !== null
+                    ? persistedProgress
+                    : Math.round(videoProgress + quizProgress)}
+                  %
+                </div>
               </div>
             </div>
           </label>

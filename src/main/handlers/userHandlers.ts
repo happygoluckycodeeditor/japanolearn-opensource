@@ -79,21 +79,32 @@ export function setupUserHandlers(userDb: Database.Database): void {
   // Record lesson completion
   ipcMain.handle(
     'record-lesson-completion',
-    (_event, { userId, lessonId, xpEarned, videoProgress, quizProgress, overallProgress }) => {
+    (
+      _event,
+      { userId, lessonId, xpEarned, videoProgress, quizProgress, overallProgress, completed }
+    ) => {
       try {
         const transaction = userDb.transaction(() => {
           const progressStmt = userDb.prepare(`
           INSERT INTO user_progress (user_id, lesson_id, xp_earned, completed, last_accessed, video_progress, quiz_progress, overall_progress)
-          VALUES (?, ?, ?, 1, CURRENT_TIMESTAMP, ?, ?, ?)
+          VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?, ?)
           ON CONFLICT(user_id, lesson_id) DO UPDATE SET
-            xp_earned = excluded.xp_earned,
-            completed = 1,
+            xp_earned = CASE WHEN excluded.completed = 1 THEN excluded.xp_earned ELSE user_progress.xp_earned END,
+            completed = excluded.completed,
             last_accessed = CURRENT_TIMESTAMP,
-            video_progress = excluded.video_progress,
-            quiz_progress = excluded.quiz_progress,
-            overall_progress = excluded.overall_progress
+            video_progress = MAX(user_progress.video_progress, excluded.video_progress),
+            quiz_progress = MAX(user_progress.quiz_progress, excluded.quiz_progress),
+            overall_progress = MAX(user_progress.overall_progress, excluded.overall_progress)
         `)
-          progressStmt.run(userId, lessonId, xpEarned, videoProgress, quizProgress, overallProgress)
+          progressStmt.run(
+            userId,
+            lessonId,
+            xpEarned,
+            completed,
+            videoProgress,
+            quizProgress,
+            overallProgress
+          )
 
           // Update daily activity (optional, keep as is if you want)
           const today = new Date().toISOString().split('T')[0]

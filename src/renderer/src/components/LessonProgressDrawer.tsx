@@ -63,12 +63,13 @@ const LessonProgressDrawer: React.FC<LessonProgressDrawerProps> = ({
     fetchPersistedProgress()
   }, [lesson.id])
 
-  // Use persisted values if available, else fallback to props
-  const videoProgress = persisted ? persisted.video_progress : propVideoProgress
-  const quizProgress = persisted ? persisted.quiz_progress : propQuizProgress
-  const totalProgress = persisted
-    ? persisted.overall_progress
-    : Math.round(propVideoProgress + propQuizProgress)
+  // Use the greater of persisted and in-memory values for progress
+  const videoProgress = Math.max(persisted ? persisted.video_progress : 0, propVideoProgress)
+  const quizProgress = Math.max(persisted ? persisted.quiz_progress : 0, propQuizProgress)
+  const totalProgress = Math.max(
+    persisted ? persisted.overall_progress : 0,
+    Math.round(propVideoProgress + propQuizProgress)
+  )
 
   return (
     <div className="min-h-full w-80 bg-white shadow-xl">
