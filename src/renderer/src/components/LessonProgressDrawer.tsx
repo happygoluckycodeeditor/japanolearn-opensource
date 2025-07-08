@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 interface LessonProgressDrawerProps {
   lesson: {
@@ -19,8 +19,8 @@ interface LessonProgressDrawerProps {
 
 const LessonProgressDrawer: React.FC<LessonProgressDrawerProps> = ({
   lesson,
-  videoProgress,
-  quizProgress,
+  videoProgress: propVideoProgress,
+  quizProgress: propQuizProgress,
   videoDuration,
   videoWatchTime,
   questions,
@@ -29,8 +29,46 @@ const LessonProgressDrawer: React.FC<LessonProgressDrawerProps> = ({
   score,
   onBackClick
 }) => {
-  // Calculate total lesson progress
-  const totalProgress = Math.round(videoProgress + quizProgress)
+  // State for persisted progress
+  const [persisted, setPersisted] = useState<{
+    video_progress: number
+    quiz_progress: number
+    overall_progress: number
+  } | null>(null)
+
+  // Fetch persisted progress on mount or when lesson changes
+  useEffect(() => {
+    async function fetchPersistedProgress(): Promise<void> {
+      try {
+        const userResult = await window.electron.ipcRenderer.invoke('get-users')
+        if (userResult.success && userResult.users && userResult.users.length > 0) {
+          const uid = userResult.users[0].id
+          const progressResult = await window.electron.ipcRenderer.invoke(
+            'get-user-lesson-progress',
+            {
+              userId: uid,
+              lessonId: lesson.id
+            }
+          )
+          if (progressResult.success && progressResult.progress) {
+            setPersisted(progressResult.progress)
+          } else {
+            setPersisted(null)
+          }
+        }
+      } catch {
+        setPersisted(null)
+      }
+    }
+    fetchPersistedProgress()
+  }, [lesson.id])
+
+  // Use persisted values if available, else fallback to props
+  const videoProgress = persisted ? persisted.video_progress : propVideoProgress
+  const quizProgress = persisted ? persisted.quiz_progress : propQuizProgress
+  const totalProgress = persisted
+    ? persisted.overall_progress
+    : Math.round(propVideoProgress + propQuizProgress)
 
   return (
     <div className="min-h-full w-80 bg-white shadow-xl">

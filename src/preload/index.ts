@@ -61,7 +61,8 @@ if (process.contextIsolated) {
             'get-user-profile',
             'get-user-activity',
             'record-lesson-completion',
-            'record-exercise-attempt'
+            'record-exercise-attempt',
+            'get-user-lesson-progress'
           ]
 
           if (validChannels.includes(channel)) {

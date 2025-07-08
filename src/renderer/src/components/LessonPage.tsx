@@ -61,6 +61,7 @@ interface Lesson {
   level: string
   category: string
   order_index: number
+  exp?: number // Added exp to Lesson interface
 }
 
 interface LessonQuestion {
@@ -98,6 +99,11 @@ const LessonPage: React.FC = () => {
   const [showConfetti, setShowConfetti] = useState(false)
   const [hasTriggeredConfetti, setHasTriggeredConfetti] = useState(false)
 
+  // Add user state
+  const [user, setUser] = useState<{ id: number; username: string } | null>(null)
+  // Track if lesson completion has been recorded
+  const [hasRecordedCompletion, setHasRecordedCompletion] = useState(false)
+
   // Add a ref to track the current interval
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const confettiTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -130,6 +136,56 @@ const LessonPage: React.FC = () => {
       loadLessonData()
     }
   }, [lessonId, youtubeAPIReady])
+
+  // Fetch current user on mount
+  useEffect(() => {
+    async function fetchUser(): Promise<void> {
+      try {
+        const result = await window.electron.ipcRenderer.invoke('get-users')
+        if (result.success && result.users && result.users.length > 0) {
+          setUser({ id: result.users[0].id, username: result.users[0].username })
+        }
+      } catch (err) {
+        // Optionally handle error
+      }
+    }
+    fetchUser()
+  }, [])
+
+  // Persist lesson completion when both video and quiz are done
+  useEffect(() => {
+    if (
+      user &&
+      lesson &&
+      Math.round(videoProgress) === 50 &&
+      Math.round(quizProgress) === 50 &&
+      !hasRecordedCompletion
+    ) {
+      // Call IPC to record lesson completion
+      window.electron.ipcRenderer
+        .invoke('record-lesson-completion', {
+          userId: user.id,
+          lessonId: lesson.id,
+          xpEarned: lesson.exp || 10, // fallback to 10 if not set
+          videoProgress: Math.round(videoProgress),
+          quizProgress: Math.round(quizProgress),
+          overallProgress: Math.round(videoProgress + quizProgress)
+        })
+        .then(() => {
+          setHasRecordedCompletion(true)
+        })
+        .catch(() => {
+          // Optionally handle error
+        })
+    }
+    // Reset flag if lesson changes or progress resets
+    if (
+      hasRecordedCompletion &&
+      (Math.round(videoProgress) < 50 || Math.round(quizProgress) < 50)
+    ) {
+      setHasRecordedCompletion(false)
+    }
+  }, [user, lesson, videoProgress, quizProgress, hasRecordedCompletion])
 
   const loadLessonData = async (): Promise<void> => {
     try {

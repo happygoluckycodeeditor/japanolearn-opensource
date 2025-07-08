@@ -132,6 +132,24 @@ function setupUserTables(userDb: Database.Database): void {
     )
   `)
 
+  // Add xp_earned column to user_progress if it doesn't exist
+  const userProgressColumns = userDb.prepare(`PRAGMA table_info(user_progress)`).all() as {
+    name: string
+  }[]
+  if (!userProgressColumns.some((col) => col.name === 'xp_earned')) {
+    userDb.prepare('ALTER TABLE user_progress ADD COLUMN xp_earned INTEGER DEFAULT 0').run()
+  }
+  // Add video_progress, quiz_progress, and overall_progress columns if they don't exist
+  if (!userProgressColumns.some((col) => col.name === 'video_progress')) {
+    userDb.prepare('ALTER TABLE user_progress ADD COLUMN video_progress INTEGER DEFAULT 0').run()
+  }
+  if (!userProgressColumns.some((col) => col.name === 'quiz_progress')) {
+    userDb.prepare('ALTER TABLE user_progress ADD COLUMN quiz_progress INTEGER DEFAULT 0').run()
+  }
+  if (!userProgressColumns.some((col) => col.name === 'overall_progress')) {
+    userDb.prepare('ALTER TABLE user_progress ADD COLUMN overall_progress INTEGER DEFAULT 0').run()
+  }
+
   userDb.exec(`
     CREATE TABLE IF NOT EXISTS exercise_results (
       id INTEGER PRIMARY KEY AUTOINCREMENT,

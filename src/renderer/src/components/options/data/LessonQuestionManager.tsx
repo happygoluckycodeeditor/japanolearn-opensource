@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Lesson, LessonQuestion } from '../../../types/database'
 import ImageSelector from '../../common/ImageSelector'
 
@@ -32,6 +32,40 @@ const LessonQuestionManager: React.FC<LessonQuestionManagerProps> = ({
     explanation: '',
     image_path: null
   })
+
+  // Add state for user progress
+  const [progress, setProgress] = useState<{ xp_earned: number; completed: number } | null>(null)
+
+  // Fetch userId and progress on mount or when lesson changes
+  useEffect(() => {
+    async function fetchUserAndProgress(): Promise<void> {
+      try {
+        // Fetch userId (assume first user, as in Dashboard)
+        const userResult = await window.electron.ipcRenderer.invoke('get-users')
+        if (userResult.success && userResult.users && userResult.users.length > 0) {
+          const uid = userResult.users[0].id
+          // Fetch progress for this lesson and user
+          const progressResult = await window.electron.ipcRenderer.invoke(
+            'get-user-lesson-progress',
+            {
+              userId: uid,
+              lessonId: lesson.id
+            }
+          )
+          if (progressResult.success && progressResult.progress) {
+            setProgress(progressResult.progress)
+          } else {
+            setProgress(null)
+          }
+        }
+      } catch (err) {
+        setProgress(null)
+      }
+    }
+    if (isOpen) {
+      fetchUserAndProgress()
+    }
+  }, [lesson.id, isOpen])
 
   const handleAddNewQuestion = (): void => {
     setIsAddingQuestion(true)
@@ -127,6 +161,16 @@ const LessonQuestionManager: React.FC<LessonQuestionManagerProps> = ({
     <div className={`modal ${isOpen ? 'modal-open' : ''}`}>
       <div className="modal-box max-w-4xl">
         <h3 className="font-bold text-lg mb-4">Manage Questions for &quot;{lesson.title}&quot;</h3>
+
+        {/* User Progress Summary */}
+        {progress && (
+          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded">
+            <strong>Lesson Completion:</strong>{' '}
+            {progress.completed ? '✅ Completed' : '❌ Not completed'}
+            <br />
+            <strong>XP Earned:</strong> {progress.xp_earned}
+          </div>
+        )}
 
         {/* Question List */}
         <div className="overflow-x-auto mb-4">

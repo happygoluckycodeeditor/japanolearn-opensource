@@ -77,35 +77,44 @@ export function setupUserHandlers(userDb: Database.Database): void {
   })
 
   // Record lesson completion
-  ipcMain.handle('record-lesson-completion', (_event, { userId, lessonId, xpEarned }) => {
-    try {
-      const transaction = userDb.transaction(() => {
-        // Insert lesson completion
-        const progressStmt = userDb.prepare(`
-          INSERT INTO user_progress (user_id, lesson_id, xp_earned) 
-          VALUES (?, ?, ?)
+  ipcMain.handle(
+    'record-lesson-completion',
+    (_event, { userId, lessonId, xpEarned, videoProgress, quizProgress, overallProgress }) => {
+      try {
+        const transaction = userDb.transaction(() => {
+          const progressStmt = userDb.prepare(`
+          INSERT INTO user_progress (user_id, lesson_id, xp_earned, completed, last_accessed, video_progress, quiz_progress, overall_progress)
+          VALUES (?, ?, ?, 1, CURRENT_TIMESTAMP, ?, ?, ?)
+          ON CONFLICT(user_id, lesson_id) DO UPDATE SET
+            xp_earned = excluded.xp_earned,
+            completed = 1,
+            last_accessed = CURRENT_TIMESTAMP,
+            video_progress = excluded.video_progress,
+            quiz_progress = excluded.quiz_progress,
+            overall_progress = excluded.overall_progress
         `)
-        progressStmt.run(userId, lessonId, xpEarned)
+          progressStmt.run(userId, lessonId, xpEarned, videoProgress, quizProgress, overallProgress)
 
-        // Update daily activity
-        const today = new Date().toISOString().split('T')[0]
-        const activityStmt = userDb.prepare(`
+          // Update daily activity (optional, keep as is if you want)
+          const today = new Date().toISOString().split('T')[0]
+          const activityStmt = userDb.prepare(`
           INSERT INTO user_daily_activity (user_id, date, xp_earned, lessons_completed)
           VALUES (?, ?, ?, 1)
           ON CONFLICT(user_id, date) DO UPDATE SET
             xp_earned = xp_earned + ?,
             lessons_completed = lessons_completed + 1
         `)
-        activityStmt.run(userId, today, xpEarned, xpEarned)
-      })
+          activityStmt.run(userId, today, xpEarned, xpEarned)
+        })
 
-      transaction()
-      return { success: true, message: 'Lesson completion recorded' }
-    } catch (error) {
-      console.error('Error recording lesson completion:', error)
-      return { success: false, error: 'Failed to record lesson completion' }
+        transaction()
+        return { success: true, message: 'Lesson completion recorded' }
+      } catch (error) {
+        console.error('Error recording lesson completion:', error)
+        return { success: false, error: 'Failed to record lesson completion' }
+      }
     }
-  })
+  )
 
   // Record exercise attempt
   ipcMain.handle(
@@ -218,6 +227,16 @@ export function setupUserHandlers(userDb: Database.Database): void {
     } catch (error) {
       console.error('Error getting user activity:', error)
       return { success: false, error: 'Failed to get user activity' }
+    }
+  })
+
+  ipcMain.handle('get-user-lesson-progress', (_event, { userId, lessonId }) => {
+    try {
+      const stmt = userDb.prepare('SELECT * FROM user_progress WHERE user_id = ? AND lesson_id = ?')
+      const progress = stmt.get(userId, lessonId)
+      return { success: true, progress }
+    } catch (error) {
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
     }
   })
 }
