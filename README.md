@@ -79,3 +79,14 @@ $ npx electron-vite build && npx electron-builder --linux
 
 
 If you want to have the executable file, please let me know.
+
+### Git Commit Style Rules (Recommendations)
+
+Use the following things at the start of the commit so it is easy to under what it was doing :D
+1. chore
+2. docs
+3. style
+4. feature
+5. fix
+6. refactor
+7. test
