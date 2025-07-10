@@ -84,13 +84,41 @@ export function setupUserHandlers(userDb: Database.Database): void {
       { userId, lessonId, xpEarned, videoProgress, quizProgress, overallProgress, completed }
     ) => {
       try {
+        // Check if lesson is already completed for this user
+        const existingProgressStmt = userDb.prepare(
+          'SELECT completed FROM user_progress WHERE user_id = ? AND lesson_id = ?'
+        )
+        const existing = existingProgressStmt.get(userId, lessonId) as
+          | { completed: number }
+          | undefined
+        let awardXp = false
+        let xpToAward = 0
+        let markCompleted = completed
+        if (!existing) {
+          // No record yet, so award XP if completed
+          awardXp = completed === 1
+          xpToAward = awardXp ? xpEarned : 0
+        } else if (
+          typeof existing.completed === 'number' &&
+          existing.completed !== 1 &&
+          completed === 1
+        ) {
+          // Was not completed before, now completed
+          awardXp = true
+          xpToAward = xpEarned
+        } else {
+          // Already completed, do not award XP again
+          xpToAward = 0
+          markCompleted = existing.completed // keep as already completed
+        }
+
         const transaction = userDb.transaction(() => {
           const progressStmt = userDb.prepare(`
           INSERT INTO user_progress (user_id, lesson_id, xp_earned, completed, last_accessed, video_progress, quiz_progress, overall_progress)
           VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?, ?)
           ON CONFLICT(user_id, lesson_id) DO UPDATE SET
-            xp_earned = CASE WHEN excluded.completed = 1 THEN excluded.xp_earned ELSE user_progress.xp_earned END,
-            completed = excluded.completed,
+            xp_earned = CASE WHEN user_progress.completed = 1 THEN user_progress.xp_earned ELSE excluded.xp_earned END,
+            completed = MAX(user_progress.completed, excluded.completed),
             last_accessed = CURRENT_TIMESTAMP,
             video_progress = MAX(user_progress.video_progress, excluded.video_progress),
             quiz_progress = MAX(user_progress.quiz_progress, excluded.quiz_progress),
@@ -99,27 +127,35 @@ export function setupUserHandlers(userDb: Database.Database): void {
           progressStmt.run(
             userId,
             lessonId,
-            xpEarned,
-            completed,
+            xpToAward,
+            markCompleted,
             videoProgress,
             quizProgress,
             overallProgress
           )
 
-          // Update daily activity (optional, keep as is if you want)
-          const today = new Date().toISOString().split('T')[0]
-          const activityStmt = userDb.prepare(`
-          INSERT INTO user_daily_activity (user_id, date, xp_earned, lessons_completed)
-          VALUES (?, ?, ?, 1)
-          ON CONFLICT(user_id, date) DO UPDATE SET
-            xp_earned = xp_earned + ?,
-            lessons_completed = lessons_completed + 1
-        `)
-          activityStmt.run(userId, today, xpEarned, xpEarned)
+          // Only update daily activity if XP is awarded (first completion)
+          if (awardXp && xpToAward > 0) {
+            const today = new Date().toISOString().split('T')[0]
+            const activityStmt = userDb.prepare(`
+            INSERT INTO user_daily_activity (user_id, date, xp_earned, lessons_completed)
+            VALUES (?, ?, ?, 1)
+            ON CONFLICT(user_id, date) DO UPDATE SET
+              xp_earned = xp_earned + ?,
+              lessons_completed = lessons_completed + 1
+          `)
+            activityStmt.run(userId, today, xpToAward, xpToAward)
+          }
         })
 
         transaction()
-        return { success: true, message: 'Lesson completion recorded' }
+        return {
+          success: true,
+          message: awardXp
+            ? 'Lesson completion recorded, XP awarded'
+            : 'Lesson already completed, no XP awarded',
+          xpAwarded: xpToAward
+        }
       } catch (error) {
         console.error('Error recording lesson completion:', error)
         return { success: false, error: 'Failed to record lesson completion' }
