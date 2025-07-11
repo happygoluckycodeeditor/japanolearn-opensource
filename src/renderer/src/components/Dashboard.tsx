@@ -43,6 +43,10 @@ export default function Dashboard(): JSX.Element {
     navigate('/profile')
   }
 
+  const goToKanaLesson = (): void => {
+    navigate('/kana-lesson')
+  }
+
   return (
     <div className="w-screen max-w-full p-10 pt-20 sm:pl-10 sm:pr-10 md:pl-24 md:pr-24 bg-gray-200">
       {/*Greeting */}
@@ -117,14 +121,15 @@ export default function Dashboard(): JSX.Element {
               ease-in-out 
               hover:shadow-2xl
               "
+              onClick={goToKanaLesson}
             >
-              <h2 className="text-lg font-bold text-green-800">Katakana Challenge</h2>
+              <h2 className="text-lg font-bold text-green-800">Learn Hiragana and Katakana</h2>
               <p className="mt-2 text-green-700">
-                Learn foreign words written in the Japanese syllabary.
+                Learn the two syllabaries of the Japanese language through interactive lessons.
               </p>
               <div className="absolute bottom-4 right-4 text-4xl">カ</div>
               <div className="mt-3 text-green-600">
-                <span className="inline-block bg-green-100 rounded px-2 py-1 mr-1">コーヒー</span>
+                <span className="inline-block bg-green-100 rounded px-2 py-1 mr-1">いぬ</span>
                 <span className="inline-block bg-green-100 rounded px-2 py-1 mr-1">パン</span>
               </div>
             </div>
