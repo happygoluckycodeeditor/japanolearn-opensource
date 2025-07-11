@@ -1,5 +1,6 @@
 import React from 'react'
 import { ActivityData } from '../../types/database'
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts'
 
 interface XPChartProps {
   activityData: ActivityData[]
@@ -21,45 +22,40 @@ const XPChart: React.FC<XPChartProps> = ({ activityData }) => {
     )
   }
 
-  const maxXp = Math.max(...last30Days.map((d) => d.xp_earned), 1)
-  const chartHeight = 200
+  // Format data for chart
+  const chartData = last30Days.map((day) => ({
+    date: new Date(day.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+    xp: day.xp_earned,
+    lessons: day.lessons_completed,
+    exercises: day.exercises_completed
+  }))
 
   return (
     <div className="space-y-4">
-      <div className="flex items-end justify-between h-48 gap-1">
-        {last30Days.map((day, index) => {
-          const height = (day.xp_earned / maxXp) * chartHeight
-          const date = new Date(day.date)
-
-          return (
-            <div key={day.date} className="flex flex-col items-center flex-1 group cursor-pointer">
-              <div
-                className="bg-primary rounded-t-sm w-full transition-all hover:bg-primary-focus relative"
-                style={{ height: `${height}px`, minHeight: day.xp_earned > 0 ? '4px' : '0px' }}
-                title={`${date.toLocaleDateString()}: ${day.xp_earned} XP`}
-              >
-                {/* Tooltip */}
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-base-100 text-xs rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-                  <div className="text-center">
-                    <div className="font-semibold">{date.toLocaleDateString()}</div>
-                    <div>{day.xp_earned} XP</div>
-                    {day.lessons_completed > 0 && <div>{day.lessons_completed} lessons</div>}
-                    {day.exercises_completed > 0 && <div>{day.exercises_completed} exercises</div>}
-                  </div>
-                </div>
-              </div>
-
-              {/* Date labels (show every 5th day) */}
-              {index % 5 === 0 && (
-                <div className="text-xs text-base-content/50 mt-1 transform -rotate-45 origin-top-left">
-                  {date.getDate()}/{date.getMonth() + 1}
-                </div>
-              )}
-            </div>
-          )
-        })}
-      </div>
-
+      <ResponsiveContainer width="100%" height={220}>
+        <BarChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 30 }}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis
+            dataKey="date"
+            angle={-45}
+            textAnchor="end"
+            interval={4}
+            height={50}
+            tick={{ fontSize: 12 }}
+          />
+          <YAxis tick={{ fontSize: 12 }} allowDecimals={false} width={40} />
+          <Tooltip
+            formatter={(value: number | string, name: string): [string, string] => {
+              if (name === 'xp') return [`${value} XP`, 'XP']
+              if (name === 'lessons') return [`${value}`, 'Lessons']
+              if (name === 'exercises') return [`${value}`, 'Exercises']
+              return [String(value), name]
+            }}
+            labelFormatter={(label) => `Date: ${label}`}
+          />
+          <Bar dataKey="xp" fill="#5bc0be" radius={[4, 4, 0, 0]} />
+        </BarChart>
+      </ResponsiveContainer>
       <div className="flex justify-between text-sm text-base-content/70">
         <span>Last 30 days</span>
         <span>Total: {last30Days.reduce((sum, day) => sum + day.xp_earned, 0)} XP</span>
