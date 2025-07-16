@@ -1,17 +1,5 @@
 import { useState } from 'react'
-
-const kanaIntro = {
-  hiragana: {
-    title: 'What is Hiragana?',
-    description:
-      "Hiragana is one of the two basic Japanese syllabaries. It is used for native Japanese words and grammatical elements. Let's start learning Hiragana in a fun way!"
-  },
-  katakana: {
-    title: 'What is Katakana?',
-    description:
-      "Katakana is the other basic Japanese syllabary. It is mainly used for foreign words, names, and onomatopoeia. Let's start learning Katakana in a fun way!"
-  }
-}
+import KanaStudyApp from './kana-study/KanaStudyApp'
 
 export default function KanaLesson(): JSX.Element {
   const [mode, setMode] = useState<'hiragana' | 'katakana' | null>(null)
@@ -39,19 +27,18 @@ export default function KanaLesson(): JSX.Element {
     )
   }
 
-  // Step 2: Show intro slide for selected script
-  const intro = kanaIntro[mode]
+  // Step 2: Show the full study app for the selected script
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh]">
-      <h1 className="text-3xl font-bold mb-4">{intro.title}</h1>
-      <p className="text-lg mb-8 max-w-xl text-center">{intro.description}</p>
-      {/* Next: Add slide/flashcard navigation here */}
-      <button
-        className="mt-4 px-6 py-2 bg-gray-300 rounded hover:bg-gray-400 text-lg"
-        onClick={() => setMode(null)}
-      >
-        Back
-      </button>
+    <div>
+      <KanaStudyApp initialKanaType={mode} />
+      <div className="flex justify-center mt-4">
+        <button
+          className="px-6 py-2 bg-gray-300 rounded hover:bg-gray-400 text-lg"
+          onClick={() => setMode(null)}
+        >
+          Back
+        </button>
+      </div>
     </div>
   )
 }
