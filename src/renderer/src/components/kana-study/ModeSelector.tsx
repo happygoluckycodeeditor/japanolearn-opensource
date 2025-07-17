@@ -17,7 +17,7 @@ const studyModes = [
     features: ['Visual mnemonics', 'Example words', 'Step-by-step learning']
   },
   {
-    id: 'flashcard' as StudyMode,
+    id: 'flashcards' as StudyMode,
     title: 'Flashcards',
     description: 'Practice with interactive flashcards',
     emoji: '🃏',
@@ -65,13 +65,13 @@ export default function ModeSelector({
   const kanaEmoji = kanaType === 'hiragana' ? '🌸' : '⚡'
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 p-4">
+    <div className="min-h-screen p-4 pt-20">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
           <button
             onClick={onBack}
-            className="absolute left-4 top-4 bg-white hover:bg-gray-100 text-gray-700 font-medium py-2 px-4 rounded-lg shadow-md transition-colors"
+            className="absolute left-4 top-20 bg-white hover:bg-gray-100 text-gray-700 font-medium py-2 px-4 rounded-lg shadow-md transition-colors z-10"
           >
             ← Back
           </button>

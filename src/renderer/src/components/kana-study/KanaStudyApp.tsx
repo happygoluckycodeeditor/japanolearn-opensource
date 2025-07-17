@@ -127,7 +127,7 @@ export default function KanaStudyApp({ initialKanaType }: KanaStudyAppProps): JS
   // Step 1: Kana Type Selection
   if (!kanaType) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 p-4">
+      <div className="p-4">
         <div className="max-w-4xl mx-auto">
           {/* ProgressDashboard expects kanaType, progress, session, achievements, onBack */}
           {/* Only show dashboard if session exists */}
@@ -217,6 +217,7 @@ export default function KanaStudyApp({ initialKanaType }: KanaStudyAppProps): JS
             onUpdateSession={updateSession}
             onUpdateProgress={updateProgress}
             onComplete={resetToHome}
+            onBack={() => setStudyMode(null)}
           />
         )
       case 'quiz':
@@ -235,7 +236,7 @@ export default function KanaStudyApp({ initialKanaType }: KanaStudyAppProps): JS
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
+    <div className="min-h-screen p-4 pt-20">
       {renderStudyMode()}
 
       {/* Achievement Notification */}
@@ -247,16 +248,6 @@ export default function KanaStudyApp({ initialKanaType }: KanaStudyAppProps): JS
           onClose={() => setShowAchievement(false)}
         />
       )}
-
-      {/* Back to Home Button */}
-      <div className="fixed top-4 left-4">
-        <button
-          onClick={resetToHome}
-          className="bg-white hover:bg-gray-100 text-gray-700 font-medium py-2 px-4 rounded-lg shadow-md transition-colors"
-        >
-          🏠 Home
-        </button>
-      </div>
     </div>
   )
 }

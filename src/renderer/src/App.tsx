@@ -17,7 +17,7 @@ import CategoryLessons from './components/CategoryLessons'
 import LessonPage from './components/LessonPage'
 import Profile from './components/Profile'
 import DonateButton from './components/DonateButton'
-import KanaLesson from './components/KanaLesson'
+import KanaStudyApp from './components/kana-study/KanaStudyApp'
 
 // This component determines whether to show the navbar based on the current route
 const AppContent = (): JSX.Element => {
@@ -39,7 +39,7 @@ const AppContent = (): JSX.Element => {
   }, [location, displayLocation])
 
   return (
-    <div className="flex flex-col h-screen bg-gray-200">
+    <div className="flex flex-col min-h-screen bg-gray-200">
       {showNavbar && <Navbar />}
       {showDonate && <DonateButton />}
       <div className="flex flex-col items-center justify-center flex-grow">
@@ -57,7 +57,7 @@ const AppContent = (): JSX.Element => {
             <Route path="/" element={<HomePage />} />
             <Route path="/setup" element={<SetupForm />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/kana-lesson" element={<KanaLesson />} />
+            <Route path="/kana-lesson" element={<KanaStudyApp />} />
             <Route path="/options" element={<Options />} />
             <Route path="/exercises" element={<Exercises />} />
             <Route path="/exercise/:exerciseId" element={<ExercisePage />} />

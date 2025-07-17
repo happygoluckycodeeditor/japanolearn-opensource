@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { KanaCharacter, StudySession, StudyProgress, Difficulty } from './types'
+import { KanaCharacter, StudySession, StudyProgress, DifficultyLevel } from './types'
 
 interface FlashcardModeProps {
   characters: KanaCharacter[]
@@ -8,6 +8,7 @@ interface FlashcardModeProps {
   onUpdateSession: (updates: Partial<StudySession>) => void
   onUpdateProgress: (character: string, correct: boolean) => void
   onComplete: () => void
+  onBack: () => void // Add this prop
 }
 
 export default function FlashcardMode({
@@ -16,7 +17,8 @@ export default function FlashcardMode({
   progress,
   onUpdateSession,
   onUpdateProgress,
-  onComplete
+  onComplete,
+  onBack // Add this to destructuring
 }: FlashcardModeProps): JSX.Element {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isFlipped, setIsFlipped] = useState(false)
@@ -108,7 +110,7 @@ export default function FlashcardMode({
     }
   }
 
-  const getDifficultyColor = (difficulty?: Difficulty): string => {
+  const getDifficultyColor = (difficulty?: DifficultyLevel): string => {
     switch (difficulty) {
       case 'easy':
         return 'bg-green-100 text-green-800 border-green-200'
@@ -128,7 +130,15 @@ export default function FlashcardMode({
         : 0
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center p-4">
+      <div className="min-h-screen flex items-center justify-center p-4 pt-30">
+        {/* Back Button - positioned same as GroupSelector */}
+        <button
+          onClick={onBack}
+          className="absolute left-4 top-20 bg-white hover:bg-gray-100 text-gray-700 font-medium py-2 px-4 rounded-lg shadow-md transition-colors z-10"
+        >
+          ← Back
+        </button>
+
         <div className="bg-white rounded-2xl p-8 shadow-xl max-w-md w-full text-center">
           <div className="text-6xl mb-4">🎉</div>
           <h2 className="text-3xl font-bold text-gray-800 mb-4">Flashcard Session Complete!</h2>
@@ -182,7 +192,15 @@ export default function FlashcardMode({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-4">
+    <div className="min-h-screen p-4 pt-20">
+      {/* Back Button - positioned same as GroupSelector */}
+      <button
+        onClick={onBack}
+        className="absolute left-4 top-20 bg-white hover:bg-gray-100 text-gray-700 font-medium py-2 px-4 rounded-lg shadow-md transition-colors z-10"
+      >
+        ← Back
+      </button>
+
       <div className="max-w-2xl mx-auto">
         {/* Header with Progress */}
         <div className="bg-white rounded-xl p-4 shadow-md mb-6">

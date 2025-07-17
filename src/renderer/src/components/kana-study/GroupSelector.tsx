@@ -22,14 +22,12 @@ export default function GroupSelector({
     switch (mode) {
       case 'learn':
         return { emoji: '📚', title: 'Learn', color: 'green' }
-      case 'flashcard':
+      case 'flashcards':
         return { emoji: '🃏', title: 'Flashcards', color: 'blue' }
       case 'quiz':
         return { emoji: '🧠', title: 'Quiz', color: 'purple' }
-      case 'writing':
-        return { emoji: '✍️', title: 'Writing', color: 'orange' }
-      case 'listening':
-        return { emoji: '🔊', title: 'Listening', color: 'pink' }
+      default:
+        return { emoji: '📚', title: 'Learn', color: 'green' }
     }
   }
 
@@ -87,13 +85,13 @@ export default function GroupSelector({
   const kanaTitle = kanaType === 'hiragana' ? 'Hiragana ひらがな' : 'Katakana カタカナ'
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 p-4">
+    <div className="min-h-screen p-4 pt-20">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
           <button
             onClick={onBack}
-            className="absolute left-4 top-4 bg-white hover:bg-gray-100 text-gray-700 font-medium py-2 px-4 rounded-lg shadow-md transition-colors"
+            className="absolute left-4 top-20 bg-white hover:bg-gray-100 text-gray-700 font-medium py-2 px-4 rounded-lg shadow-md transition-colors z-10"
           >
             ← Back
           </button>
