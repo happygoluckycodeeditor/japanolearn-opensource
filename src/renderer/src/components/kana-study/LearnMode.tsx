@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { KanaCharacter, StudySession } from './types'
 
 interface LearnModeProps {
@@ -20,16 +20,19 @@ export default function LearnMode({
   const [showMnemonic, setShowMnemonic] = useState(true)
   const [showExamples, setShowExamples] = useState(false)
   const [isCompleted, setIsCompleted] = useState(false)
+  const visited = useRef<Set<number>>(new Set())
 
   const currentCharacter = characters[currentIndex]
   const progress = ((currentIndex + 1) / characters.length) * 100
 
   useEffect(() => {
-    // Mark character as studied when viewed
-    if (currentCharacter) {
+    if (currentCharacter && !visited.current.has(currentIndex)) {
       onUpdateProgress(currentCharacter.kana, true)
+      visited.current.add(currentIndex)
     }
-  }, [currentIndex, currentCharacter, onUpdateProgress])
+    // Only depend on currentIndex and currentCharacter
+    // DO NOT include onUpdateProgress in the dependency array
+  }, [currentIndex, currentCharacter])
 
   const handleNext = (): void => {
     if (currentIndex < characters.length - 1) {
