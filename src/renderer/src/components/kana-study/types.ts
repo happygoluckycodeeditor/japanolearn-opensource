@@ -124,124 +124,6 @@ export interface LearningSession {
   startTime: Date
 }
 
-// Achievement Types
-export type AchievementType = 'streak' | 'accuracy' | 'progress' | 'score' | 'speed' | 'mastery'
-export type AchievementRarity = 'common' | 'rare' | 'epic' | 'legendary'
-
-export interface Achievement {
-  id: string
-  title: string
-  description: string
-  emoji: string
-  type: AchievementType
-  requirement: number
-  rarity: AchievementRarity
-  unlockedAt?: Date
-}
-
-// Statistics Types
-export interface SessionStats {
-  totalSessions: number
-  totalTimeSpent: number
-  totalCharactersStudied: number
-  totalQuestionsAnswered: number
-  totalCorrectAnswers: number
-  averageAccuracy: number
-  longestStreak: number
-  achievementsUnlocked: number
-}
-
-export interface CharacterStats {
-  character: string
-  timesStudied: number
-  correctCount: number
-  incorrectCount: number
-  accuracy: number
-  averageResponseTime: number
-  difficulty: DifficultyLevel
-  lastStudied: Date
-  firstStudied: Date
-}
-
-export interface GroupStats {
-  groupId: string
-  charactersStudied: number
-  totalCharacters: number
-  averageAccuracy: number
-  timeSpent: number
-  completionPercentage: number
-  difficulty: DifficultyLevel
-}
-
-// UI State Types
-export interface AppState {
-  currentView: 'home' | 'learn' | 'flashcards' | 'quiz' | 'progress'
-  selectedKanaType: KanaType | null
-  selectedGroups: string[]
-  studySession: StudySession | null
-  progress: StudyProgress[]
-  achievements: Achievement[]
-  settings: AppSettings
-}
-
-export interface AppSettings {
-  theme: 'light' | 'dark' | 'auto'
-  language: 'en' | 'ja'
-  soundEnabled: boolean
-  animationsEnabled: boolean
-  autoSave: boolean
-  studyReminders: boolean
-  flashcardSettings: FlashcardSettings
-  quizSettings: QuizSettings
-}
-
-// Component Props Types
-export interface KanaStudyAppProps {
-  onBack?: () => void
-}
-
-export interface FlashcardModeProps {
-  characters: KanaCharacter[]
-  session: StudySession
-  settings: FlashcardSettings
-  onUpdateSession: (updates: Partial<StudySession>) => void
-  onUpdateProgress: (character: string, correct: boolean, responseTime?: number) => void
-  onComplete: () => void
-  onSettingsChange: (settings: FlashcardSettings) => void
-}
-
-export interface QuizModeProps {
-  characters: KanaCharacter[]
-  session: StudySession
-  settings: QuizSettings
-  onUpdateSession: (updates: Partial<StudySession>) => void
-  onUpdateProgress: (character: string, correct: boolean, responseTime?: number) => void
-  onComplete: () => void
-}
-
-export interface LearnModeProps {
-  group: KanaGroup
-  session: StudySession
-  onUpdateSession: (updates: Partial<StudySession>) => void
-  onUpdateProgress: (character: string, correct: boolean) => void
-  onComplete: () => void
-}
-
-export interface ProgressDashboardProps {
-  kanaType: KanaType
-  progress: StudyProgress[]
-  session: StudySession
-  achievements: Achievement[]
-  onBack: () => void
-}
-
-export interface AchievementNotificationProps {
-  session: StudySession
-  progress: StudyProgress[]
-  totalCharacters: number
-  onClose: () => void
-}
-
 // Utility Types
 export interface SpacedRepetitionCard {
   character: string
@@ -250,16 +132,6 @@ export interface SpacedRepetitionCard {
   repetitions: number
   nextReview: Date
   quality: number
-}
-
-export interface StudyStatistics {
-  sessionsToday: number
-  timeStudiedToday: number
-  streakDays: number
-  totalCharactersLearned: number
-  weakestCharacters: CharacterStats[]
-  strongestCharacters: CharacterStats[]
-  recentAchievements: Achievement[]
 }
 
 // Error Types
@@ -325,17 +197,6 @@ export const DEFAULT_QUIZ_SETTINGS: QuizSettings = {
   questionTypes: ['kana-to-romaji', 'romaji-to-kana'],
   includeGroups: [],
   randomOrder: true
-}
-
-export const DEFAULT_APP_SETTINGS: AppSettings = {
-  theme: 'light',
-  language: 'en',
-  soundEnabled: true,
-  animationsEnabled: true,
-  autoSave: true,
-  studyReminders: false,
-  flashcardSettings: DEFAULT_FLASHCARD_SETTINGS,
-  quizSettings: DEFAULT_QUIZ_SETTINGS
 }
 
 // Type guards

@@ -1,13 +1,11 @@
 import { useState } from 'react'
-import { KanaType, StudyMode, StudySession, Achievement, StudyProgress } from './types'
+import { KanaType, StudyMode, StudySession, StudyProgress } from './types'
 import { kanaGroups } from './kanaData'
 import ModeSelector from './ModeSelector'
 import GroupSelector from './GroupSelector'
 import FlashcardMode from './FlashcardMode'
 import QuizMode from './QuizMode'
 import LearnMode from './LearnMode'
-import ProgressDashboard from './ProgressDashboard'
-import AchievementNotification, { checkForAchievements } from './AchievementNotification'
 
 interface KanaStudyAppProps {
   initialKanaType?: 'hiragana' | 'katakana'
@@ -19,9 +17,6 @@ export default function KanaStudyApp({ initialKanaType }: KanaStudyAppProps): JS
   const [currentGroup, setCurrentGroup] = useState<string | null>(null)
   const [session, setSession] = useState<StudySession | null>(null)
   const [progress, setProgress] = useState<StudyProgress[]>([])
-  const [unlockedAchievements, setUnlockedAchievements] = useState<string[]>([])
-  const [newAchievements, setNewAchievements] = useState<Achievement[]>([])
-  const [showAchievement, setShowAchievement] = useState(false)
 
   // Start a new session
   const startSession = (type: KanaType, mode: StudyMode, group: string): void => {
@@ -46,24 +41,6 @@ export default function KanaStudyApp({ initialKanaType }: KanaStudyAppProps): JS
     if (session) {
       const updatedSession = { ...session, ...updates }
       setSession(updatedSession)
-      // Check for achievements
-      if (kanaType && currentGroup) {
-        const groupData = kanaGroups[kanaType].find((g) => g.id === currentGroup)
-        if (groupData) {
-          const totalCharacters = groupData.characters.length
-          const newAch = checkForAchievements(
-            updatedSession,
-            progress,
-            totalCharacters,
-            unlockedAchievements
-          )
-          if (newAch.length > 0) {
-            setNewAchievements(newAch)
-            setUnlockedAchievements((prev) => [...prev, ...newAch.map((a) => a.id)])
-            setShowAchievement(true)
-          }
-        }
-      }
     }
   }
 
@@ -131,14 +108,6 @@ export default function KanaStudyApp({ initialKanaType }: KanaStudyAppProps): JS
         <div className="max-w-4xl mx-auto">
           {/* ProgressDashboard expects kanaType, progress, session, achievements, onBack */}
           {/* Only show dashboard if session exists */}
-          {session && (
-            <ProgressDashboard
-              kanaType={kanaType || 'hiragana'}
-              progress={progress}
-              session={session}
-              onBack={() => {}}
-            />
-          )}
           <div className="flex flex-col items-center justify-center min-h-[60vh]">
             <h1 className="text-4xl font-bold mb-4 text-gray-800">🎌 Learn Japanese Kana</h1>
             <p className="text-lg text-gray-600 mb-8 text-center max-w-2xl">
@@ -235,19 +204,5 @@ export default function KanaStudyApp({ initialKanaType }: KanaStudyAppProps): JS
     }
   }
 
-  return (
-    <div className="min-h-screen p-4 pt-20">
-      {renderStudyMode()}
-
-      {/* Achievement Notification */}
-      {showAchievement && newAchievements.length > 0 && session && (
-        <AchievementNotification
-          session={session}
-          progress={progress}
-          totalCharacters={currentGroupData.characters.length}
-          onClose={() => setShowAchievement(false)}
-        />
-      )}
-    </div>
-  )
+  return <div className="min-h-screen p-4 pt-20">{renderStudyMode()}</div>
 }
