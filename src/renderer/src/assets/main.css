@@ -10,8 +10,39 @@
   }
   
   /* Hide scrollbar for IE, Edge and Firefox */
-  html {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-  }
+html {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* 3D Flip Animation for Flashcards */
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+/* Ensure proper 3D perspective for flip animations */
+.transform {
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+/* Flashcard flip animation */
+.flashcard-flip {
+  transition: transform 0.5s;
+  transform-style: preserve-3d;
+}
+
+.flashcard-front,
+.flashcard-back {
+  backface-visibility: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.flashcard-back {
+  transform: rotateY(180deg);
+}
   

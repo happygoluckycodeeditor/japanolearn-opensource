@@ -19,11 +19,17 @@ const studyModes = [
   {
     id: 'flashcards' as StudyMode,
     title: 'Flashcards',
-    description: 'Practice with interactive flashcards',
+    description: 'Practice with interactive flashcards (Coming Soon, in research phase)',
     emoji: '🃏',
     color: 'from-blue-200 to-blue-300 hover:from-blue-300 hover:to-blue-400',
     textColor: 'text-blue-900',
-    features: ['Flip to reveal', 'Difficulty rating', 'Spaced repetition']
+    features: [
+      'SM-2 Spaced Repetition',
+      'Personalized review scheduling',
+      'Memory science-backed learning',
+      'Progress tracking & mastery'
+    ],
+    disabled: true
   },
   {
     id: 'quiz' as StudyMode,
@@ -41,7 +47,7 @@ const studyModes = [
     emoji: '✍️',
     color: 'from-orange-200 to-orange-300 hover:from-orange-300 hover:to-orange-400',
     textColor: 'text-orange-900',
-    features: ['Stroke order', 'Writing practice', 'Real-time feedback'],
+    features: ['Learn about Japanese Keyboard', 'Writing practice', 'Real-time feedback'],
     disabled: true
   },
   {

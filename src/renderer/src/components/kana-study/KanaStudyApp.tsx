@@ -113,16 +113,16 @@ export default function KanaStudyApp({ initialKanaType }: KanaStudyAppProps): JS
             <p className="text-lg text-gray-600 mb-8 text-center max-w-2xl">
               Master Hiragana and Katakana with interactive flashcards, quizzes, and games!
             </p>
-            <div className="flex gap-8">
+            <div className="flex flex-col md:flex-row gap-8 w-full max-w-xl">
               <button
-                className="bg-gradient-to-r from-pink-200 to-pink-300 hover:from-pink-300 hover:to-pink-400 text-pink-900 font-bold py-8 px-12 rounded-xl text-2xl shadow-lg transition-all transform hover:scale-105"
+                className="bg-gradient-to-r from-pink-200 to-pink-300 hover:from-pink-300 hover:to-pink-400 text-pink-900 font-bold py-8 px-12 rounded-xl text-2xl shadow-lg transition-all transform hover:scale-105 w-full"
                 onClick={() => setKanaType('hiragana')}
               >
                 <div className="text-4xl mb-2">ひ</div>
                 Learn Hiragana
               </button>
               <button
-                className="bg-gradient-to-r from-blue-200 to-blue-300 hover:from-blue-300 hover:to-blue-400 text-blue-900 font-bold py-8 px-12 rounded-xl text-2xl shadow-lg transition-all transform hover:scale-105"
+                className="bg-gradient-to-r from-blue-200 to-blue-300 hover:from-blue-300 hover:to-blue-400 text-blue-900 font-bold py-8 px-12 rounded-xl text-2xl shadow-lg transition-all transform hover:scale-105 w-full"
                 onClick={() => setKanaType('katakana')}
               >
                 <div className="text-4xl mb-2">カ</div>
@@ -179,15 +179,7 @@ export default function KanaStudyApp({ initialKanaType }: KanaStudyAppProps): JS
         )
       case 'flashcards':
         return (
-          <FlashcardMode
-            characters={currentGroupData.characters}
-            session={session}
-            progress={progress}
-            onUpdateSession={updateSession}
-            onUpdateProgress={updateProgress}
-            onComplete={resetToHome}
-            onBack={() => setStudyMode(null)}
-          />
+          <FlashcardMode />
         )
       case 'quiz':
         return (
