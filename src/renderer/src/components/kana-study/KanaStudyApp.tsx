@@ -178,9 +178,7 @@ export default function KanaStudyApp({ initialKanaType }: KanaStudyAppProps): JS
           />
         )
       case 'flashcards':
-        return (
-          <FlashcardMode />
-        )
+        return <FlashcardMode />
       case 'quiz':
         return (
           <QuizMode
