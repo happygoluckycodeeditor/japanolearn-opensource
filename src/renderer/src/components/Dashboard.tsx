@@ -10,17 +10,21 @@ export default function Dashboard(): JSX.Element {
   const [userLevel, setUserLevel] = useState<number | null>(null)
 
   useEffect(() => {
-    async function fetchUserData(): Promise<void> {
-      const result = await window.electron.ipcRenderer.invoke('get-users')
-
-      if (result.success && result.users && result.users.length > 0) {
-        setUsername(result.users[0].username)
-        // Assuming the level is stored in the user data
-        setUserLevel(result.users[0].level || 1)
+    async function fetchUserProfile(): Promise<void> {
+      try {
+        const userId = 1 // For now, hardcoded to match ProfilePage
+        const result = await window.electron.ipcRenderer.invoke('get-user-profile', userId)
+        if (result.success && result.profile) {
+          setUsername(result.profile.username)
+          setUserLevel(result.profile.level || 1)
+        }
+      } catch (err) {
+        // Optionally handle error
+        setUsername('User')
+        setUserLevel(1)
       }
     }
-
-    fetchUserData()
+    fetchUserProfile()
   }, [])
 
   // Addding navigation to the dashboard
