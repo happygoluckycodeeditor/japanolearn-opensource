@@ -1,133 +1,242 @@
-import { useState } from 'react'
-import { KanaType, StudyMode, StudySession, StudyProgress } from './types'
-import { kanaGroups } from './kanaData'
-import ModeSelector from './ModeSelector'
-import GroupSelector from './GroupSelector'
-import FlashcardMode from './FlashcardMode'
-import QuizMode from './QuizMode'
-import LearnMode from './LearnMode'
+import { useState, useEffect } from 'react'
+import { hiraganaGroups, katakanaGroups, Character } from './data/japanese-characters'
+import { hiraganaWords, katakanaWords, Word } from './data/japanese-words'
+
+type LearningPhase = 'learn' | 'quiz' | 'practice'
+type StudyMode = 'character-to-romaji' | 'romaji-to-character'
+type CharacterSet = 'hiragana' | 'katakana'
+
+interface StudySession {
+  currentIndex: number
+  score: number
+  total: number
+  incorrectAnswers: (Character | Word)[]
+}
 
 interface KanaStudyAppProps {
   initialKanaType?: 'hiragana' | 'katakana'
 }
 
 export default function KanaStudyApp({ initialKanaType }: KanaStudyAppProps): JSX.Element {
-  const [kanaType, setKanaType] = useState<KanaType | null>(initialKanaType ?? null)
-  const [studyMode, setStudyMode] = useState<StudyMode | null>(null)
-  const [currentGroup, setCurrentGroup] = useState<string | null>(null)
-  const [session, setSession] = useState<StudySession | null>(null)
-  const [progress, setProgress] = useState<StudyProgress[]>([])
+  const [characterSet, setCharacterSet] = useState<CharacterSet>(initialKanaType || 'hiragana')
+  const [selectedGroup, setSelectedGroup] = useState<string>('Basic Vowels')
+  const [learningPhase, setLearningPhase] = useState<LearningPhase>('learn')
+  const [studyMode, setStudyMode] = useState<StudyMode>('character-to-romaji')
+  const [currentCharacters, setCurrentCharacters] = useState<Character[]>([])
+  const [currentWords, setCurrentWords] = useState<Word[]>([])
+  const [session, setSession] = useState<StudySession>({
+    currentIndex: 0,
+    score: 0,
+    total: 0,
+    incorrectAnswers: []
+  })
+  const [selectedAnswer, setSelectedAnswer] = useState<string>('')
+  const [showResult, setShowResult] = useState<boolean>(false)
+  const [isCorrect, setIsCorrect] = useState<boolean>(false)
+  const [options, setOptions] = useState<string[]>([])
 
-  // Start a new session
-  const startSession = (type: KanaType, mode: StudyMode, group: string): void => {
-    const newSession: StudySession = {
-      startTime: new Date(),
-      totalAnswered: 0,
-      correctAnswers: 0,
-      streak: 0,
-      maxStreak: 0,
-      score: 0,
-      timeSpent: 0,
-      mode
+  const groups = characterSet === 'hiragana' ? hiraganaGroups : katakanaGroups
+  const wordGroups = characterSet === 'hiragana' ? hiraganaWords : katakanaWords
+  const currentGroup = groups.find((g) => g.name === selectedGroup)
+  const currentWordGroup = wordGroups.find((g) => g.groupName === selectedGroup)
+
+  useEffect(() => {
+    resetSession()
+  }, [currentGroup, characterSet, selectedGroup, learningPhase])
+
+  useEffect(() => {
+    if (
+      learningPhase === 'quiz' &&
+      currentCharacters.length > 0 &&
+      session.currentIndex < currentCharacters.length
+    ) {
+      generateQuizOptions()
+    } else if (
+      learningPhase === 'practice' &&
+      currentWords.length > 0 &&
+      session.currentIndex < currentWords.length
+    ) {
+      generateWordOptions()
     }
-    setSession(newSession)
-    setKanaType(type)
-    setStudyMode(mode)
-    setCurrentGroup(group)
+  }, [currentCharacters, currentWords, session.currentIndex, studyMode, learningPhase])
+
+  const resetSession = (): void => {
+    if (learningPhase === 'learn' && currentGroup) {
+      setCurrentCharacters(currentGroup.characters)
+      setSession({
+        currentIndex: 0,
+        score: 0,
+        total: currentGroup.characters.length,
+        incorrectAnswers: []
+      })
+    } else if (learningPhase === 'quiz' && currentGroup) {
+      const shuffled = [...currentGroup.characters].sort(() => Math.random() - 0.5)
+      setCurrentCharacters(shuffled)
+      setSession({ currentIndex: 0, score: 0, total: shuffled.length, incorrectAnswers: [] })
+    } else if (learningPhase === 'practice' && currentWordGroup) {
+      const shuffled = [...currentWordGroup.words].sort(() => Math.random() - 0.5)
+      setCurrentWords(shuffled)
+      setSession({ currentIndex: 0, score: 0, total: shuffled.length, incorrectAnswers: [] })
+    }
+    setShowResult(false)
+    setSelectedAnswer('')
   }
 
-  // Update session state
-  const updateSession = (updates: Partial<StudySession>): void => {
-    if (session) {
-      const updatedSession = { ...session, ...updates }
-      setSession(updatedSession)
+  const generateQuizOptions = (): void => {
+    if (currentCharacters.length === 0) return
+
+    const currentChar = currentCharacters[session.currentIndex]
+    const correctAnswer =
+      studyMode === 'character-to-romaji' ? currentChar.romaji : currentChar.character
+
+    const otherChars = currentGroup?.characters.filter((c) => c !== currentChar) || []
+    const wrongOptions = otherChars
+      .map((c) => (studyMode === 'character-to-romaji' ? c.romaji : c.character))
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 3)
+
+    const allOptions = [correctAnswer, ...wrongOptions].sort(() => Math.random() - 0.5)
+    setOptions(allOptions)
+  }
+
+  const generateWordOptions = (): void => {
+    if (currentWords.length === 0) return
+
+    const currentWord = currentWords[session.currentIndex]
+    const correctAnswer = currentWord.meaning
+
+    const otherWords = currentWordGroup?.words.filter((w) => w !== currentWord) || []
+    const wrongOptions = otherWords
+      .map((w) => w.meaning)
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 3)
+
+    const allOptions = [correctAnswer, ...wrongOptions].sort(() => Math.random() - 0.5)
+    setOptions(allOptions)
+  }
+
+  const handleAnswer = (answer: string): void => {
+    if (showResult) return
+
+    setSelectedAnswer(answer)
+    let correct = false
+
+    if (learningPhase === 'quiz') {
+      const currentChar = currentCharacters[session.currentIndex]
+      const correctAnswer =
+        studyMode === 'character-to-romaji' ? currentChar.romaji : currentChar.character
+      correct = answer === correctAnswer
+    } else if (learningPhase === 'practice') {
+      const currentWord = currentWords[session.currentIndex]
+      correct = answer === currentWord.meaning
+    }
+
+    setIsCorrect(correct)
+    setShowResult(true)
+
+    setSession((prev) => ({
+      ...prev,
+      score: correct ? prev.score + 1 : prev.score,
+      incorrectAnswers: correct
+        ? prev.incorrectAnswers
+        : [
+            ...prev.incorrectAnswers,
+            learningPhase === 'quiz'
+              ? currentCharacters[session.currentIndex]
+              : currentWords[session.currentIndex]
+          ]
+    }))
+  }
+
+  const nextQuestion = (): void => {
+    setSession((prev) => ({ ...prev, currentIndex: prev.currentIndex + 1 }))
+    setShowResult(false)
+    setSelectedAnswer('')
+  }
+
+  const prevCharacter = (): void => {
+    if (session.currentIndex > 0) {
+      setSession((prev) => ({ ...prev, currentIndex: prev.currentIndex - 1 }))
     }
   }
 
-  // Reset to home
-  const resetToHome = (): void => {
-    setKanaType(null)
-    setStudyMode(null)
-    setCurrentGroup(null)
-    setSession(null)
+  const nextCharacter = (): void => {
+    if (session.currentIndex < session.total - 1) {
+      setSession((prev) => ({ ...prev, currentIndex: prev.currentIndex + 1 }))
+    }
   }
 
-  // Update progress for a character
-  const updateProgress = (character: string, correct: boolean): void => {
-    setProgress((prev) => {
-      const existing = prev.find((p) => p.character === character)
-      if (existing) {
-        const correctCount = correct ? existing.correctCount + 1 : existing.correctCount
-        const incorrectCount = correct ? existing.incorrectCount : existing.incorrectCount + 1
-        const streakCount = correct ? existing.streakCount + 1 : 0
-        return prev.map((p) =>
-          p.character === character
-            ? {
-                ...p,
-                correctCount,
-                incorrectCount,
-                lastStudied: new Date(),
-                streakCount,
-                difficulty: getDifficultyFromStats(correctCount, incorrectCount)
-              }
-            : p
-        )
-      } else {
-        return [
-          ...prev,
-          {
-            character,
-            correctCount: correct ? 1 : 0,
-            incorrectCount: correct ? 0 : 1,
-            lastStudied: new Date(),
-            difficulty: correct ? 'easy' : 'medium',
-            streakCount: correct ? 1 : 0
-          }
-        ]
-      }
-    })
+  const isComplete = session.currentIndex >= session.total
+  const progressPercentage =
+    session.total > 0
+      ? ((session.currentIndex + (learningPhase === 'learn' ? 0 : 1)) / session.total) * 100
+      : 0
+
+  // Phase icons
+  const phaseIcons = {
+    learn: '📚',
+    quiz: '🧠',
+    practice: '✏️'
   }
 
-  // Helper for difficulty
-  const getDifficultyFromStats = (
-    correct: number,
-    incorrect: number
-  ): 'easy' | 'medium' | 'hard' => {
-    const total = correct + incorrect
-    if (total === 0) return 'medium'
-    const accuracy = correct / total
-    if (accuracy >= 0.8 && correct >= 3) return 'easy'
-    if (accuracy < 0.5 && total >= 3) return 'hard'
-    return 'medium'
-  }
-
-  // Step 1: Kana Type Selection
-  if (!kanaType) {
+  if (isComplete && learningPhase !== 'learn') {
     return (
-      <div className="p-4">
-        <div className="max-w-4xl mx-auto">
-          {/* ProgressDashboard expects kanaType, progress, session, achievements, onBack */}
-          {/* Only show dashboard if session exists */}
-          <div className="flex flex-col items-center justify-center min-h-[60vh]">
-            <h1 className="text-4xl font-bold mb-4 text-gray-800">🎌 Learn Japanese Kana</h1>
-            <p className="text-lg text-gray-600 mb-8 text-center max-w-2xl">
-              Master Hiragana and Katakana with interactive flashcards, quizzes, and games!
-            </p>
-            <div className="flex flex-col md:flex-row gap-8 w-full max-w-xl">
-              <button
-                className="bg-gradient-to-r from-pink-200 to-pink-300 hover:from-pink-300 hover:to-pink-400 text-pink-900 font-bold py-8 px-12 rounded-xl text-2xl shadow-lg transition-all transform hover:scale-105 w-full"
-                onClick={() => setKanaType('hiragana')}
-              >
-                <div className="text-4xl mb-2">ひ</div>
-                Learn Hiragana
-              </button>
-              <button
-                className="bg-gradient-to-r from-blue-200 to-blue-300 hover:from-blue-300 hover:to-blue-400 text-blue-900 font-bold py-8 px-12 rounded-xl text-2xl shadow-lg transition-all transform hover:scale-105 w-full"
-                onClick={() => setKanaType('katakana')}
-              >
-                <div className="text-4xl mb-2">カ</div>
-                Learn Katakana
-              </button>
+      <div className="min-h-screen p-4 pt-24 sm:pt-20 lg:pt-22 flex items-start justify-center">
+        <div className="card bg-base-100 shadow-xl w-full max-w-[1100px]">
+          <div className="card-body text-center">
+            <h2 className="card-title text-2xl justify-center">
+              {learningPhase === 'quiz' ? 'Quiz Complete!' : 'Practice Complete!'}
+            </h2>
+
+            <div className="space-y-6">
+              <div className="space-y-4">
+                <div className="text-6xl">🎉</div>
+                <div className="space-y-2">
+                  <p className="text-2xl">
+                    Score: {session.score}/{session.total}
+                  </p>
+                  <p className="text-lg text-base-content/70">
+                    {Math.round((session.score / session.total) * 100)}% correct
+                  </p>
+                </div>
+              </div>
+
+              {session.incorrectAnswers.length > 0 && (
+                <div className="space-y-4">
+                  <h3 className="text-lg">Review These:</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {session.incorrectAnswers.map((item, index) => (
+                      <div key={index} className="p-4 bg-base-200 rounded-lg text-center">
+                        {'character' in item ? (
+                          <>
+                            <div className="text-2xl mb-1">{item.character}</div>
+                            <div className="text-sm text-base-content/70">{item.romaji}</div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="text-xl mb-1">{item.word}</div>
+                            <div className="text-sm text-base-content/70">{item.meaning}</div>
+                          </>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-3">
+                <button onClick={resetSession} className="btn btn-primary w-full">
+                  🔄 Try Again
+                </button>
+                {learningPhase === 'quiz' && (
+                  <button
+                    onClick={() => setLearningPhase('practice')}
+                    className="btn btn-outline w-full"
+                  >
+                    ✏️ Continue to Word Practice
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -135,64 +244,325 @@ export default function KanaStudyApp({ initialKanaType }: KanaStudyAppProps): JS
     )
   }
 
-  // Step 2: Study Mode Selection
-  if (!studyMode) {
-    return (
-      <ModeSelector
-        kanaType={kanaType}
-        onModeSelect={setStudyMode}
-        onBack={() => setKanaType(null)}
-      />
-    )
-  }
+  return (
+    <div className="min-h-screen p-4 pt-24 sm:pt-20 lg:pt-22 flex items-start justify-center">
+      <div className="card bg-base-100 shadow-xl w-full max-w-[1100px] h-fit">
+        <div className="card-body px-8 py-6">
+          <h2 className="card-title text-2xl justify-center mb-4">Japanese Character Learning</h2>
 
-  // Step 3: Group Selection
-  if (!currentGroup) {
-    return (
-      <GroupSelector
-        kanaType={kanaType}
-        studyMode={studyMode}
-        progress={progress}
-        onGroupSelect={(group) => startSession(kanaType, studyMode, group)}
-        onBack={() => setStudyMode(null)}
-      />
-    )
-  }
+          <div className="space-y-4">
+            {/* Learning Phase Selector */}
+            <div className="grid grid-cols-3 gap-2">
+              {(['learn', 'quiz', 'practice'] as LearningPhase[]).map((phase) => (
+                <button
+                  key={phase}
+                  className={`btn ${learningPhase === phase ? 'btn-primary' : 'btn-outline'} btn-sm`}
+                  onClick={() => setLearningPhase(phase)}
+                >
+                  <span className="mr-2">{phaseIcons[phase]}</span>
+                  <span className="capitalize">{phase}</span>
+                </button>
+              ))}
+            </div>
 
-  // Step 4: Study Session
-  const currentGroupData = kanaGroups[kanaType].find((g) => g.id === currentGroup)
-  if (!currentGroupData || !session) {
-    return <div>Error: Group not found</div>
-  }
+            {/* Character Set Tabs */}
+            <div className="tabs tabs-boxed">
+              <button
+                className={`tab ${characterSet === 'hiragana' ? 'tab-active' : ''}`}
+                onClick={() => setCharacterSet('hiragana')}
+              >
+                Hiragana
+              </button>
+              <button
+                className={`tab ${characterSet === 'katakana' ? 'tab-active' : ''}`}
+                onClick={() => setCharacterSet('katakana')}
+              >
+                Katakana
+              </button>
+            </div>
 
-  const renderStudyMode = (): JSX.Element => {
-    switch (studyMode) {
-      case 'learn':
-        return (
-          <LearnMode
-            characters={currentGroupData.characters}
-            session={session}
-            onUpdateSession={updateSession}
-            onUpdateProgress={updateProgress}
-            onComplete={resetToHome}
-          />
-        )
-      case 'flashcards':
-        return <FlashcardMode />
-      case 'quiz':
-        return (
-          <QuizMode
-            characters={currentGroupData.characters}
-            session={session}
-            onUpdateSession={updateSession}
-            onUpdateProgress={updateProgress}
-            onComplete={resetToHome}
-          />
-        )
-      default:
-        return <div>Mode not implemented yet</div>
-    }
-  }
+            {/* Character Group and Quiz Mode Selection */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">Character Group</span>
+                </label>
+                <select
+                  className="select select-bordered w-full"
+                  value={selectedGroup}
+                  onChange={(e) => setSelectedGroup(e.target.value)}
+                >
+                  {groups.map((group) => (
+                    <option key={group.name} value={group.name}>
+                      {group.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-  return <div className="min-h-screen p-4 pt-20">{renderStudyMode()}</div>
+              {learningPhase === 'quiz' && (
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">Quiz Mode</span>
+                  </label>
+                  <select
+                    className="select select-bordered w-full"
+                    value={studyMode}
+                    onChange={(e) => setStudyMode(e.target.value as StudyMode)}
+                  >
+                    <option value="character-to-romaji">Character → Romaji</option>
+                    <option value="romaji-to-character">Romaji → Character</option>
+                  </select>
+                </div>
+              )}
+            </div>
+
+            {/* Progress Bar */}
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <span className="text-sm">Progress</span>
+                <span className="badge badge-outline">
+                  {session.currentIndex + 1} / {session.total}
+                </span>
+              </div>
+              <progress
+                className="progress progress-primary w-full"
+                value={progressPercentage}
+                max="100"
+              ></progress>
+            </div>
+
+            {/* Main Content Area */}
+            <div className="space-y-4">
+              {/* Learn Mode */}
+              {learningPhase === 'learn' && currentCharacters[session.currentIndex] && (
+                <div className="text-center space-y-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                    <div className="space-y-3">
+                      <div className="text-6xl sm:text-7xl lg:text-5xl xl:text-6xl font-mono p-6 bg-base-200 rounded-lg">
+                        {currentCharacters[session.currentIndex].character}
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-2xl">{currentCharacters[session.currentIndex].romaji}</p>
+                        <p className="text-lg text-base-content/70">
+                          Pronounced: &quot;{currentCharacters[session.currentIndex].romaji}&quot;
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <h3 className="text-lg font-semibold">Character Information</h3>
+                      <div className="bg-base-200 p-4 rounded-lg text-left space-y-2">
+                        <div>
+                          <span className="font-semibold">Character:</span>{' '}
+                          {currentCharacters[session.currentIndex].character}
+                        </div>
+                        <div>
+                          <span className="font-semibold">Reading:</span>{' '}
+                          {currentCharacters[session.currentIndex].reading}
+                        </div>
+                        <div>
+                          <span className="font-semibold">Romaji:</span>{' '}
+                          {currentCharacters[session.currentIndex].romaji}
+                        </div>
+                        <div>
+                          <span className="font-semibold">Position:</span>{' '}
+                          {session.currentIndex + 1} of {session.total}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between items-center">
+                    <button
+                      className="btn btn-outline"
+                      onClick={prevCharacter}
+                      disabled={session.currentIndex === 0}
+                    >
+                      ← Previous
+                    </button>
+
+                    {session.currentIndex === session.total - 1 ? (
+                      <button onClick={() => setLearningPhase('quiz')} className="btn btn-primary">
+                        🧠 Start Quiz
+                      </button>
+                    ) : (
+                      <button onClick={nextCharacter} className="btn btn-primary">
+                        Next →
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Quiz Mode */}
+              {learningPhase === 'quiz' && currentCharacters[session.currentIndex] && (
+                <>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                    <div className="text-center space-y-3">
+                      <div className="space-y-2">
+                        <p className="text-sm text-base-content/70">
+                          {studyMode === 'character-to-romaji'
+                            ? 'What is the romaji for:'
+                            : 'Which character represents:'}
+                        </p>
+                        <div className="text-6xl sm:text-7xl lg:text-5xl xl:text-6xl font-mono p-6 bg-base-200 rounded-lg">
+                          {studyMode === 'character-to-romaji'
+                            ? currentCharacters[session.currentIndex].character
+                            : currentCharacters[session.currentIndex].romaji}
+                        </div>
+                      </div>
+
+                      {showResult && (
+                        <div className="flex items-center justify-center space-x-2">
+                          {isCorrect ? (
+                            <>
+                              <span className="text-success">✅</span>
+                              <span className="text-success">Correct!</span>
+                            </>
+                          ) : (
+                            <>
+                              <span className="text-error">❌</span>
+                              <span className="text-error">
+                                Incorrect. The answer is:{' '}
+                                {studyMode === 'character-to-romaji'
+                                  ? currentCharacters[session.currentIndex].romaji
+                                  : currentCharacters[session.currentIndex].character}
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="space-y-3">
+                      <h3 className="text-lg font-semibold">
+                        Question {session.currentIndex + 1} of {session.total}
+                      </h3>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {options.map((option, index) => (
+                          <button
+                            key={index}
+                            className={`btn ${
+                              showResult
+                                ? option === selectedAnswer
+                                  ? isCorrect
+                                    ? 'btn-success'
+                                    : 'btn-error'
+                                  : option ===
+                                      (studyMode === 'character-to-romaji'
+                                        ? currentCharacters[session.currentIndex].romaji
+                                        : currentCharacters[session.currentIndex].character)
+                                    ? 'btn-success'
+                                    : 'btn-outline'
+                                : 'btn-outline'
+                            } btn-md h-12`}
+                            onClick={() => handleAnswer(option)}
+                            disabled={showResult}
+                          >
+                            {option}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {showResult && (
+                    <button onClick={nextQuestion} className="btn btn-primary w-full btn-lg">
+                      {session.currentIndex + 1 >= session.total
+                        ? 'Complete Quiz'
+                        : 'Next Question'}
+                    </button>
+                  )}
+                </>
+              )}
+
+              {/* Practice Mode */}
+              {learningPhase === 'practice' && currentWords[session.currentIndex] && (
+                <>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                    <div className="text-center space-y-3">
+                      <div className="space-y-2">
+                        <p className="text-sm text-base-content/70">What does this word mean?</p>
+                        <div className="space-y-2">
+                          <div className="text-5xl sm:text-6xl lg:text-4xl xl:text-5xl font-mono p-4 bg-base-200 rounded-lg">
+                            {currentWords[session.currentIndex].word}
+                          </div>
+                          <div className="text-xl text-base-content/70">
+                            {currentWords[session.currentIndex].reading} (
+                            {currentWords[session.currentIndex].romaji})
+                          </div>
+                        </div>
+                      </div>
+
+                      {showResult && (
+                        <div className="flex items-center justify-center space-x-2">
+                          {isCorrect ? (
+                            <>
+                              <span className="text-success">✅</span>
+                              <span className="text-success">Correct!</span>
+                            </>
+                          ) : (
+                            <>
+                              <span className="text-error">❌</span>
+                              <span className="text-error">
+                                Incorrect. The answer is:{' '}
+                                {currentWords[session.currentIndex].meaning}
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="space-y-3">
+                      <h3 className="text-lg font-semibold">
+                        Word {session.currentIndex + 1} of {session.total}
+                      </h3>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {options.map((option, index) => (
+                          <button
+                            key={index}
+                            className={`btn ${
+                              showResult
+                                ? option === selectedAnswer
+                                  ? isCorrect
+                                    ? 'btn-success'
+                                    : 'btn-error'
+                                  : option === currentWords[session.currentIndex].meaning
+                                    ? 'btn-success'
+                                    : 'btn-outline'
+                                : 'btn-outline'
+                            } btn-md h-12`}
+                            onClick={() => handleAnswer(option)}
+                            disabled={showResult}
+                          >
+                            {option}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {showResult && (
+                    <button onClick={nextQuestion} className="btn btn-primary w-full btn-lg">
+                      {session.currentIndex + 1 >= session.total
+                        ? 'Complete Practice'
+                        : 'Next Word'}
+                    </button>
+                  )}
+                </>
+              )}
+
+              <div className="flex justify-center">
+                <button onClick={resetSession} className="btn btn-outline btn-sm">
+                  🔄 Reset
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }
