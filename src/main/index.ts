@@ -1,5 +1,5 @@
 import { app, BrowserWindow } from 'electron'
-import { electronApp, optimizer } from '@electron-toolkit/utils'
+import { electronApp /* , optimizer */ } from '@electron-toolkit/utils'
 import { runMigrations } from './migrations'
 import { setupDictionaryHandlers } from './dictionary'
 import { setupDatabases } from './database/setup'
@@ -48,9 +48,9 @@ app.whenReady().then(() => {
   createMenu(mainWindow)
 
   // Default open or close DevTools by F12 in development
-  app.on('browser-window-created', (_, window) => {
-    optimizer.watchWindowShortcuts(window)
-  })
+  //app.on('browser-window-created', (_, window) => {
+  //  optimizer.watchWindowShortcuts(window)
+  //})
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
