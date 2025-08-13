@@ -6,7 +6,6 @@ import KanaStudyApp from './KanaStudyApp'
 // Types for ModeSelector and KanaStudyApp
 import type { KanaType, StudyMode } from './types'
 
-
 export default function KanaStudyMain(): JSX.Element {
   const [selectedMode, setSelectedMode] = useState<StudyMode | null>(null)
   const kanaType: KanaType = 'hiragana'
