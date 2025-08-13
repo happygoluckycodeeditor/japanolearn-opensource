@@ -50,7 +50,7 @@ export function createWindow(shouldShowSetup: boolean): BrowserWindow {
 
   // For some reason the development mode is not running so when you want to run Dev Mode (F12)
   // you have to manually open the dev tools, please uncomment the following line to enable dev tools
-  mainWindow.webContents.openDevTools()
+  // mainWindow.webContents.openDevTools()
 
   return mainWindow
 }

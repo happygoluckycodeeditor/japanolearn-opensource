@@ -15,9 +15,10 @@ interface StudySession {
 
 interface KanaStudyAppProps {
   initialKanaType?: 'hiragana' | 'katakana'
+  onBack?: () => void
 }
 
-export default function KanaStudyApp({ initialKanaType }: KanaStudyAppProps): JSX.Element {
+export default function KanaStudyApp({ initialKanaType, onBack }: KanaStudyAppProps): JSX.Element {
   const [characterSet, setCharacterSet] = useState<CharacterSet>(initialKanaType || 'hiragana')
   const [selectedGroup, setSelectedGroup] = useState<string>('Basic Vowels')
   const [learningPhase, setLearningPhase] = useState<LearningPhase>('learn')
@@ -249,6 +250,15 @@ export default function KanaStudyApp({ initialKanaType }: KanaStudyAppProps): JS
       <div className="card bg-base-100 shadow-xl w-full max-w-[1100px] h-fit">
         <div className="card-body px-8 py-6">
           <h2 className="card-title text-2xl justify-center mb-4">Japanese Character Learning</h2>
+
+          {/* Back button */}
+          {onBack && (
+            <div className="flex justify-start mb-4">
+              <button onClick={onBack} className="btn btn-outline btn-sm">
+                ← Back to Mode Selection
+              </button>
+            </div>
+          )}
 
           <div className="space-y-4">
             {/* Learning Phase Selector */}
