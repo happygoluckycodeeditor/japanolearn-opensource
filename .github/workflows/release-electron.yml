@@ -28,6 +28,21 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # macOS Code Signing Setup
+      - name: Setup macOS Code Signing
+        if: runner.os == 'macOS'
+        run: |
+          echo "${{ secrets.MACOS_CERTIFICATE }}" | base64 --decode > certificate.p12
+          security create-keychain -p actions build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p actions build.keychain
+          security import certificate.p12 -k build.keychain -P "${{ secrets.MACOS_CERTIFICATE_PWD }}" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k actions build.keychain
+          rm certificate.p12
+        env:
+          MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+          MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
+
       - name: Build app
         run: npm run build
 
@@ -37,6 +52,9 @@ jobs:
           if [ "${{ runner.os }}" == "Windows" ]; then
             npm run build:win:publish
           elif [ "${{ runner.os }}" == "macOS" ]; then
+            # Set identity for code signing in CI
+            export CSC_IDENTITY_AUTO_DISCOVERY=false
+            export CSC_NAME="Developer ID Application: Tanmay Sandeep Bagwe (FG934KHYV5)"
             npm run build:mac:publish
           else
             npm run build:linux:publish
