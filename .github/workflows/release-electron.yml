@@ -54,7 +54,7 @@ jobs:
           elif [ "${{ runner.os }}" == "macOS" ]; then
             # Set identity for code signing in CI
             export CSC_IDENTITY_AUTO_DISCOVERY=false
-            export CSC_NAME="Developer ID Application: Tanmay Sandeep Bagwe (FG934KHYV5)"
+            export CSC_NAME="Tanmay Sandeep Bagwe (FG934KHYV5)"
             npm run build:mac:publish
           else
             npm run build:linux:publish
