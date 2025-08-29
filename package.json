@@ -59,7 +59,17 @@
             "universal"
           ]
         }
-      ]
+      ],
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "notarize": {
+        "teamId": "@env:APPLE_TEAM_ID",
+        "appleId": "@env:APPLE_ID",
+        "appleIdPassword": "@env:APPLE_APP_SPECIFIC_PASSWORD",
+        "appBundleId": "com.japanolearn.app"
+      }
     },
     "linux": {
       "target": [
