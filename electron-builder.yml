@@ -37,7 +37,8 @@ mac:
   notarize: {
     teamId: "FG934KHYV5",
     appleId: "tanmayappledev@gmail.com",
-    appleIdPassword: "@env:APPLE_APP_SPECIFIC_PASSWORD"
+    appleIdPassword: "@env:APPLE_APP_SPECIFIC_PASSWORD",
+    appBundleId: "com.japanolearn.app"
   }
 dmg:
   artifactName: ${name}-${version}.${ext}
