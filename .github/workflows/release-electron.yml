@@ -62,8 +62,31 @@ jobs:
         shell: bash
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+
+      # Manual notarization step for macOS
+      - name: Notarize macOS app
+        if: runner.os == 'macOS'
+        run: |
+          # Find the DMG file
+          DMG_FILE=$(find dist -name "*.dmg" | head -1)
+          echo "Found DMG file: $DMG_FILE"
+          
+          # Submit for notarization
+          echo "Submitting for notarization..."
+          xcrun notarytool submit "$DMG_FILE" \
+            --apple-id "${{ secrets.APPLE_ID }}" \
+            --password "${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}" \
+            --team-id "${{ secrets.APPLE_TEAM_ID }}" \
+            --wait
+          
+          # Staple the notarization ticket
+          echo "Stapling notarization ticket..."
+          xcrun stapler staple "$DMG_FILE"
+          
+          echo "Notarization complete!"
+        env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
 
       # Upload artifacts for manual download
