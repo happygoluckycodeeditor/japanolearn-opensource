@@ -1,6 +1,6 @@
 {
   "name": "japanolearn-opensource",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "description": "An Electron application made with React for Learning Japanese",
   "main": "./out/main/index.js",
   "author": "https://github.com/happygoluckycodeeditor",
@@ -62,8 +62,7 @@
       "entitlements": "build/entitlements.mac.plist",
       "entitlementsInherit": "build/entitlements.mac.plist",
       "notarize": {
-        "teamId": "FG934KHYV5",
-        "appBundleId": "com.japanolearn.app"
+        "teamId": "FG934KHYV5"
       },
       "target": [
         {
