@@ -55,6 +55,10 @@ jobs:
             # Set identity for code signing in CI
             export CSC_IDENTITY_AUTO_DISCOVERY=false
             export CSC_NAME="Tanmay Sandeep Bagwe (FG934KHYV5)"
+            # Set notarization credentials
+            export APPLE_ID="${{ secrets.APPLE_ID }}"
+            export APPLE_APP_SPECIFIC_PASSWORD="${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}"
+            export APPLE_TEAM_ID="FG934KHYV5"
             npm run build:mac:publish
           else
             npm run build:linux:publish
