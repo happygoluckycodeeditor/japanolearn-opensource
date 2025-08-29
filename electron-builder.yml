@@ -1,5 +1,5 @@
-appId: com.electron.app
-productName: japanolearn-opensource
+appId: com.japanolearn.app
+productName: JapanoLearn
 directories:
   buildResources: build
 files:
@@ -35,7 +35,8 @@ mac:
     - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
     - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
   notarize: {
-    teamId: "FG934KHYV5"
+    teamId: "FG934KHYV5",
+    appBundleId: "com.japanolearn.app"
   }
 dmg:
   artifactName: ${name}-${version}.${ext}
