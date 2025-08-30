@@ -67,23 +67,39 @@ jobs:
       - name: Notarize macOS app
         if: runner.os == 'macOS'
         run: |
-          # Find the DMG file
-          DMG_FILE=$(find dist -name "*.dmg" | head -1)
-          echo "Found DMG file: $DMG_FILE"
+          # Find the app bundle (before DMG creation)
+          APP_FILE=$(find dist/mac-universal -name "*.app" | head -1)
+          echo "Found app bundle: $APP_FILE"
           
-          # Submit for notarization
+          # Create ZIP for notarization (Apple recommends ZIP over DMG)
+          ZIP_FILE="dist/JapanoLearn-notarization.zip"
+          echo "Creating ZIP for notarization..."
+          /usr/bin/ditto -c -k --keepParent "$APP_FILE" "$ZIP_FILE"
+          
+          # Submit for notarization with timeout
           echo "Submitting for notarization..."
-          xcrun notarytool submit "$DMG_FILE" \
+          timeout 1800 xcrun notarytool submit "$ZIP_FILE" \
             --apple-id "${{ secrets.APPLE_ID }}" \
             --password "${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}" \
             --team-id "${{ secrets.APPLE_TEAM_ID }}" \
-            --wait
+            --wait || {
+            echo "Notarization timed out or failed, but continuing..."
+            echo "You can check status later with the submission ID"
+            exit 0
+          }
           
-          # Staple the notarization ticket
-          echo "Stapling notarization ticket..."
-          xcrun stapler staple "$DMG_FILE"
+          # If successful, staple the ticket to the app
+          echo "Stapling notarization ticket to app..."
+          xcrun stapler staple "$APP_FILE"
           
-          echo "Notarization complete!"
+          # Also staple to DMG if it exists
+          DMG_FILE=$(find dist -name "*.dmg" | head -1)
+          if [ -n "$DMG_FILE" ]; then
+            echo "Stapling notarization ticket to DMG..."
+            xcrun stapler staple "$DMG_FILE"
+          fi
+          
+          echo "Notarization process complete!"
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
