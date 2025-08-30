@@ -76,9 +76,9 @@ jobs:
           echo "Creating ZIP for notarization..."
           /usr/bin/ditto -c -k --keepParent "$APP_FILE" "$ZIP_FILE"
           
-          # Submit for notarization with timeout
+          # Submit for notarization with timeout using gtimeout (GNU timeout on macOS)
           echo "Submitting for notarization..."
-          timeout 1800 xcrun notarytool submit "$ZIP_FILE" \
+          gtimeout 1800 xcrun notarytool submit "$ZIP_FILE" \
             --apple-id "${{ secrets.APPLE_ID }}" \
             --password "${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}" \
             --team-id "${{ secrets.APPLE_TEAM_ID }}" \
