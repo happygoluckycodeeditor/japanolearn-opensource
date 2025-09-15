@@ -72,7 +72,7 @@ export const useAudio = (): UseAudioReturn => {
   const splitRomajiIntoSyllables = (romaji: string): string[] => {
     const syllables: string[] = []
     let i = 0
-    
+
     while (i < romaji.length) {
       // Handle special combinations first
       if (i < romaji.length - 2) {
@@ -83,7 +83,7 @@ export const useAudio = (): UseAudioReturn => {
           continue
         }
       }
-      
+
       // Handle two-letter combinations
       if (i < romaji.length - 1) {
         const twoLetter = romaji.slice(i, i + 2)
@@ -93,12 +93,12 @@ export const useAudio = (): UseAudioReturn => {
           continue
         }
       }
-      
+
       // Handle single letters
       syllables.push(romaji[i])
       i += 1
     }
-    
+
     return syllables
   }
 
