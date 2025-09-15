@@ -57,6 +57,7 @@ if (process.contextIsolated) {
             'update-lesson-question',
             'delete-lesson-question',
             'get-secure-image-url',
+            'get-secure-audio-url',
             // User profile channels - ADD THESE
             'get-user-profile',
             'get-user-activity',

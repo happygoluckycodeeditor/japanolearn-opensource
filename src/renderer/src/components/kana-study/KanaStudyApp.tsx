@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { hiraganaGroups, katakanaGroups, Character } from './data/japanese-characters'
 import { hiraganaWords, katakanaWords, Word } from './data/japanese-words'
+import { useAudio } from './hooks/useAudio'
 
 type LearningPhase = 'learn' | 'quiz' | 'practice'
 type StudyMode = 'character-to-romaji' | 'romaji-to-character'
@@ -35,6 +36,9 @@ export default function KanaStudyApp({ initialKanaType, onBack }: KanaStudyAppPr
   const [showResult, setShowResult] = useState<boolean>(false)
   const [isCorrect, setIsCorrect] = useState<boolean>(false)
   const [options, setOptions] = useState<string[]>([])
+
+  // Audio hook
+  const { playKanaAudio, playWordAudio, isPlaying } = useAudio()
 
   const groups = characterSet === 'hiragana' ? hiraganaGroups : katakanaGroups
   const wordGroups = characterSet === 'hiragana' ? hiraganaWords : katakanaWords
@@ -349,8 +353,25 @@ export default function KanaStudyApp({ initialKanaType, onBack }: KanaStudyAppPr
                 <div className="text-center space-y-4">
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
                     <div className="space-y-3">
-                      <div className="text-6xl sm:text-7xl lg:text-5xl xl:text-6xl font-mono p-6 bg-base-200 rounded-lg">
-                        {currentCharacters[session.currentIndex].character}
+                      <div className="relative">
+                        <div className="text-6xl sm:text-7xl lg:text-5xl xl:text-6xl font-mono p-6 bg-base-200 rounded-lg">
+                          {currentCharacters[session.currentIndex].character}
+                        </div>
+                        <button
+                          className={`btn btn-circle btn-sm absolute -top-2 -right-2 ${
+                            isPlaying ? 'btn-secondary animate-pulse' : 'btn-primary'
+                          }`}
+                          onClick={() =>
+                            playKanaAudio(
+                              currentCharacters[session.currentIndex].romaji,
+                              characterSet
+                            )
+                          }
+                          title="Play pronunciation"
+                          disabled={isPlaying}
+                        >
+                          {isPlaying ? '🔊' : '🔊'}
+                        </button>
                       </div>
                       <div className="space-y-2">
                         <p className="text-2xl">{currentCharacters[session.currentIndex].romaji}</p>
@@ -416,10 +437,27 @@ export default function KanaStudyApp({ initialKanaType, onBack }: KanaStudyAppPr
                             ? 'What is the romaji for:'
                             : 'Which character represents:'}
                         </p>
-                        <div className="text-6xl sm:text-7xl lg:text-5xl xl:text-6xl font-mono p-6 bg-base-200 rounded-lg">
-                          {studyMode === 'character-to-romaji'
-                            ? currentCharacters[session.currentIndex].character
-                            : currentCharacters[session.currentIndex].romaji}
+                        <div className="relative">
+                          <div className="text-6xl sm:text-7xl lg:text-5xl xl:text-6xl font-mono p-6 bg-base-200 rounded-lg">
+                            {studyMode === 'character-to-romaji'
+                              ? currentCharacters[session.currentIndex].character
+                              : currentCharacters[session.currentIndex].romaji}
+                          </div>
+                          <button
+                            className={`btn btn-circle btn-sm absolute -top-2 -right-2 ${
+                              isPlaying ? 'btn-secondary animate-pulse' : 'btn-primary'
+                            }`}
+                            onClick={() =>
+                              playKanaAudio(
+                                currentCharacters[session.currentIndex].romaji,
+                                characterSet
+                              )
+                            }
+                            title="Play pronunciation"
+                            disabled={isPlaying}
+                          >
+                            {isPlaying ? '🔊' : '🔊'}
+                          </button>
                         </div>
                       </div>
 
@@ -495,8 +533,25 @@ export default function KanaStudyApp({ initialKanaType, onBack }: KanaStudyAppPr
                       <div className="space-y-2">
                         <p className="text-sm text-base-content/70">What does this word mean?</p>
                         <div className="space-y-2">
-                          <div className="text-5xl sm:text-6xl lg:text-4xl xl:text-5xl font-mono p-4 bg-base-200 rounded-lg">
-                            {currentWords[session.currentIndex].word}
+                          <div className="relative">
+                            <div className="text-5xl sm:text-6xl lg:text-4xl xl:text-5xl font-mono p-4 bg-base-200 rounded-lg">
+                              {currentWords[session.currentIndex].word}
+                            </div>
+                            <button
+                              className={`btn btn-circle btn-sm absolute -top-2 -right-2 ${
+                                isPlaying ? 'btn-secondary animate-pulse' : 'btn-primary'
+                              }`}
+                              onClick={() =>
+                                playWordAudio(
+                                  currentWords[session.currentIndex].romaji,
+                                  characterSet
+                                )
+                              }
+                              title="Play word pronunciation"
+                              disabled={isPlaying}
+                            >
+                              {isPlaying ? '🔊' : '🔊'}
+                            </button>
                           </div>
                           <div className="text-xl text-base-content/70">
                             {currentWords[session.currentIndex].reading} (

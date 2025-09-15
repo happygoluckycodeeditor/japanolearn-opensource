@@ -284,4 +284,13 @@ export function setupQuestionHandlers(lessonDb: Database.Database): void {
     // For newly selected images (absolute path)
     return `app-image://${imagePath}`
   })
+
+  ipcMain.handle('get-secure-audio-url', async (_, audioPath) => {
+    if (!audioPath) return ''
+
+    // For audio files, construct path to user data directory
+    const userDataPath = app.getPath('userData')
+    const absolutePath = path.join(userDataPath, audioPath)
+    return `app-audio://${absolutePath}`
+  })
 }

@@ -9,6 +9,7 @@ export interface DatabasePaths {
   lessonDbPath: string
   dictionaryDbPath: string
   questionImagesPath: string
+  audioPath: string
 }
 
 export function getDatabasePaths(): DatabasePaths {
@@ -17,13 +18,15 @@ export function getDatabasePaths(): DatabasePaths {
   const lessonDbPath = join(userDataPath, 'japanolearn.db')
   const dictionaryDbPath = join(userDataPath, 'jmdict.sqlite')
   const questionImagesPath = join(userDataPath, 'question_images')
+  const audioPath = join(userDataPath, 'audio')
 
   return {
     userDataPath,
     userDbPath,
     lessonDbPath,
     dictionaryDbPath,
-    questionImagesPath
+    questionImagesPath,
+    audioPath
   }
 }
 
@@ -55,10 +58,16 @@ export function setupDatabases(): { userDb: Database.Database; lessonDb: Databas
     mkdirSync(paths.questionImagesPath, { recursive: true })
   }
 
+  // Create audio directory
+  if (!existsSync(paths.audioPath)) {
+    mkdirSync(paths.audioPath, { recursive: true })
+  }
+
   // Copy databases from resources if they don't exist
   const resourceLessonDbPath = join(__dirname, '../../resources/japanolearn.db')
   const resourceDictionaryDbPath = join(__dirname, '../../resources/jmdict.sqlite')
   const resourceQuestionImagesPath = join(__dirname, '../../resources/question_images')
+  const resourceAudioPath = join(__dirname, '../../resources/audio')
 
   if (!existsSync(paths.lessonDbPath) && existsSync(resourceLessonDbPath)) {
     copyFileSync(resourceLessonDbPath, paths.lessonDbPath)
@@ -77,6 +86,16 @@ export function setupDatabases(): { userDb: Database.Database; lessonDb: Databas
     if (!userImagesExist) {
       console.log('Copying question images to user data directory...')
       copyDirectoryRecursive(resourceQuestionImagesPath, paths.questionImagesPath)
+    }
+  }
+
+  // Copy audio files from resources if they don't exist in user data
+  if (existsSync(resourceAudioPath)) {
+    const userAudioExists = existsSync(paths.audioPath) && readdirSync(paths.audioPath).length > 0
+
+    if (!userAudioExists) {
+      console.log('Copying audio files to user data directory...')
+      copyDirectoryRecursive(resourceAudioPath, paths.audioPath)
     }
   }
 

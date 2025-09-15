@@ -7,4 +7,10 @@ export function setupProtocolHandlers(): void {
     const filePath = url.fileURLToPath('file://' + request.url.slice('app-image://'.length))
     callback({ path: filePath })
   })
+
+  // Register protocol handler for audio files
+  protocol.registerFileProtocol('app-audio', (request, callback) => {
+    const filePath = url.fileURLToPath('file://' + request.url.slice('app-audio://'.length))
+    callback({ path: filePath })
+  })
 }
