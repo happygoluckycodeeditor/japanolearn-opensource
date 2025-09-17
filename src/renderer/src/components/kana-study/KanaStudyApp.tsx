@@ -38,7 +38,7 @@ export default function KanaStudyApp({ initialKanaType, onBack }: KanaStudyAppPr
   const [options, setOptions] = useState<string[]>([])
 
   // Audio hook
-  const { playKanaAudio, playWordAudio, isPlaying } = useAudio()
+  const { playKanaAudio, isPlaying } = useAudio()
 
   const groups = characterSet === 'hiragana' ? hiraganaGroups : katakanaGroups
   const wordGroups = characterSet === 'hiragana' ? hiraganaWords : katakanaWords
@@ -533,25 +533,8 @@ export default function KanaStudyApp({ initialKanaType, onBack }: KanaStudyAppPr
                       <div className="space-y-2">
                         <p className="text-sm text-base-content/70">What does this word mean?</p>
                         <div className="space-y-2">
-                          <div className="relative">
-                            <div className="text-5xl sm:text-6xl lg:text-4xl xl:text-5xl font-mono p-4 bg-base-200 rounded-lg">
-                              {currentWords[session.currentIndex].word}
-                            </div>
-                            <button
-                              className={`btn btn-circle btn-sm absolute -top-2 -right-2 ${
-                                isPlaying ? 'btn-secondary animate-pulse' : 'btn-primary'
-                              }`}
-                              onClick={() =>
-                                playWordAudio(
-                                  currentWords[session.currentIndex].romaji,
-                                  characterSet
-                                )
-                              }
-                              title="Play word pronunciation"
-                              disabled={isPlaying}
-                            >
-                              {isPlaying ? '🔊' : '🔊'}
-                            </button>
+                          <div className="text-5xl sm:text-6xl lg:text-4xl xl:text-5xl font-mono p-4 bg-base-200 rounded-lg">
+                            {currentWords[session.currentIndex].word}
                           </div>
                           <div className="text-xl text-base-content/70">
                             {currentWords[session.currentIndex].reading} (
