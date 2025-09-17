@@ -19,7 +19,17 @@ export const hiraganaWords: WordGroup[] = [
       { word: 'いえ', reading: 'いえ', romaji: 'ie', meaning: 'house', characters: ['い', 'え'] },
       { word: 'うえ', reading: 'うえ', romaji: 'ue', meaning: 'above', characters: ['う', 'え'] },
       { word: 'おい', reading: 'おい', romaji: 'oi', meaning: 'nephew', characters: ['お', 'い'] },
-      { word: 'あお', reading: 'あお', romaji: 'ao', meaning: 'blue', characters: ['あ', 'お'] }
+      { word: 'あお', reading: 'あお', romaji: 'ao', meaning: 'blue', characters: ['あ', 'お'] },
+      { word: 'いう', reading: 'いう', romaji: 'iu', meaning: 'to say', characters: ['い', 'う'] },
+      { word: 'うお', reading: 'うお', romaji: 'uo', meaning: 'fish', characters: ['う', 'お'] },
+      {
+        word: 'えい',
+        reading: 'えい',
+        romaji: 'ei',
+        meaning: 'ray (fish)',
+        characters: ['え', 'い']
+      },
+      { word: 'おう', reading: 'おう', romaji: 'ou', meaning: 'king', characters: ['お', 'う'] }
     ]
   },
   {
@@ -35,7 +45,18 @@ export const hiraganaWords: WordGroup[] = [
         meaning: 'to listen',
         characters: ['き', 'く']
       },
-      { word: 'ここ', reading: 'ここ', romaji: 'koko', meaning: 'here', characters: ['こ', 'こ'] }
+      { word: 'ここ', reading: 'ここ', romaji: 'koko', meaning: 'here', characters: ['こ', 'こ'] },
+      { word: 'かけ', reading: 'かけ', romaji: 'kake', meaning: 'lack', characters: ['か', 'け'] },
+      {
+        word: 'きつ',
+        reading: 'きつ',
+        romaji: 'kitsu',
+        meaning: 'tight',
+        characters: ['き', 'つ']
+      },
+      { word: 'くう', reading: 'くう', romaji: 'kuu', meaning: 'to eat', characters: ['く', 'う'] },
+      { word: 'けき', reading: 'けき', romaji: 'keki', meaning: 'cake', characters: ['け', 'き'] },
+      { word: 'こい', reading: 'こい', romaji: 'koi', meaning: 'carp', characters: ['こ', 'い'] }
     ]
   },
   {
@@ -57,7 +78,36 @@ export const hiraganaWords: WordGroup[] = [
         characters: ['す', 'し']
       },
       { word: 'そこ', reading: 'そこ', romaji: 'soko', meaning: 'there', characters: ['そ', 'こ'] },
-      { word: 'あさ', reading: 'あさ', romaji: 'asa', meaning: 'morning', characters: ['あ', 'さ'] }
+      {
+        word: 'あさ',
+        reading: 'あさ',
+        romaji: 'asa',
+        meaning: 'morning',
+        characters: ['あ', 'さ']
+      },
+      {
+        word: 'さき',
+        reading: 'さき',
+        romaji: 'saki',
+        meaning: 'tip/point',
+        characters: ['さ', 'き']
+      },
+      { word: 'しか', reading: 'しか', romaji: 'shika', meaning: 'deer', characters: ['し', 'か'] },
+      {
+        word: 'すく',
+        reading: 'すく',
+        romaji: 'suku',
+        meaning: 'to scoop',
+        characters: ['す', 'く']
+      },
+      { word: 'せき', reading: 'せき', romaji: 'seki', meaning: 'seat', characters: ['せ', 'き'] },
+      {
+        word: 'そう',
+        reading: 'そう',
+        romaji: 'sou',
+        meaning: 'so/like that',
+        characters: ['そ', 'う']
+      }
     ]
   },
   {
@@ -79,7 +129,30 @@ export const hiraganaWords: WordGroup[] = [
       },
       { word: 'つき', reading: 'つき', romaji: 'tsuki', meaning: 'moon', characters: ['つ', 'き'] },
       { word: 'てつ', reading: 'てつ', romaji: 'tetsu', meaning: 'iron', characters: ['て', 'つ'] },
-      { word: 'とき', reading: 'とき', romaji: 'toki', meaning: 'time', characters: ['と', 'き'] }
+      { word: 'とき', reading: 'とき', romaji: 'toki', meaning: 'time', characters: ['と', 'き'] },
+      {
+        word: 'たい',
+        reading: 'たい',
+        romaji: 'tai',
+        meaning: 'sea bream',
+        characters: ['た', 'い']
+      },
+      { word: 'ちか', reading: 'ちか', romaji: 'chika', meaning: 'near', characters: ['ち', 'か'] },
+      {
+        word: 'つつ',
+        reading: 'つつ',
+        romaji: 'tsutsu',
+        meaning: 'tube',
+        characters: ['つ', 'つ']
+      },
+      { word: 'てき', reading: 'てき', romaji: 'teki', meaning: 'enemy', characters: ['て', 'き'] },
+      {
+        word: 'とる',
+        reading: 'とる',
+        romaji: 'toru',
+        meaning: 'to take',
+        characters: ['と', 'る']
+      }
     ]
   },
   {
@@ -95,7 +168,36 @@ export const hiraganaWords: WordGroup[] = [
       { word: 'にく', reading: 'にく', romaji: 'niku', meaning: 'meat', characters: ['に', 'く'] },
       { word: 'ねこ', reading: 'ねこ', romaji: 'neko', meaning: 'cat', characters: ['ね', 'こ'] },
       { word: 'のこ', reading: 'のこ', romaji: 'noko', meaning: 'saw', characters: ['の', 'こ'] },
-      { word: 'ぬの', reading: 'ぬの', romaji: 'nuno', meaning: 'cloth', characters: ['ぬ', 'の'] }
+      { word: 'ぬの', reading: 'ぬの', romaji: 'nuno', meaning: 'cloth', characters: ['ぬ', 'の'] },
+      {
+        word: 'なか',
+        reading: 'なか',
+        romaji: 'naka',
+        meaning: 'inside',
+        characters: ['な', 'か']
+      },
+      {
+        word: 'にわ',
+        reading: 'にわ',
+        romaji: 'niwa',
+        meaning: 'garden',
+        characters: ['に', 'わ']
+      },
+      { word: 'ぬま', reading: 'ぬま', romaji: 'numa', meaning: 'swamp', characters: ['ぬ', 'ま'] },
+      {
+        word: 'ねつ',
+        reading: 'ねつ',
+        romaji: 'netsu',
+        meaning: 'fever',
+        characters: ['ね', 'つ']
+      },
+      {
+        word: 'のり',
+        reading: 'のり',
+        romaji: 'nori',
+        meaning: 'seaweed',
+        characters: ['の', 'り']
+      }
     ]
   },
   {
@@ -117,7 +219,24 @@ export const hiraganaWords: WordGroup[] = [
       },
       { word: 'ふね', reading: 'ふね', romaji: 'fune', meaning: 'boat', characters: ['ふ', 'ね'] },
       { word: 'へび', reading: 'へび', romaji: 'hebi', meaning: 'snake', characters: ['へ', 'び'] },
-      { word: 'ほし', reading: 'ほし', romaji: 'hoshi', meaning: 'star', characters: ['ほ', 'し'] }
+      { word: 'ほし', reading: 'ほし', romaji: 'hoshi', meaning: 'star', characters: ['ほ', 'し'] },
+      { word: 'はこ', reading: 'はこ', romaji: 'hako', meaning: 'box', characters: ['は', 'こ'] },
+      { word: 'ひる', reading: 'ひる', romaji: 'hiru', meaning: 'noon', characters: ['ひ', 'る'] },
+      {
+        word: 'ふく',
+        reading: 'ふく',
+        romaji: 'fuku',
+        meaning: 'clothes',
+        characters: ['ふ', 'く']
+      },
+      {
+        word: 'へた',
+        reading: 'へた',
+        romaji: 'heta',
+        meaning: 'unskilled',
+        characters: ['へ', 'た']
+      },
+      { word: 'ほね', reading: 'ほね', romaji: 'hone', meaning: 'bone', characters: ['ほ', 'ね'] }
     ]
   },
   {
@@ -133,7 +252,16 @@ export const hiraganaWords: WordGroup[] = [
         characters: ['む', 'し']
       },
       { word: 'めし', reading: 'めし', romaji: 'meshi', meaning: 'meal', characters: ['め', 'し'] },
-      { word: 'もり', reading: 'もり', romaji: 'mori', meaning: 'forest', characters: ['も', 'り'] }
+      {
+        word: 'もり',
+        reading: 'もり',
+        romaji: 'mori',
+        meaning: 'forest',
+        characters: ['も', 'り']
+      },
+      { word: 'まめ', reading: 'まめ', romaji: 'mame', meaning: 'bean', characters: ['ま', 'め'] },
+      { word: 'みち', reading: 'みち', romaji: 'michi', meaning: 'road', characters: ['み', 'ち'] },
+      { word: 'むね', reading: 'むね', romaji: 'mune', meaning: 'chest', characters: ['む', 'ね'] }
     ]
   },
   {
@@ -355,6 +483,35 @@ export const katakanaWords: WordGroup[] = [
         romaji: 'oiru',
         meaning: 'oil',
         characters: ['オ', 'イ', 'ル']
+      },
+      {
+        word: 'アート',
+        reading: 'アート',
+        romaji: 'aato',
+        meaning: 'art',
+        characters: ['ア', 'ー', 'ト']
+      },
+      {
+        word: 'イエス',
+        reading: 'イエス',
+        romaji: 'iesu',
+        meaning: 'yes',
+        characters: ['イ', 'エ', 'ス']
+      },
+      {
+        word: 'ウール',
+        reading: 'ウール',
+        romaji: 'uuru',
+        meaning: 'wool',
+        characters: ['ウ', 'ー', 'ル']
+      },
+      { word: 'エコ', reading: 'エコ', romaji: 'eko', meaning: 'eco', characters: ['エ', 'コ'] },
+      {
+        word: 'オープン',
+        reading: 'オープン',
+        romaji: 'oopun',
+        meaning: 'open',
+        characters: ['オ', 'ー', 'プ', 'ン']
       }
     ]
   },
@@ -389,6 +546,41 @@ export const katakanaWords: WordGroup[] = [
         romaji: 'koohii',
         meaning: 'coffee',
         characters: ['コ', 'ー', 'ヒ', 'ー']
+      },
+      {
+        word: 'カード',
+        reading: 'カード',
+        romaji: 'kaado',
+        meaning: 'card',
+        characters: ['カ', 'ー', 'ド']
+      },
+      {
+        word: 'キッチン',
+        reading: 'キッチン',
+        romaji: 'kicchin',
+        meaning: 'kitchen',
+        characters: ['キ', 'ッ', 'チ', 'ン']
+      },
+      {
+        word: 'クール',
+        reading: 'クール',
+        romaji: 'kuuru',
+        meaning: 'cool',
+        characters: ['ク', 'ー', 'ル']
+      },
+      {
+        word: 'ケース',
+        reading: 'ケース',
+        romaji: 'keesu',
+        meaning: 'case',
+        characters: ['ケ', 'ー', 'ス']
+      },
+      {
+        word: 'コップ',
+        reading: 'コップ',
+        romaji: 'koppu',
+        meaning: 'cup',
+        characters: ['コ', 'ッ', 'プ']
       }
     ]
   },
@@ -429,6 +621,41 @@ export const katakanaWords: WordGroup[] = [
         romaji: 'soosu',
         meaning: 'sauce',
         characters: ['ソ', 'ー', 'ス']
+      },
+      {
+        word: 'サイズ',
+        reading: 'サイズ',
+        romaji: 'saizu',
+        meaning: 'size',
+        characters: ['サ', 'イ', 'ズ']
+      },
+      {
+        word: 'システム',
+        reading: 'システム',
+        romaji: 'shisutemu',
+        meaning: 'system',
+        characters: ['シ', 'ス', 'テ', 'ム']
+      },
+      {
+        word: 'スタイル',
+        reading: 'スタイル',
+        romaji: 'sutairu',
+        meaning: 'style',
+        characters: ['ス', 'タ', 'イ', 'ル']
+      },
+      {
+        word: 'セクション',
+        reading: 'セクション',
+        romaji: 'sekushon',
+        meaning: 'section',
+        characters: ['セ', 'ク', 'シ', 'ョ', 'ン']
+      },
+      {
+        word: 'ソフト',
+        reading: 'ソフト',
+        romaji: 'sofuto',
+        meaning: 'soft',
+        characters: ['ソ', 'フ', 'ト']
       }
     ]
   },
@@ -469,6 +696,41 @@ export const katakanaWords: WordGroup[] = [
         romaji: 'toppu',
         meaning: 'top',
         characters: ['ト', 'ッ', 'プ']
+      },
+      {
+        word: 'タイプ',
+        reading: 'タイプ',
+        romaji: 'taipu',
+        meaning: 'type',
+        characters: ['タ', 'イ', 'プ']
+      },
+      {
+        word: 'チケット',
+        reading: 'チケット',
+        romaji: 'chiketto',
+        meaning: 'ticket',
+        characters: ['チ', 'ケ', 'ッ', 'ト']
+      },
+      {
+        word: 'ツール',
+        reading: 'ツール',
+        romaji: 'tsuuru',
+        meaning: 'tool',
+        characters: ['ツ', 'ー', 'ル']
+      },
+      {
+        word: 'テーブル',
+        reading: 'テーブル',
+        romaji: 'teeburu',
+        meaning: 'table',
+        characters: ['テ', 'ー', 'ブ', 'ル']
+      },
+      {
+        word: 'トイレ',
+        reading: 'トイレ',
+        romaji: 'toire',
+        meaning: 'toilet',
+        characters: ['ト', 'イ', 'レ']
       }
     ]
   },
@@ -509,6 +771,34 @@ export const katakanaWords: WordGroup[] = [
         romaji: 'nooto',
         meaning: 'notebook',
         characters: ['ノ', 'ー', 'ト']
+      },
+      {
+        word: 'ナンバー',
+        reading: 'ナンバー',
+        romaji: 'nanbaa',
+        meaning: 'number',
+        characters: ['ナ', 'ン', 'バ', 'ー']
+      },
+      {
+        word: 'ニーズ',
+        reading: 'ニーズ',
+        romaji: 'niizu',
+        meaning: 'needs',
+        characters: ['ニ', 'ー', 'ズ']
+      },
+      {
+        word: 'ネーム',
+        reading: 'ネーム',
+        romaji: 'neemu',
+        meaning: 'name',
+        characters: ['ネ', 'ー', 'ム']
+      },
+      {
+        word: 'ノンストップ',
+        reading: 'ノンストップ',
+        romaji: 'nonsutoppu',
+        meaning: 'non-stop',
+        characters: ['ノ', 'ン', 'ス', 'ト', 'ッ', 'プ']
       }
     ]
   },
@@ -589,6 +879,41 @@ export const katakanaWords: WordGroup[] = [
         romaji: 'moderu',
         meaning: 'model',
         characters: ['モ', 'デ', 'ル']
+      },
+      {
+        word: 'マップ',
+        reading: 'マップ',
+        romaji: 'mappu',
+        meaning: 'map',
+        characters: ['マ', 'ッ', 'プ']
+      },
+      {
+        word: 'ミックス',
+        reading: 'ミックス',
+        romaji: 'mikkusu',
+        meaning: 'mix',
+        characters: ['ミ', 'ッ', 'ク', 'ス']
+      },
+      {
+        word: 'ムード',
+        reading: 'ムード',
+        romaji: 'muudo',
+        meaning: 'mood',
+        characters: ['ム', 'ー', 'ド']
+      },
+      {
+        word: 'メニュー',
+        reading: 'メニュー',
+        romaji: 'menyuu',
+        meaning: 'menu',
+        characters: ['メ', 'ニ', 'ュ', 'ー']
+      },
+      {
+        word: 'モード',
+        reading: 'モード',
+        romaji: 'moodo',
+        meaning: 'mode',
+        characters: ['モ', 'ー', 'ド']
       }
     ]
   },
@@ -648,6 +973,41 @@ export const katakanaWords: WordGroup[] = [
         romaji: 'robotto',
         meaning: 'robot',
         characters: ['ロ', 'ボ', 'ッ', 'ト']
+      },
+      {
+        word: 'ライト',
+        reading: 'ライト',
+        romaji: 'raito',
+        meaning: 'light',
+        characters: ['ラ', 'イ', 'ト']
+      },
+      {
+        word: 'リスト',
+        reading: 'リスト',
+        romaji: 'risuto',
+        meaning: 'list',
+        characters: ['リ', 'ス', 'ト']
+      },
+      {
+        word: 'ルーム',
+        reading: 'ルーム',
+        romaji: 'ruumu',
+        meaning: 'room',
+        characters: ['ル', 'ー', 'ム']
+      },
+      {
+        word: 'レベル',
+        reading: 'レベル',
+        romaji: 'reberu',
+        meaning: 'level',
+        characters: ['レ', 'ベ', 'ル']
+      },
+      {
+        word: 'ロック',
+        reading: 'ロック',
+        romaji: 'rokku',
+        meaning: 'rock/lock',
+        characters: ['ロ', 'ッ', 'ク']
       }
     ]
   },
