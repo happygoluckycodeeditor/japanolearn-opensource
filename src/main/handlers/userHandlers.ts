@@ -286,6 +286,55 @@ export function setupUserHandlers(userDb: Database.Database): void {
       return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
     }
   })
+
+  // Get user onboarding status
+  ipcMain.handle('get-onboarding-status', (_event, userId) => {
+    try {
+      const stmt = userDb.prepare('SELECT onboarding_completed FROM users WHERE id = ?')
+      const result = stmt.get(userId) as { onboarding_completed: number } | undefined
+      return {
+        success: true,
+        completed: result ? Boolean(result.onboarding_completed) : false
+      }
+    } catch (error) {
+      console.error('Error getting onboarding status:', error)
+      return { success: false, error: 'Failed to get onboarding status' }
+    }
+  })
+
+  // Update user onboarding status
+  ipcMain.handle('complete-onboarding', (_event, userId) => {
+    try {
+      const stmt = userDb.prepare('UPDATE users SET onboarding_completed = 1 WHERE id = ?')
+      const result = stmt.run(userId)
+
+      if (result.changes > 0) {
+        return { success: true, message: 'Onboarding completed successfully' }
+      } else {
+        return { success: false, error: 'No user found with that ID' }
+      }
+    } catch (error) {
+      console.error('Error completing onboarding:', error)
+      return { success: false, error: 'Failed to complete onboarding' }
+    }
+  })
+
+  // Reset user onboarding status (development only)
+  ipcMain.handle('reset-onboarding', (_event, userId) => {
+    try {
+      const stmt = userDb.prepare('UPDATE users SET onboarding_completed = 0 WHERE id = ?')
+      const result = stmt.run(userId)
+
+      if (result.changes > 0) {
+        return { success: true, message: 'Onboarding reset successfully' }
+      } else {
+        return { success: false, error: 'No user found with that ID' }
+      }
+    } catch (error) {
+      console.error('Error resetting onboarding:', error)
+      return { success: false, error: 'Failed to reset onboarding' }
+    }
+  })
 }
 
 // Helper functions for level calculation

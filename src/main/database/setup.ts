@@ -139,6 +139,14 @@ function setupUserTables(userDb: Database.Database): void {
     )
   `)
 
+  // Add onboarding_completed column to users if it doesn't exist
+  const usersColumns = userDb.prepare(`PRAGMA table_info(users)`).all() as {
+    name: string
+  }[]
+  if (!usersColumns.some((col) => col.name === 'onboarding_completed')) {
+    userDb.prepare('ALTER TABLE users ADD COLUMN onboarding_completed BOOLEAN DEFAULT 0').run()
+  }
+
   userDb.exec(`
     CREATE TABLE IF NOT EXISTS user_progress (
       id INTEGER PRIMARY KEY AUTOINCREMENT,

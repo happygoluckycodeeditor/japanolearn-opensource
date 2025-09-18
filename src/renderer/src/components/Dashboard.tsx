@@ -1,5 +1,6 @@
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry'
 import { useEffect, useState } from 'react'
+import Joyride, { Step, STATUS, ACTIONS, CallBackProps } from 'react-joyride'
 import img1 from '../assets/images/img1.svg'
 import img2 from '../assets/images/img2.svg'
 import img3 from '../assets/images/img3.svg'
@@ -8,6 +9,53 @@ import { useNavigate } from 'react-router-dom'
 export default function Dashboard(): JSX.Element {
   const [username, setUsername] = useState('User')
   const [userLevel, setUserLevel] = useState<number | null>(null)
+  const [showOnboarding, setShowOnboarding] = useState(false)
+  const [runTour, setRunTour] = useState(false)
+
+  // Define the onboarding tour steps
+  const tourSteps: Step[] = [
+    {
+      target: '.dashboard-greeting',
+      content:
+        'Welcome to JapanoLearn! This is your personal dashboard where you can track your progress and access all learning features.',
+      placement: 'bottom',
+      disableBeacon: true
+    },
+    {
+      target: '[data-tour="lessons"]',
+      content:
+        'Start your Japanese learning journey here! Access structured lessons covering hiragana, katakana, and basic vocabulary.',
+      placement: 'bottom',
+      disableBeacon: true
+    },
+    {
+      target: '[data-tour="kana-lesson"]',
+      content:
+        'Learn the Japanese writing systems - Hiragana and Katakana - with interactive lessons and audio pronunciation.',
+      placement: 'top',
+      disableBeacon: true
+    },
+    {
+      target: '[data-tour="dictionary"]',
+      content:
+        'Look up Japanese words and phrases in our comprehensive dictionary. Perfect for expanding your vocabulary!',
+      placement: 'top',
+      disableBeacon: true
+    },
+    {
+      target: '[data-tour="exercises"]',
+      content: 'Test your knowledge with various exercises and quizzes. Practice makes perfect!',
+      placement: 'top',
+      disableBeacon: true
+    },
+    {
+      target: '[data-tour="profile"]',
+      content:
+        "Track your learning progress, view your stats, and see how far you've come in your Japanese journey.",
+      placement: 'top',
+      disableBeacon: true
+    }
+  ]
 
   useEffect(() => {
     async function fetchUserProfile(): Promise<void> {
@@ -24,11 +72,55 @@ export default function Dashboard(): JSX.Element {
         setUserLevel(1)
       }
     }
+
+    async function checkOnboardingStatus(): Promise<void> {
+      try {
+        const userId = 1 // For now, hardcoded to match ProfilePage
+        const result = await window.electron.ipcRenderer.invoke('get-onboarding-status', userId)
+        if (result.success && !result.completed) {
+          setShowOnboarding(true)
+          setRunTour(true)
+        }
+      } catch (err) {
+        console.error('Error checking onboarding status:', err)
+      }
+    }
+
+    // Development keyboard shortcut to reset onboarding (Cmd+Shift+O on Mac, Ctrl+Shift+O on others)
+    const handleKeyPress = (event: KeyboardEvent): void => {
+      if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key === 'O') {
+        resetOnboarding()
+      }
+    }
+
     fetchUserProfile()
+    checkOnboardingStatus()
+    document.addEventListener('keydown', handleKeyPress)
+
+    return (): void => {
+      document.removeEventListener('keydown', handleKeyPress)
+    }
   }, [])
 
   // Addding navigation to the dashboard
   const navigate = useNavigate()
+
+  // Handle Joyride callback
+  const handleJoyrideCallback = async (data: CallBackProps): Promise<void> => {
+    const { status, action } = data
+
+    if (status === STATUS.FINISHED || status === STATUS.SKIPPED || action === ACTIONS.CLOSE) {
+      setRunTour(false)
+      // Mark onboarding as completed
+      try {
+        const userId = 1
+        await window.electron.ipcRenderer.invoke('complete-onboarding', userId)
+        setShowOnboarding(false)
+      } catch (err) {
+        console.error('Error completing onboarding:', err)
+      }
+    }
+  }
 
   // New function to navigate to Dashboard
 
@@ -51,17 +143,31 @@ export default function Dashboard(): JSX.Element {
     navigate('/kana-lesson')
   }
 
+  // Development-only function to reset onboarding (remove in production)
+  const resetOnboarding = async (): Promise<void> => {
+    try {
+      const userId = 1
+      await window.electron.ipcRenderer.invoke('reset-onboarding', userId)
+      setShowOnboarding(true)
+      setRunTour(true)
+    } catch (err) {
+      console.error('Error resetting onboarding:', err)
+    }
+  }
+
   return (
     <div className="w-screen max-w-full p-10 pt-20 sm:pl-10 sm:pr-10 md:pl-24 md:pr-24 bg-gray-200">
       {/*Greeting */}
-      <h1 className="text-4xl font-bold mb-4">Welcome to Japanolearn</h1>
-      <div className="flex items-center gap-4 mt-4">
-        <p className="text-lg">Hello, {username}!</p>
-        {userLevel && (
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-            Level {userLevel}
-          </span>
-        )}
+      <div className="dashboard-greeting">
+        <h1 className="text-4xl font-bold mb-4">Welcome to Japanolearn</h1>
+        <div className="flex items-center gap-4 mt-4">
+          <p className="text-lg">Hello, {username}!</p>
+          {userLevel && (
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+              Level {userLevel}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Masonry Layout */}
@@ -85,6 +191,7 @@ export default function Dashboard(): JSX.Element {
               w-full
               "
               onClick={goToAllLessons}
+              data-tour="lessons"
               style={{
                 backgroundImage: `url(${img1})`,
                 backgroundSize: 'cover',
@@ -126,6 +233,7 @@ export default function Dashboard(): JSX.Element {
               hover:shadow-2xl
               "
               onClick={goToKanaLesson}
+              data-tour="kana-lesson"
             >
               <h2 className="text-lg font-bold text-green-800">Learn Hiragana and Katakana</h2>
               <p className="mt-2 text-green-700">
@@ -154,6 +262,7 @@ export default function Dashboard(): JSX.Element {
               hover:shadow-2xl
               "
               onClick={goToDictionary}
+              data-tour="dictionary"
               style={{
                 backgroundImage: `url(${img2})`,
                 backgroundSize: 'cover',
@@ -223,6 +332,7 @@ export default function Dashboard(): JSX.Element {
               hover:shadow-2xl
               "
               onClick={goToExercises}
+              data-tour="exercises"
               style={{
                 backgroundImage: `url(${img3})`,
                 backgroundSize: 'cover',
@@ -262,6 +372,7 @@ export default function Dashboard(): JSX.Element {
               hover:shadow-2xl
               "
               onClick={goToProfile}
+              data-tour="profile"
             >
               <h2 className="text-lg font-bold text-teal-800">Profile</h2>
               <p className="mt-2 text-teal-700">Check your stats, level and progress</p>
@@ -277,6 +388,39 @@ export default function Dashboard(): JSX.Element {
           </Masonry>
         </ResponsiveMasonry>
       </div>
+
+      {/* Onboarding Tour */}
+      {showOnboarding && (
+        <Joyride
+          steps={tourSteps}
+          run={runTour}
+          continuous
+          showProgress
+          showSkipButton
+          disableOverlayClose
+          hideCloseButton
+          spotlightClicks
+          callback={handleJoyrideCallback}
+          styles={{
+            options: {
+              primaryColor: '#3b82f6',
+              backgroundColor: '#ffffff',
+              textColor: '#374151',
+              overlayColor: 'rgba(0, 0, 0, 0.4)',
+              arrowColor: '#ffffff',
+              zIndex: 1000,
+              beaconSize: 0 // This effectively hides the beacon
+            }
+          }}
+          locale={{
+            back: 'Back',
+            close: 'Close',
+            last: 'Finish Tour',
+            next: 'Next',
+            skip: 'Skip Tour'
+          }}
+        />
+      )}
     </div>
   )
 }

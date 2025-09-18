@@ -63,7 +63,11 @@ if (process.contextIsolated) {
             'get-user-activity',
             'record-lesson-completion',
             'record-exercise-attempt',
-            'get-user-lesson-progress'
+            'get-user-lesson-progress',
+            // Onboarding channels
+            'get-onboarding-status',
+            'complete-onboarding',
+            'reset-onboarding'
           ]
 
           if (validChannels.includes(channel)) {
