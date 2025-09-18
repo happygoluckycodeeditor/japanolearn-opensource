@@ -1,7 +1,7 @@
 # Onboarding Feature Documentation
 
 ## Overview
-The onboarding feature provides new users with a guided tour of the JapanoLearn application using react-joyride. The tour automatically triggers when a user first sets up the application and highlights key features of the dashboard.
+The onboarding feature provides new users with a guided tour of the JapanoLearn application using react-joyride. The tour automatically triggers when a user first sets up the application and highlights key features of the dashboard. This is a ongoing feature and will get better with more feedabck! So make sure to give your feedback!
 
 ## Implementation Details
 
