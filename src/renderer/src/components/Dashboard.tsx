@@ -307,7 +307,8 @@ export default function Dashboard(): JSX.Element {
             >
               <h2 className="text-lg font-bold text-red-800">Vocabulary Builder</h2>
               <p className="mt-2 text-red-700">
-                Expand your Japanese vocabulary with common words and phrases.
+                Expand your Japanese vocabulary with common words and phrases. This section is a
+                work in progress!
               </p>
               <div className="mt-3 text-red-600">
                 <span className="inline-block bg-red-100 rounded px-2 py-1 mr-1">こんにちは</span>
