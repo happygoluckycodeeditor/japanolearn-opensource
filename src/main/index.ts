@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, protocol } from 'electron'
 import { electronApp /* , optimizer */ } from '@electron-toolkit/utils'
 import { runMigrations } from './migrations'
 import { setupDictionaryHandlers } from './dictionary'
@@ -11,6 +11,20 @@ import { setupUpdaterHandlers, checkForUpdatesOnStartup } from './handlers/updat
 import { createMenu } from './menu/setup'
 import { createWindow } from './window/setup'
 import { setupProtocolHandlers } from './protocol/setup'
+
+// Register privileged schemes BEFORE app.ready
+protocol.registerSchemesAsPrivileged([
+  { 
+    scheme: 'app', 
+    privileges: { 
+      standard: true, 
+      secure: true, 
+      supportFetchAPI: true, 
+      corsEnabled: true, 
+      stream: true 
+    } 
+  }
+])
 
 let mainWindow: BrowserWindow
 

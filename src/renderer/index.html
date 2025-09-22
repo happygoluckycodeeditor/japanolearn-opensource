@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <title>Japanolearn</title>
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-    <!-- Secure CSP - HTTPS only -->
+    <!-- CSP for app:// protocol and YouTube embeds -->
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self' 'unsafe-eval' https://www.youtube.com https://s.ytimg.com; script-src-elem 'self' https://www.youtube.com https://s.ytimg.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: app-image: https://i.ytimg.com https://s.ytimg.com; media-src 'self' app-audio:; frame-src https://www.youtube.com https://youtube.com; connect-src 'self';"
+      content="default-src 'self' app:; script-src 'self' app:; style-src 'self' app: 'unsafe-inline' https:; img-src 'self' app: data: https:; connect-src 'self' app: https:; frame-src https://www.youtube.com https://www.youtube-nocookie.com; media-src https://*.googlevideo.com https://*.youtube.com;"
     >
     <!-- Permissions Policy for YouTube features -->
     <meta

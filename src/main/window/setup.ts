@@ -39,12 +39,10 @@ export function createWindow(shouldShowSetup: boolean): BrowserWindow {
     mainWindow.loadURL(url.toString())
   } else {
     console.log('Needs setup:', shouldShowSetup)
-    const htmlPath = join(__dirname, '../renderer/index.html')
-    mainWindow.loadFile(htmlPath, {
-      query: {
-        setup: shouldShowSetup ? 'true' : 'false'
-      }
-    })
+    // Use app:// protocol for web-like origin (fixes YouTube embeds)
+    const appUrl = new URL('app://index.html')
+    appUrl.searchParams.set('setup', shouldShowSetup ? 'true' : 'false')
+    mainWindow.loadURL(appUrl.toString())
   }
 
   // Setup quit handler
