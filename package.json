@@ -1,6 +1,6 @@
 {
   "name": "japanolearn-opensource",
-  "version": "0.0.31",
+  "version": "0.0.32",
   "description": "An Electron application made with React for Learning Japanese",
   "main": "./out/main/index.js",
   "author": "https://github.com/happygoluckycodeeditor",
