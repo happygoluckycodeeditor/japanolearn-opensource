@@ -319,11 +319,28 @@ const LessonPage: React.FC = () => {
   const getYouTubeVideoId = (url: string): string => {
     if (!url) return ''
 
-    // Handle different YouTube URL formats
+    // Handle different YouTube URL formats including youtube-nocookie.com
     const videoIdMatch = url.match(
-      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube-nocookie\.com\/embed\/)([^&\n?#]+)/
     )
     return videoIdMatch ? videoIdMatch[1] : ''
+  }
+
+  const isYouTubeNoCookieUrl = (url: string): boolean => {
+    return url.includes('youtube-nocookie.com')
+  }
+
+  const getEmbedUrl = (url: string): string => {
+    if (isYouTubeNoCookieUrl(url)) {
+      // For youtube-nocookie URLs, return the URL as-is if it's already an embed URL
+      if (url.includes('/embed/')) {
+        return url
+      }
+      // Convert regular youtube-nocookie URL to embed format
+      const videoId = getYouTubeVideoId(url)
+      return videoId ? `https://www.youtube-nocookie.com/embed/${videoId}` : url
+    }
+    return ''
   }
 
   // YouTube player event handlers
@@ -549,18 +566,33 @@ const LessonPage: React.FC = () => {
             </div>
 
             {/* YouTube Video */}
-            {lesson.video_url && videoId && (
+            {lesson.video_url && (
               <div className="bg-white rounded-lg shadow-md p-6 mb-6">
                 <h2 className="text-2xl font-semibold mb-4 text-gray-700">Video Lesson</h2>
                 <div className="aspect-video">
-                  <YouTube
-                    videoId={videoId}
-                    opts={youtubeOpts}
-                    onReady={onPlayerReady}
-                    onStateChange={onPlayerStateChange}
-                    onError={onPlayerError}
-                    className="w-full h-full"
-                  />
+                  {isYouTubeNoCookieUrl(lesson.video_url) ? (
+                    <iframe
+                      src={getEmbedUrl(lesson.video_url)}
+                      title="YouTube video player"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                      className="w-full h-full rounded-lg"
+                      onLoad={() => {
+                        // Basic tracking for iframe videos - simplified since we can't access YouTube API directly
+                        setVideoProgress(25) // Give some progress for loading the video
+                      }}
+                    />
+                  ) : videoId ? (
+                    <YouTube
+                      videoId={videoId}
+                      opts={youtubeOpts}
+                      onReady={onPlayerReady}
+                      onStateChange={onPlayerStateChange}
+                      onError={onPlayerError}
+                      className="w-full h-full"
+                    />
+                  ) : null}
                 </div>
               </div>
             )}
