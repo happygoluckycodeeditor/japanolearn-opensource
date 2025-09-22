@@ -48,9 +48,27 @@ export function createWindow(shouldShowSetup: boolean): BrowserWindow {
     app.quit()
   })
 
-  // For some reason the development mode is not running so when you want to run Dev Mode (F12)
-  // you have to manually open the dev tools, please uncomment the following line to enable dev tools
-  // mainWindow.webContents.openDevTools()
+  // Open dev tools only in development mode
+  if (is.dev) {
+    mainWindow.webContents.openDevTools()
+  }
+  
+  // Enable console in production for debugging
+  if (!is.dev) {
+    mainWindow.webContents.on('console-message', (_, level, message) => {
+      console.log(`Console [${level}]: ${message}`)
+    })
+    
+    // Add keyboard shortcut to open dev tools in production (Ctrl/Cmd+Shift+I)
+    mainWindow.webContents.on('before-input-event', (_, input) => {
+      if (input.control && input.shift && input.key.toLowerCase() === 'i' && input.type === 'keyDown') {
+        mainWindow.webContents.toggleDevTools()
+      }
+      if (input.meta && input.shift && input.key.toLowerCase() === 'i' && input.type === 'keyDown') {
+        mainWindow.webContents.toggleDevTools()
+      }
+    })
+  }
 
   return mainWindow
 }
