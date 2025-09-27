@@ -1,4 +1,5 @@
 import React from 'react'
+import AttributionSection from './AttributionSection'
 
 const Options: React.FC = () => {
   return (
@@ -50,9 +51,11 @@ const Options: React.FC = () => {
         <br />
         Thank you very much!
         <br />
-        <p>Checking for Auto Updates v0.0.10 Hopefully it works</p>
+        <p>Checking for Auto Updates v0.0.36 Hopefully it works</p>
         <br />
-        <p className="mt-4 text-sm text-gray-700 border-t border-gray-300 pt-4">
+        {/* Open Source Attributions */}
+        <AttributionSection />
+        <p className="mt-8 text-sm text-gray-700 border-t border-gray-300 pt-4">
           <strong>Disclaimer:</strong> This application is provided &quot;as is&quot; without
           warranty of any kind, express or implied. The creator of Japanolearn does not provide
           technical support for this open-source version and disclaims all liability for damages
