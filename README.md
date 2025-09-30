@@ -2,7 +2,7 @@
 
 The Open-Source Version of Japanolearn, use it, improve it and have fun!
 
-I am updating the project everyday and I am hoping that I will be able to make the alpha version of this project by the end of April 2025 with a demo ready
+I am updating the project everyday and I am hoping that I will be able to make the alpha version of this project by the end of October 2025 with a demo ready
 
 <img width="1201" alt="image" src="https://github.com/user-attachments/assets/6ec87cdb-44c5-42fd-b6e2-b4e9f40bf999" />
 
