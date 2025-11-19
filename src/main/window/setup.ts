@@ -27,6 +27,19 @@ export function createWindow(shouldShowSetup: boolean): BrowserWindow {
     return { action: 'deny' }
   })
 
+  // Set referer header for YouTube requests to fix Error 153 in production builds
+  mainWindow.webContents.session.webRequest.onBeforeSendHeaders(
+    { urls: ['*://*.youtube.com/*', '*://*.youtube-nocookie.com/*', '*://*.ytimg.com/*'] },
+    (details, callback) => {
+      const { requestHeaders } = details
+      // Add referer header if not present - using app ID as per YouTube API requirements
+      if (!requestHeaders['Referer'] && !requestHeaders['referer']) {
+        requestHeaders['Referer'] = 'https://com.japanolearn.app'
+      }
+      callback({ requestHeaders })
+    }
+  )
+
   // Load the appropriate URL/file
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     console.log('Needs setup:', shouldShowSetup)
