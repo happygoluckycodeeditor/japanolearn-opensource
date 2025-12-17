@@ -271,16 +271,16 @@ const QuestionManager: React.FC<QuestionManagerProps> = ({
               >
                 <option value="">Select correct answer</option>
                 {questionFormData.option_a && (
-                  <option value={questionFormData.option_a}>A: {questionFormData.option_a}</option>
+                  <option value="A">A: {questionFormData.option_a}</option>
                 )}
                 {questionFormData.option_b && (
-                  <option value={questionFormData.option_b}>B: {questionFormData.option_b}</option>
+                  <option value="B">B: {questionFormData.option_b}</option>
                 )}
                 {questionFormData.option_c && (
-                  <option value={questionFormData.option_c}>C: {questionFormData.option_c}</option>
+                  <option value="C">C: {questionFormData.option_c}</option>
                 )}
                 {questionFormData.option_d && (
-                  <option value={questionFormData.option_d}>D: {questionFormData.option_d}</option>
+                  <option value="D">D: {questionFormData.option_d}</option>
                 )}
               </select>
 
