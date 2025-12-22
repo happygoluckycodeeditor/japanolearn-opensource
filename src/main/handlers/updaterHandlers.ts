@@ -1,5 +1,7 @@
 import { app, dialog, BrowserWindow, ipcMain } from 'electron'
 import { autoUpdater } from 'electron-updater'
+import { join } from 'path'
+import { existsSync, copyFileSync } from 'fs'
 
 let mainWindow: BrowserWindow
 
@@ -196,6 +198,37 @@ function showDownloadProgressDialog(): void {
         .then((result) => {
           if (result.response === 0) {
             console.log('User clicked Restart Now - attempting to quit and install')
+
+            try {
+              const resourceLessonDbPath = join(__dirname, '../../resources/japanolearn.db')
+              const userLessonDbPath = join(app.getPath('userData'), 'japanolearn.db')
+
+              if (existsSync(resourceLessonDbPath)) {
+                // Backup existing lesson DB (do not touch UserData.db)
+                if (existsSync(userLessonDbPath)) {
+                  const backupPath = `${userLessonDbPath}.bak-${Date.now()}`
+                  try {
+                    copyFileSync(userLessonDbPath, backupPath)
+                    console.log(`Backed up existing lesson DB to ${backupPath}`)
+                  } catch (backupErr) {
+                    console.warn(
+                      'Failed to backup existing lesson DB, aborting overwrite:',
+                      backupErr
+                    )
+                    throw backupErr
+                  }
+                }
+
+                // Overwrite lesson DB with packaged one
+                copyFileSync(resourceLessonDbPath, userLessonDbPath)
+                console.log(`Overwrote lesson DB at ${userLessonDbPath}`)
+              } else {
+                console.warn(`Packaged lesson DB not found at ${resourceLessonDbPath}`)
+              }
+            } catch (err) {
+              console.error('Failed to copy packaged DB to userData path before install:', err)
+            }
+
             app.removeAllListeners('window-all-closed')
             setImmediate(() => {
               autoUpdater.quitAndInstall(false, true)
