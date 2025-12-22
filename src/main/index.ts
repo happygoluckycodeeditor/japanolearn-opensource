@@ -2,7 +2,7 @@ import { app, BrowserWindow } from 'electron'
 import { electronApp /* , optimizer */ } from '@electron-toolkit/utils'
 import { runMigrations } from './migrations'
 import { setupDictionaryHandlers } from './dictionary'
-import { setupDatabases } from './database/setup'
+import { setupDatabases, copyPackagedLessonDbIfNeeded } from './database/setup'
 import { setupUserHandlers, shouldShowSetup } from './handlers/userHandlers'
 import { setupLessonHandlers } from './handlers/lessonHandlers'
 import { setupExerciseHandlers } from './handlers/exerciseHandlers'
@@ -18,6 +18,10 @@ let mainWindow: BrowserWindow
 app.whenReady().then(() => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
+
+  // If this is a new app version, copy packaged lesson DB first so the
+  // subsequent `setupDatabases()` opens the intended DB file.
+  copyPackagedLessonDbIfNeeded()
 
   // Setup databases
   const { userDb, lessonDb } = setupDatabases()

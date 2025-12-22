@@ -53,22 +53,32 @@ function copyDirectoryRecursive(source: string, destination: string): void {
 export function setupDatabases(): { userDb: Database.Database; lessonDb: Database.Database } {
   const paths = getDatabasePaths()
 
-  // Create question images directory
+  // Create directories
   if (!existsSync(paths.questionImagesPath)) {
     mkdirSync(paths.questionImagesPath, { recursive: true })
   }
-
-  // Create audio directory
   if (!existsSync(paths.audioPath)) {
     mkdirSync(paths.audioPath, { recursive: true })
   }
 
-  // Copy databases from resources if they don't exist
-  const resourceLessonDbPath = join(__dirname, '../../resources/japanolearn.db')
-  const resourceDictionaryDbPath = join(__dirname, '../../resources/jmdict.sqlite')
-  const resourceQuestionImagesPath = join(__dirname, '../../resources/question_images')
-  const resourceAudioPath = join(__dirname, '../../resources/audio')
+  // Define resource paths based on whether app is packaged
+  const resourceLessonDbPath = app.isPackaged
+    ? join(process.resourcesPath, 'app.asar.unpacked', 'resources', 'japanolearn.db')
+    : join(__dirname, '../../resources/japanolearn.db')
 
+  const resourceDictionaryDbPath = app.isPackaged
+    ? join(process.resourcesPath, 'app.asar.unpacked', 'resources', 'jmdict.sqlite')
+    : join(__dirname, '../../resources/jmdict.sqlite')
+
+  const resourceQuestionImagesPath = app.isPackaged
+    ? join(process.resourcesPath, 'app.asar.unpacked', 'resources', 'question_images')
+    : join(__dirname, '../../resources/question_images')
+
+  const resourceAudioPath = app.isPackaged
+    ? join(process.resourcesPath, 'app.asar.unpacked', 'resources', 'audio')
+    : join(__dirname, '../../resources/audio')
+
+  // Copy databases from resources if they don't exist
   if (!existsSync(paths.lessonDbPath) && existsSync(resourceLessonDbPath)) {
     copyFileSync(resourceLessonDbPath, paths.lessonDbPath)
   }
@@ -78,44 +88,34 @@ export function setupDatabases(): { userDb: Database.Database; lessonDb: Databas
     copyFileSync(resourceDictionaryDbPath, paths.dictionaryDbPath)
   }
 
-  // Copy question images from resources if they don't exist in user data
+  // Copy question images
   if (existsSync(resourceQuestionImagesPath)) {
     const userImagesExist =
       existsSync(paths.questionImagesPath) && readdirSync(paths.questionImagesPath).length > 0
-
     if (!userImagesExist) {
       console.log('Copying question images to user data directory...')
       copyDirectoryRecursive(resourceQuestionImagesPath, paths.questionImagesPath)
     }
   }
 
-  // Copy audio files from resources if they don't exist in user data
+  // Copy audio files
   if (existsSync(resourceAudioPath)) {
     const userAudioExists = existsSync(paths.audioPath) && readdirSync(paths.audioPath).length > 0
-
     if (!userAudioExists) {
       console.log('Copying audio files to user data directory...')
       copyDirectoryRecursive(resourceAudioPath, paths.audioPath)
     }
   }
 
-  // Initialize databases
+  // Rest of the function stays the same...
   const userDb = new Database(paths.userDbPath)
   const lessonDb = new Database(paths.lessonDbPath)
 
-  // Log database information
   console.log('User database path:', paths.userDbPath)
   console.log('Lesson database path:', paths.lessonDbPath)
   console.log('Resource lesson database path:', resourceLessonDbPath)
   console.log('Lesson database exists:', existsSync(paths.lessonDbPath))
-  console.log('Dictionary database path:', paths.dictionaryDbPath)
-  console.log('Resource dictionary database path:', resourceDictionaryDbPath)
-  console.log('Dictionary database exists:', existsSync(paths.dictionaryDbPath))
-  console.log('Question images path:', paths.questionImagesPath)
-  console.log('Resource question images path:', resourceQuestionImagesPath)
-  console.log('Question images exist:', existsSync(paths.questionImagesPath))
 
-  // Log lesson database tables
   const tables = lessonDb.prepare("SELECT name FROM sqlite_master WHERE type='table'").all() as {
     name: string
   }[]
@@ -124,10 +124,78 @@ export function setupDatabases(): { userDb: Database.Database; lessonDb: Databas
     tables.map((t) => t.name)
   )
 
-  // Setup user database tables
   setupUserTables(userDb)
-
   return { userDb, lessonDb }
+}
+
+export function copyPackagedLessonDbIfNeeded(): void {
+  try {
+    // In production builds, resources are unpacked to app.asar.unpacked/resources
+    const resourceLessonDbPath = app.isPackaged
+      ? join(process.resourcesPath, 'app.asar.unpacked', 'resources', 'japanolearn.db')
+      : join(__dirname, '../../resources/japanolearn.db')
+
+    const userLessonDbPath = join(app.getPath('userData'), 'japanolearn.db')
+    const versionFilePath = join(app.getPath('userData'), 'db-version.txt')
+
+    console.log('Checking for packaged lesson DB at:', resourceLessonDbPath)
+    console.log('App version:', app.getVersion())
+    console.log('App is packaged:', app.isPackaged)
+
+    if (!existsSync(resourceLessonDbPath)) {
+      console.log('No packaged lesson DB found at', resourceLessonDbPath)
+      return
+    }
+
+    const currentAppVersion = app.getVersion()
+    let lastDbVersion = ''
+
+    try {
+      if (existsSync(versionFilePath)) {
+        lastDbVersion = require('fs').readFileSync(versionFilePath, 'utf8').trim()
+      }
+    } catch (e) {
+      console.warn('Failed to read DB version file:', e)
+      lastDbVersion = ''
+    }
+
+    console.log('Last DB version:', lastDbVersion)
+    console.log('Current app version:', currentAppVersion)
+
+    if (lastDbVersion !== currentAppVersion) {
+      console.log(`Updating lesson DB from version ${lastDbVersion} to ${currentAppVersion}`)
+
+      if (existsSync(userLessonDbPath)) {
+        const backupPath = `${userLessonDbPath}.bak-${Date.now()}`
+        try {
+          copyFileSync(userLessonDbPath, backupPath)
+          console.log(`✅ Backed up existing lesson DB to ${backupPath}`)
+        } catch (backupErr) {
+          console.warn('Failed to backup existing lesson DB, aborting overwrite:', backupErr)
+          return
+        }
+      }
+
+      try {
+        copyFileSync(resourceLessonDbPath, userLessonDbPath)
+        console.log(`✅ Copied packaged lesson DB to ${userLessonDbPath}`)
+      } catch (copyErr) {
+        console.error('❌ Failed to copy packaged lesson DB:', copyErr)
+        return
+      }
+
+      try {
+        require('fs').writeFileSync(versionFilePath, currentAppVersion, 'utf8')
+        console.log('✅ Wrote DB version file:', versionFilePath)
+      } catch (writeErr) {
+        console.warn('Failed to write DB version file:', writeErr)
+      }
+    } else {
+      console.log('✅ Lesson DB is already up to date for version', currentAppVersion)
+    }
+  } catch (err) {
+    console.error('❌ Error while checking/copying packaged lesson DB:', err)
+  }
 }
 
 function setupUserTables(userDb: Database.Database): void {
