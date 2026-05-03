@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { JSX } from 'react'
 
 interface DictionaryEntryProps {
   id: number
@@ -7,7 +7,6 @@ interface DictionaryEntryProps {
   meanings: string
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const DictionaryEntry: React.FC<DictionaryEntryProps> = ({ kanji, readings, meanings }) => {
   // Format meanings for display
   const formatMeanings = (meanings: string): JSX.Element[] => {

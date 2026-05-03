@@ -46,7 +46,7 @@ const ProfileSettings: React.FC = () => {
       } else {
         setMessage({ text: result.error || 'Failed to update username', type: 'error' })
       }
-    } catch (error) {
+    } catch (_error) {
       setMessage({ text: 'An error occurred while updating username', type: 'error' })
     }
   }

@@ -174,7 +174,7 @@ const LessonPage: React.FC = () => {
         if (result.success && result.users && result.users.length > 0) {
           setUser({ id: result.users[0].id, username: result.users[0].username })
         }
-      } catch (err) {
+      } catch (_err) {
         // Optionally handle error
       }
     }
@@ -278,8 +278,8 @@ const LessonPage: React.FC = () => {
         imageUrlMap[questionId] = url
       })
       setImageUrls(imageUrlMap)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
+    } catch (_err) {
+      setError(_err instanceof Error ? _err.message : 'An error occurred')
     } finally {
       setLoading(false)
     }

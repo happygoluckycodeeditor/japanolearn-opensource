@@ -25,7 +25,7 @@ export function setupLessonHandlers(lessonDb: Database.Database): void {
       try {
         const stmt = lessonDb.prepare('SELECT * FROM lessons ORDER BY id ASC')
         lessons = stmt.all()
-      } catch (e) {
+      } catch (_e) {
         console.log('No "lessons" table found, trying alternatives...')
 
         // Try with other possible table names
@@ -46,7 +46,7 @@ export function setupLessonHandlers(lessonDb: Database.Database): void {
       }
 
       return { success: true, lessons }
-    } catch (error) {
+    } catch (_error) {
       console.error('Error fetching lessons:', error)
       if (error instanceof Error) {
         return { success: false, error: error.message }
@@ -81,7 +81,7 @@ export function setupLessonHandlers(lessonDb: Database.Database): void {
         .get(result.lastInsertRowid)
 
       return { success: true, lesson: newLesson }
-    } catch (error) {
+    } catch (_error) {
       console.error('Error adding lesson:', error)
       if (error instanceof Error) {
         return { success: false, error: error.message }
@@ -119,7 +119,7 @@ export function setupLessonHandlers(lessonDb: Database.Database): void {
         .get(lessonData.id)
 
       return { success: true, lesson: updatedLesson }
-    } catch (error) {
+    } catch (_error) {
       console.error('Error updating lesson:', error)
       if (error instanceof Error) {
         return { success: false, error: error.message }
@@ -159,12 +159,12 @@ export function setupLessonHandlers(lessonDb: Database.Database): void {
         lessonDb.prepare('COMMIT').run()
 
         return { success: true }
-      } catch (error) {
+      } catch (_error) {
         // Rollback on error
         lessonDb.prepare('ROLLBACK').run()
         throw error
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Error deleting lesson:', error)
       if (error instanceof Error) {
         return { success: false, error: error.message }

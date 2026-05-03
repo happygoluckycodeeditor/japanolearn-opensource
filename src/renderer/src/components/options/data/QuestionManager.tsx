@@ -70,7 +70,7 @@ const QuestionManager: React.FC<QuestionManagerProps> = ({
         } else {
           setDbMessage({ text: result.error || 'Failed to delete question', type: 'error' })
         }
-      } catch (error) {
+      } catch (_error) {
         setDbMessage({ text: 'An error occurred while deleting the question', type: 'error' })
       }
     }
@@ -114,7 +114,7 @@ const QuestionManager: React.FC<QuestionManagerProps> = ({
       } else {
         setDbMessage({ text: result.error || 'Failed to save question', type: 'error' })
       }
-    } catch (error) {
+    } catch (_error) {
       setDbMessage({ text: 'An error occurred while saving the question', type: 'error' })
     }
   }

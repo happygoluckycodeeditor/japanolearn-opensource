@@ -16,7 +16,7 @@ const AllLessons: React.FC = () => {
         } else {
           setError(result.error || 'Failed to fetch lessons')
         }
-      } catch (error) {
+      } catch (_error) {
         setError('An error occurred while fetching lessons')
       } finally {
         setLoading(false)

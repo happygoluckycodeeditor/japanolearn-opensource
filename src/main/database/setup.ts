@@ -1,6 +1,14 @@
 import { app } from 'electron'
 import { join } from 'path'
-import { existsSync, copyFileSync, mkdirSync, readdirSync, statSync } from 'fs'
+import {
+  existsSync,
+  copyFileSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  writeFileSync,
+  statSync
+} from 'fs'
 import Database from 'better-sqlite3'
 
 export interface DatabasePaths {
@@ -152,10 +160,10 @@ export function copyPackagedLessonDbIfNeeded(): void {
 
     try {
       if (existsSync(versionFilePath)) {
-        lastDbVersion = require('fs').readFileSync(versionFilePath, 'utf8').trim()
+        lastDbVersion = readFileSync(versionFilePath, 'utf8').trim()
       }
-    } catch (e) {
-      console.warn('Failed to read DB version file:', e)
+    } catch (_e) {
+      console.warn('Failed to read DB version file:', _e)
       lastDbVersion = ''
     }
 
@@ -185,7 +193,7 @@ export function copyPackagedLessonDbIfNeeded(): void {
       }
 
       try {
-        require('fs').writeFileSync(versionFilePath, currentAppVersion, 'utf8')
+        writeFileSync(versionFilePath, currentAppVersion, 'utf8')
         console.log('✅ Wrote DB version file:', versionFilePath)
       } catch (writeErr) {
         console.warn('Failed to write DB version file:', writeErr)
@@ -193,8 +201,8 @@ export function copyPackagedLessonDbIfNeeded(): void {
     } else {
       console.log('✅ Lesson DB is already up to date for version', currentAppVersion)
     }
-  } catch (err) {
-    console.error('❌ Error while checking/copying packaged lesson DB:', err)
+  } catch (_err) {
+    console.error('❌ Error while checking/copying packaged lesson DB:', _err)
   }
 }
 

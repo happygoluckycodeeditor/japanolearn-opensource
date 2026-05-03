@@ -121,7 +121,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
       } else {
         setDbMessage({ text: result.error || 'Failed to save lesson', type: 'error' })
       }
-    } catch (error) {
+    } catch (_error) {
       setDbMessage({ text: 'An error occurred while saving the lesson', type: 'error' })
     }
   }
@@ -142,7 +142,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
         } else {
           setDbMessage({ text: result.error || 'Failed to delete lesson', type: 'error' })
         }
-      } catch (error) {
+      } catch (_error) {
         setDbMessage({ text: 'An error occurred while deleting the lesson', type: 'error' })
       }
     }
