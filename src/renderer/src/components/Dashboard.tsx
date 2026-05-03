@@ -1,5 +1,5 @@
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry'
-import { useEffect, useState } from 'react'
+import { JSX, useEffect, useState } from 'react'
 import { Joyride, Step, STATUS, ACTIONS, EventData } from 'react-joyride'
 import img1 from '../assets/images/img1.svg'
 import img2 from '../assets/images/img2.svg'
