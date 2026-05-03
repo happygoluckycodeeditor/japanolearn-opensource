@@ -89,7 +89,7 @@ const ExerciseEditor: React.FC<ExerciseEditorProps> = ({
       } else {
         setDbMessage({ text: result.error || 'Failed to save exercise', type: 'error' })
       }
-    } catch (error) {
+    } catch (_error) {
       setDbMessage({ text: 'An error occurred while saving the exercise', type: 'error' })
     }
   }

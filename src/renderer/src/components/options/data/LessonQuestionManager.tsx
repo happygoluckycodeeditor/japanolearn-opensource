@@ -58,7 +58,7 @@ const LessonQuestionManager: React.FC<LessonQuestionManagerProps> = ({
             setProgress(null)
           }
         }
-      } catch (err) {
+      } catch (_err) {
         setProgress(null)
       }
     }
@@ -104,7 +104,7 @@ const LessonQuestionManager: React.FC<LessonQuestionManagerProps> = ({
         } else {
           setDbMessage({ text: result.error || 'Failed to delete question', type: 'error' })
         }
-      } catch (error) {
+      } catch (_error) {
         setDbMessage({ text: 'An error occurred while deleting the question', type: 'error' })
       }
     }
@@ -148,7 +148,7 @@ const LessonQuestionManager: React.FC<LessonQuestionManagerProps> = ({
       } else {
         setDbMessage({ text: result.error || 'Failed to save question', type: 'error' })
       }
-    } catch (error) {
+    } catch (_error) {
       setDbMessage({ text: 'An error occurred while saving the question', type: 'error' })
     }
   }

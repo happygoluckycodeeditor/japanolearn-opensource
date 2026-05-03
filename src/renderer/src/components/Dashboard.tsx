@@ -66,7 +66,7 @@ export default function Dashboard(): JSX.Element {
           setUsername(result.profile.username)
           setUserLevel(result.profile.level || 1)
         }
-      } catch (err) {
+      } catch (_err) {
         // Optionally handle error
         setUsername('User')
         setUserLevel(1)
@@ -81,8 +81,8 @@ export default function Dashboard(): JSX.Element {
           setShowOnboarding(true)
           setRunTour(true)
         }
-      } catch (err) {
-        console.error('Error checking onboarding status:', err)
+      } catch (_err) {
+        console.error('Error checking onboarding status:', _err)
       }
     }
 
@@ -116,8 +116,8 @@ export default function Dashboard(): JSX.Element {
         const userId = 1
         await window.electron.ipcRenderer.invoke('complete-onboarding', userId)
         setShowOnboarding(false)
-      } catch (err) {
-        console.error('Error completing onboarding:', err)
+      } catch (_err) {
+        console.error('Error completing onboarding:', _err)
       }
     }
   }
@@ -150,8 +150,8 @@ export default function Dashboard(): JSX.Element {
       await window.electron.ipcRenderer.invoke('reset-onboarding', userId)
       setShowOnboarding(true)
       setRunTour(true)
-    } catch (err) {
-      console.error('Error resetting onboarding:', err)
+    } catch (_err) {
+      console.error('Error resetting onboarding:', _err)
     }
   }
 

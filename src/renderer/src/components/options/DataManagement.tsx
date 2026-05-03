@@ -37,7 +37,7 @@ const DataManagement: React.FC = () => {
       } else {
         setDbMessage({ text: result.error || 'Failed to fetch lessons', type: 'error' })
       }
-    } catch (error) {
+    } catch (_error) {
       setDbMessage({ text: 'An error occurred while fetching lessons', type: 'error' })
     }
   }
@@ -51,7 +51,7 @@ const DataManagement: React.FC = () => {
       } else {
         setDbMessage({ text: result.error || 'Failed to fetch lesson questions', type: 'error' })
       }
-    } catch (error) {
+    } catch (_error) {
       setDbMessage({ text: 'An error occurred while fetching lesson questions', type: 'error' })
     }
   }
@@ -65,7 +65,7 @@ const DataManagement: React.FC = () => {
       } else {
         setDbMessage({ text: result.error || 'Failed to fetch exercises', type: 'error' })
       }
-    } catch (error) {
+    } catch (_error) {
       setDbMessage({ text: 'An error occurred while fetching exercises', type: 'error' })
     }
   }
@@ -79,7 +79,7 @@ const DataManagement: React.FC = () => {
       } else {
         setDbMessage({ text: result.error || 'Failed to fetch exercise questions', type: 'error' })
       }
-    } catch (error) {
+    } catch (_error) {
       setDbMessage({ text: 'An error occurred while fetching exercise questions', type: 'error' })
     }
   }
@@ -97,7 +97,7 @@ const DataManagement: React.FC = () => {
           fetchExerciseQuestions(exerciseId)
         }
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Error refetching selected exercise:', error)
     }
   }
@@ -150,7 +150,7 @@ const DataManagement: React.FC = () => {
         } else {
           setDbMessage({ text: result.error || 'Failed to delete exercise', type: 'error' })
         }
-      } catch (error) {
+      } catch (_error) {
         setDbMessage({ text: 'An error occurred while deleting the exercise', type: 'error' })
       }
     }
