@@ -1,5 +1,11 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, protocol } from 'electron'
 import { electronApp /* , optimizer */ } from '@electron-toolkit/utils'
+
+// Register custom schemes as privileged before app is ready
+protocol.registerSchemesAsPrivileged([
+  { scheme: 'app-image', privileges: { secure: true, supportFetchAPI: true, corsEnabled: true } },
+  { scheme: 'app-audio', privileges: { secure: true, supportFetchAPI: true, corsEnabled: true } }
+])
 import { runMigrations } from './migrations'
 import { setupDictionaryHandlers } from './dictionary'
 import { setupDatabases, copyPackagedLessonDbIfNeeded } from './database/setup'
