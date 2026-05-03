@@ -1,6 +1,6 @@
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry'
-import { useEffect, useState } from 'react'
-import Joyride, { Step, STATUS, ACTIONS, CallBackProps } from 'react-joyride'
+import { JSX, useEffect, useState } from 'react'
+import { Joyride, Step, STATUS, ACTIONS, EventData } from 'react-joyride'
 import img1 from '../assets/images/img1.svg'
 import img2 from '../assets/images/img2.svg'
 import img3 from '../assets/images/img3.svg'
@@ -19,41 +19,41 @@ export default function Dashboard(): JSX.Element {
       content:
         'Welcome to JapanoLearn! This is your personal dashboard where you can track your progress and access all learning features.',
       placement: 'bottom',
-      disableBeacon: true
+      skipBeacon: true
     },
     {
       target: '[data-tour="lessons"]',
       content:
         'Start your Japanese learning journey here! Access structured lessons covering hiragana, katakana, and basic vocabulary.',
       placement: 'bottom',
-      disableBeacon: true
+      skipBeacon: true
     },
     {
       target: '[data-tour="kana-lesson"]',
       content:
         'Learn the Japanese writing systems - Hiragana and Katakana - with interactive lessons and audio pronunciation.',
       placement: 'top',
-      disableBeacon: true
+      skipBeacon: true
     },
     {
       target: '[data-tour="dictionary"]',
       content:
         'Look up Japanese words and phrases in our comprehensive dictionary. Perfect for expanding your vocabulary!',
       placement: 'top',
-      disableBeacon: true
+      skipBeacon: true
     },
     {
       target: '[data-tour="exercises"]',
       content: 'Test your knowledge with various exercises and quizzes. Practice makes perfect!',
       placement: 'top',
-      disableBeacon: true
+      skipBeacon: true
     },
     {
       target: '[data-tour="profile"]',
       content:
         "Track your learning progress, view your stats, and see how far you've come in your Japanese journey.",
       placement: 'top',
-      disableBeacon: true
+      skipBeacon: true
     }
   ]
 
@@ -106,7 +106,7 @@ export default function Dashboard(): JSX.Element {
   const navigate = useNavigate()
 
   // Handle Joyride callback
-  const handleJoyrideCallback = async (data: CallBackProps): Promise<void> => {
+  const handleJoyrideCallback = async (data: EventData): Promise<void> => {
     const { status, action } = data
 
     if (status === STATUS.FINISHED || status === STATUS.SKIPPED || action === ACTIONS.CLOSE) {
@@ -396,22 +396,18 @@ export default function Dashboard(): JSX.Element {
           steps={tourSteps}
           run={runTour}
           continuous
-          showProgress
-          showSkipButton
-          disableOverlayClose
-          hideCloseButton
-          spotlightClicks
-          callback={handleJoyrideCallback}
-          styles={{
-            options: {
-              primaryColor: '#3b82f6',
-              backgroundColor: '#ffffff',
-              textColor: '#374151',
-              overlayColor: 'rgba(0, 0, 0, 0.4)',
-              arrowColor: '#ffffff',
-              zIndex: 1000,
-              beaconSize: 0 // This effectively hides the beacon
-            }
+          onEvent={handleJoyrideCallback}
+          options={{
+            showProgress: true,
+            buttons: ['back', 'primary', 'skip'],
+            overlayClickAction: false,
+            primaryColor: '#3b82f6',
+            backgroundColor: '#ffffff',
+            textColor: '#374151',
+            overlayColor: 'rgba(0, 0, 0, 0.4)',
+            arrowColor: '#ffffff',
+            zIndex: 1000,
+            beaconSize: 0
           }}
           locale={{
             back: 'Back',

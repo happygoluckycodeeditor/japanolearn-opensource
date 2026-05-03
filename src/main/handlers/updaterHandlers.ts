@@ -76,8 +76,7 @@ function showDownloadProgressDialog(): void {
     parent: mainWindow,
     modal: true,
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false
+      sandbox: true
     }
   })
 

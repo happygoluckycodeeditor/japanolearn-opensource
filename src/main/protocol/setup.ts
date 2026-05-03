@@ -1,16 +1,16 @@
-import { protocol } from 'electron'
-import url from 'url'
+import { protocol, net } from 'electron'
+import { pathToFileURL } from 'url'
 
 export function setupProtocolHandlers(): void {
   // Register protocol handler for images
-  protocol.registerFileProtocol('app-image', (request, callback) => {
-    const filePath = url.fileURLToPath('file://' + request.url.slice('app-image://'.length))
-    callback({ path: filePath })
+  protocol.handle('app-image', (request) => {
+    const filePath = decodeURIComponent(request.url.slice('app-image://'.length))
+    return net.fetch(pathToFileURL(filePath).toString())
   })
 
   // Register protocol handler for audio files
-  protocol.registerFileProtocol('app-audio', (request, callback) => {
-    const filePath = url.fileURLToPath('file://' + request.url.slice('app-audio://'.length))
-    callback({ path: filePath })
+  protocol.handle('app-audio', (request) => {
+    const filePath = decodeURIComponent(request.url.slice('app-audio://'.length))
+    return net.fetch(pathToFileURL(filePath).toString())
   })
 }

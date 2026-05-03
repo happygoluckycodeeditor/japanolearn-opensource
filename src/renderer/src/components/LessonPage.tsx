@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import DOMPurify from 'dompurify'
 import YouTube, { YouTubeProps } from 'react-youtube'
 import Confetti from 'react-confetti'
 import LessonProgressDrawer from './LessonProgressDrawer'
@@ -603,7 +604,7 @@ const LessonPage: React.FC = () => {
                 <h2 className="text-2xl font-semibold mb-4 text-gray-700">Explanation</h2>
                 <div
                   className="text-gray-600 leading-relaxed"
-                  dangerouslySetInnerHTML={{ __html: lesson.explanation }}
+                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(lesson.explanation) }}
                 />
               </div>
             )}
