@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import DOMPurify from 'dompurify'
 import ReactQuill from 'react-quill-new'
 import 'react-quill-new/dist/quill.snow.css'
 import { Lesson, LessonQuestion, Exercise } from '../../../types/database'
@@ -241,9 +242,10 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
             <div
               className="min-h-[100px] p-4 border border-gray-300 rounded-lg bg-gray-50"
               dangerouslySetInnerHTML={{
-                __html:
+                __html: DOMPurify.sanitize(
                   formData.explanation ||
-                  '<p class="text-gray-500 italic">No explanation provided</p>'
+                    '<p class="text-gray-500 italic">No explanation provided</p>'
+                )
               }}
             />
           </div>
